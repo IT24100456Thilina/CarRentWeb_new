@@ -39,7 +39,7 @@ public class BookingController extends HttpServlet {
                 Date endDate = Date.valueOf(drop);
 
                 if (!startDate.before(endDate)) {
-                    response.sendRedirect("home.jsp?errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
+                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
                     return;
                 }
 
@@ -55,9 +55,26 @@ public class BookingController extends HttpServlet {
                 if (rows > 0) {
                     ResultSet rs = ps.getGeneratedKeys();
                     if (rs.next()) booking.setBookingId(rs.getInt(1));
-                    response.sendRedirect("home.jsp?booked=1");
+
+                    // Calculate total cost
+                    String priceSql = "SELECT dailyPrice FROM Vehicles WHERE vehicleId = ?";
+                    PreparedStatement pricePs = conn.prepareStatement(priceSql);
+                    pricePs.setInt(1, vehicleId);
+                    ResultSet priceRs = pricePs.executeQuery();
+                    double dailyPrice = 0;
+                    if (priceRs.next()) {
+                        dailyPrice = priceRs.getDouble("dailyPrice");
+                    }
+
+                    // Calculate number of days
+                    long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+                    long diff = java.util.concurrent.TimeUnit.DAYS.convert(diffInMillies, java.util.concurrent.TimeUnit.MILLISECONDS) + 1; // +1 to include both start and end dates
+                    double totalCost = diff * dailyPrice;
+
+                    // Redirect to payment page
+                    response.sendRedirect("customer-payment.jsp?bookingId=" + booking.getBookingId() + "&amount=" + String.format("%.2f", totalCost));
                 } else {
-                    response.sendRedirect("home.jsp?errorMsg=" + java.net.URLEncoder.encode("Booking failed", java.nio.charset.StandardCharsets.UTF_8));
+                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Booking failed", java.nio.charset.StandardCharsets.UTF_8));
                 }
             } else if ("updateStatus".equalsIgnoreCase(action)) {
                 int bookingId = Integer.parseInt(request.getParameter("bookingId"));
@@ -67,11 +84,71 @@ public class BookingController extends HttpServlet {
                 ps.setString(1, status);
                 ps.setInt(2, bookingId);
                 ps.executeUpdate();
-                response.sendRedirect("admin.jsp?updated=1");
+                response.sendRedirect("admin-crud.jsp?bookingUpdated=1");
+            } else if ("update".equalsIgnoreCase(action)) {
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+                String pickup = request.getParameter("pickupDate") != null ? request.getParameter("pickupDate") : request.getParameter("startDate");
+                String drop = request.getParameter("returnDate") != null ? request.getParameter("returnDate") : request.getParameter("endDate");
+                Date startDate = Date.valueOf(pickup);
+                Date endDate = Date.valueOf(drop);
+                String status = request.getParameter("status");
+
+                if (!startDate.before(endDate)) {
+                    response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+
+                String sql = "UPDATE Bookings SET userId=?, vehicleId=?, startDate=?, endDate=?, status=? WHERE bookingId=?";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setInt(1, userId);
+                ps.setInt(2, vehicleId);
+                ps.setDate(3, startDate);
+                ps.setDate(4, endDate);
+                ps.setString(5, status);
+                ps.setInt(6, bookingId);
+                ps.executeUpdate();
+                response.sendRedirect("AdminServlet?bookingUpdated=1");
+            } else if ("delete".equalsIgnoreCase(action)) {
+                String idsParam = request.getParameter("ids");
+                String[] idArray;
+                if (idsParam != null && !idsParam.trim().isEmpty()) {
+                    // Bulk delete
+                    idArray = idsParam.split(",");
+                } else {
+                    // Single delete
+                    idArray = new String[]{request.getParameter("bookingId")};
+                }
+
+                // For each booking, delete related payments and feedbacks first
+                for (String idStr : idArray) {
+                    int bookingId = Integer.parseInt(idStr.trim());
+
+                    // Delete related payments
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Payments WHERE bookingId=?")) {
+                        ps.setInt(1, bookingId);
+                        ps.executeUpdate();
+                    } catch (Exception ignore) {}
+
+                    // Delete related feedbacks
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE bookingId=?")) {
+                        ps.setInt(1, bookingId);
+                        ps.executeUpdate();
+                    } catch (Exception ignore) {}
+
+                    // Delete booking
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Bookings WHERE bookingId=?")) {
+                        ps.setInt(1, bookingId);
+                        ps.executeUpdate();
+                    } catch (Exception ignore) {}
+                }
+
+                response.sendRedirect("admin-crud.jsp?bookingDeleted=1");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("home.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 }

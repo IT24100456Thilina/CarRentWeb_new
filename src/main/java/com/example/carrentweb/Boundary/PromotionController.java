@@ -43,14 +43,27 @@ public class PromotionController extends HttpServlet {
                     break;
                 }
                 case "delete": {
-                    String sql = "DELETE FROM Promotions WHERE id=?";
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ps.setInt(1, Integer.parseInt(request.getParameter("id")));
-                    ps.executeUpdate();
+                    String idsParam = request.getParameter("ids");
+                    if (idsParam != null && !idsParam.trim().isEmpty()) {
+                        // Bulk delete
+                        String[] idArray = idsParam.split(",");
+                        String sql = "DELETE FROM Promotions WHERE id=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        for (String id : idArray) {
+                            ps.setInt(1, Integer.parseInt(id.trim()));
+                            ps.executeUpdate();
+                        }
+                    } else {
+                        // Single delete
+                        String sql = "DELETE FROM Promotions WHERE id=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+                        ps.executeUpdate();
+                    }
                     break;
                 }
             }
-            response.sendRedirect("AdminServlet?promotionsUpdated=1");
+            response.sendRedirect("admin-crud.jsp?promotionsUpdated=1");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));

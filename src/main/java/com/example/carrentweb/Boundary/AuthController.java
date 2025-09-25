@@ -25,12 +25,12 @@ public class AuthController extends HttpServlet {
             if (session != null) {
                 session.invalidate();
             }
-            response.sendRedirect("login.jsp?logout=1");
+            response.sendRedirect("HomeServlet?logout=1");
             return;
         }
 
         // Default: forward to login page
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("cargo-landing.jsp");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -68,7 +68,7 @@ public class AuthController extends HttpServlet {
                     ps.executeUpdate();
                 }
 
-                response.sendRedirect("login.jsp?registered=1");
+                response.sendRedirect("cargo-landing.jsp?registered=1");
 
             } else if ("login".equals(action)) {
                 String username = request.getParameter("username");
@@ -95,38 +95,37 @@ public class AuthController extends HttpServlet {
 
                 if (rs.next()) {
                     HttpSession session = request.getSession(true);
+                    int userId = rs.getInt("userId");
                     session.setAttribute("userFullName", rs.getString("fullName"));
-                    session.setAttribute("userId", rs.getInt("userId"));
+                    session.setAttribute("userId", userId);
                     session.setAttribute("username", rs.getString("username"));
-                    // Determine role either from DB (if available) or from request parameter
-                    String resolvedRole = role;
-                    if (hasRoleColumn) {
-                        try {
-                            String dbRole = rs.getString("role");
-                            if (dbRole != null && !dbRole.isEmpty()) {
-                                resolvedRole = normalizeRole(dbRole);
-                            }
-                        } catch (Exception ignore) {
-                            // Column may not exist in the result set; fall back to role param
-                        }
-                    }
+
+                    // Debug logging
+                    System.out.println("AuthController: Login successful for userId = " + userId);
+                    System.out.println("AuthController: username = " + rs.getString("username"));
+
+                    // Since Users table doesn't have role column, use request parameter
+                    String resolvedRole = normalizeRole(role);
                     session.setAttribute("role", resolvedRole);
 
                     // Role-based redirect
-                    if ("admin".equals(resolvedRole)) {
-                        response.sendRedirect("AdminServlet");
-                    } else if ("customer".equals(resolvedRole)) {
-                        response.sendRedirect("booking.jsp");
-                    } else {
-                        response.sendRedirect("home.jsp");
+                    switch (resolvedRole) {
+                        case "customer":
+                            response.sendRedirect("HomeServlet?page=customer-vehicles");
+                            break;
+                        case "admin":
+                            response.sendRedirect("AdminServlet");
+                            break;
+                        default:
+                            response.sendRedirect("cargo-landing.jsp");
                     }
                 } else {
-                    response.sendRedirect("login.jsp?error=1");
+                    response.sendRedirect("HomeServlet");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("login.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 

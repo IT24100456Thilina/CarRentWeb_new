@@ -13,22 +13,78 @@ import java.sql.PreparedStatement;
 @WebServlet("/PaymentController")
 public class PaymentController extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int bookingId = Integer.parseInt(request.getParameter("bookingId"));
-        double amount = Double.parseDouble(request.getParameter("amount"));
-        String paymentMethod = request.getParameter("paymentMethod");
+        String action = request.getParameter("action");
+        if (action == null) action = "create";
 
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "INSERT INTO Payments(bookingId, amount, paymentMethod) VALUES (?, ?, ?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, bookingId);
-            ps.setDouble(2, amount);
-            ps.setString(3, paymentMethod);
-            ps.executeUpdate();
-            response.sendRedirect("payment.jsp?success=1&bookingId=" + bookingId);
+            switch (action) {
+                case "create": {
+                    int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                    double amount = Double.parseDouble(request.getParameter("amount"));
+                    String paymentMethod = request.getParameter("paymentMethod");
+
+                    String sql = "INSERT INTO Payments(bookingId, amount, paymentMethod) VALUES (?, ?, ?)";
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ps.setInt(1, bookingId);
+                    ps.setDouble(2, amount);
+                    ps.setString(3, paymentMethod);
+                    ps.executeUpdate();
+
+                    response.sendRedirect("HomeServlet?page=customer-feedback&bookingId=" + bookingId);
+                    break;
+                }
+                case "update": {
+                    int paymentId = Integer.parseInt(request.getParameter("paymentId"));
+                    int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                    double amount = Double.parseDouble(request.getParameter("amount"));
+                    String paymentMethod = request.getParameter("paymentMethod");
+
+                    String sql = "UPDATE Payments SET bookingId=?, amount=?, paymentMethod=? WHERE paymentId=?";
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ps.setInt(1, bookingId);
+                    ps.setDouble(2, amount);
+                    ps.setString(3, paymentMethod);
+                    ps.setInt(4, paymentId);
+                    ps.executeUpdate();
+
+                    response.sendRedirect("admin-crud.jsp?paymentUpdated=1");
+                    break;
+                }
+                case "delete": {
+                    String idsParam = request.getParameter("ids");
+                    if (idsParam != null && !idsParam.trim().isEmpty()) {
+                        // Bulk delete
+                        String[] idArray = idsParam.split(",");
+                        String sql = "DELETE FROM Payments WHERE paymentId=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        for (String id : idArray) {
+                            ps.setInt(1, Integer.parseInt(id.trim()));
+                            ps.executeUpdate();
+                        }
+                    } else {
+                        // Single delete
+                        int paymentId = Integer.parseInt(request.getParameter("paymentId"));
+                        String sql = "DELETE FROM Payments WHERE paymentId=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setInt(1, paymentId);
+                        ps.executeUpdate();
+                    }
+
+                    response.sendRedirect("admin-crud.jsp?paymentDeleted=1");
+                    break;
+                }
+                default:
+                    response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Invalid action", java.nio.charset.StandardCharsets.UTF_8));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("payment.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 }

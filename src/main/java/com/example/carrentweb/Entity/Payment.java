@@ -5,6 +5,7 @@ public class Payment {
     private int bookingId;
     private double amount;
     private String paymentMethod;
+    private String paymentDate; // Added paymentDate field
 
     public Payment() {}
 
@@ -12,6 +13,13 @@ public class Payment {
         this.bookingId = bookingId;
         this.amount = amount;
         this.paymentMethod = paymentMethod;
+    }
+
+    public Payment(int bookingId, double amount, String paymentMethod, String paymentDate) {
+        this.bookingId = bookingId;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.paymentDate = paymentDate;
     }
 
     // Getters and Setters
@@ -26,4 +34,7 @@ public class Payment {
 
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(String paymentDate) { this.paymentDate = paymentDate; }
 }

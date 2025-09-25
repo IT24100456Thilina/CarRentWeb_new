@@ -23,7 +23,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try (Connection conn = DBConnection.getConnection()) {
-            // Vehicles (if table exists)
+            // Vehicles (support both schemas)
             List<Map<String, Object>> cars = new ArrayList<>();
             try (PreparedStatement ps = conn.prepareStatement("SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl FROM Vehicles")) {
                 ResultSet rs = ps.executeQuery();
@@ -33,11 +33,25 @@ public class AdminServlet extends HttpServlet {
                     c.put("vehicleName", rs.getString("vehicleName"));
                     c.put("vehicleType", rs.getString("vehicleType"));
                     c.put("dailyPrice", rs.getDouble("dailyPrice"));
-                    c.put("available", rs.getBoolean("available"));
+                    c.put("available", rs.getObject("available"));
                     c.put("imageUrl", rs.getString("imageUrl"));
                     cars.add(c);
                 }
-            } catch (Exception ignore) { }
+            } catch (Exception ignore) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT id, model, type, pricePerDay, status FROM Vehicles")) {
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        Map<String, Object> c = new HashMap<>();
+                        c.put("vehicleId", rs.getInt("id"));
+                        c.put("vehicleName", rs.getString("model"));
+                        c.put("vehicleType", rs.getString("type"));
+                        c.put("dailyPrice", rs.getDouble("pricePerDay"));
+                        c.put("available", rs.getObject("status"));
+                        c.put("imageUrl", null);
+                        cars.add(c);
+                    }
+                } catch (Exception ignore2) { }
+            }
             request.setAttribute("carList", cars);
 
             // Bookings (schema does not include Vehicles table; use vehicleId directly)
@@ -154,7 +168,7 @@ public class AdminServlet extends HttpServlet {
             request.getRequestDispatcher("admin.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("home.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 }
