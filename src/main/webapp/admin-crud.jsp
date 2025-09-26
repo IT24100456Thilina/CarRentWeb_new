@@ -267,8 +267,8 @@
                                     <h3>Access Restricted</h3>
                                     <p class="text-muted">Admin privileges required to access CRUD management.</p>
                                 </div>
-                                <a href="admin.jsp" class="btn btn-primary">
-                                    <i class="fas fa-arrow-left me-2"></i>Go to Admin Login
+                                <a href="admin-dashboard.jsp" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>Go to Admin Dashboard
                                 </a>
                             </div>
                         </div>

@@ -104,12 +104,21 @@ public class AuthController extends HttpServlet {
                     System.out.println("AuthController: Login successful for userId = " + userId);
                     System.out.println("AuthController: username = " + rs.getString("username"));
 
-                    // Since Users table doesn't have role column, use request parameter
-                    String resolvedRole = normalizeRole(role);
-                    session.setAttribute("role", resolvedRole);
+                    // Set role from database if available, otherwise from request
+                    String userRole;
+                    try {
+                        userRole = rs.getString("role");
+                        if (userRole == null || userRole.trim().isEmpty()) {
+                            userRole = normalizeRole(role);
+                        }
+                    } catch (Exception e) {
+                        // Role column doesn't exist, use request parameter
+                        userRole = normalizeRole(role);
+                    }
+                    session.setAttribute("role", userRole);
 
                     // Role-based redirect
-                    switch (resolvedRole) {
+                    switch (userRole) {
                         case "customer":
                             response.sendRedirect("HomeServlet?page=customer-vehicles");
                             break;
@@ -132,7 +141,7 @@ public class AuthController extends HttpServlet {
     private static boolean hasColumn(Connection connection, String tableName, String columnName) {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
-            try (ResultSet columns = metaData.getColumns(null, null, tableName, columnName)) {
+            try (ResultSet columns = metaData.getColumns(null, "dbo", tableName, columnName)) {
                 return columns.next();
             }
         } catch (Exception e) {

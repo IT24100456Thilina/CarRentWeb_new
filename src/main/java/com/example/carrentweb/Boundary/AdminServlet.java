@@ -85,20 +85,21 @@ public class AdminServlet extends HttpServlet {
             request.setAttribute("bookingList", bookings);
 
             // Users
-            List<Map<String, Object>> users = new ArrayList<>();
-            try (PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email FROM Users")) {
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    Map<String, Object> u = new HashMap<>();
-                    u.put("userId", rs.getInt("userId"));
-                    u.put("fullName", rs.getString("fullName"));
-                    u.put("username", rs.getString("username"));
-                    u.put("email", rs.getString("email"));
-                    try { u.put("role", rs.getString("role")); } catch (Exception e) { u.put("role", ""); }
-                    users.add(u);
-                }
-            } catch (Exception ignore) { }
-            request.setAttribute("userList", users);
+             List<Map<String, Object>> users = new ArrayList<>();
+             try (PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email FROM Users")) {
+                 ResultSet rs = ps.executeQuery();
+                 while (rs.next()) {
+                     Map<String, Object> u = new HashMap<>();
+                     u.put("userId", rs.getInt("userId"));
+                     u.put("fullName", rs.getString("fullName"));
+                     u.put("username", rs.getString("username"));
+                     u.put("email", rs.getString("email"));
+                     // Don't try to get role column if it doesn't exist
+                     u.put("role", "");
+                     users.add(u);
+                 }
+             } catch (Exception ignore) { }
+             request.setAttribute("userList", users);
 
             // Promotions
             List<Map<String, Object>> promotions = new ArrayList<>();
@@ -175,7 +176,7 @@ public class AdminServlet extends HttpServlet {
             request.setAttribute("revenue", revenue);
             request.setAttribute("utilization", utilization);
 
-            request.getRequestDispatcher("admin.jsp").forward(request, response);
+            request.getRequestDispatcher("admin-dashboard.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));

@@ -151,6 +151,10 @@
                                                     <input type="email" class="form-control" name="email" required>
                                                 </div>
                                                 <div class="col-12">
+                                                    <label class="form-label">Phone</label>
+                                                    <input type="tel" class="form-control" name="phone" required>
+                                                </div>
+                                                <div class="col-12">
                                                     <label class="form-label">Username</label>
                                                     <input type="text" class="form-control" name="username" required>
                                                 </div>
