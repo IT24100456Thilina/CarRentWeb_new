@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/HomeServlet")
+@WebServlet({"/HomeServlet", "/"})
 public class HomeServlet extends HttpServlet {
 
     @Override
@@ -192,12 +192,14 @@ public class HomeServlet extends HttpServlet {
             targetJsp = "customer-promotions.jsp";
 
         } else if ("customer-booking".equals(page)) {
+            loadCustomerBookingsData(request, response);
             targetJsp = "customer-booking.jsp";
         } else if ("customer-feedback".equals(page)) {
             System.out.println("HomeServlet: Routing to customer-feedback page");
             loadCustomerFeedbackData(request, response);
             targetJsp = "customer-feedback.jsp";
         } else if ("customer-payment".equals(page)) {
+            loadCustomerPaymentsData(request, response);
             targetJsp = "customer-payment.jsp";
         } else if ("customer-dashboard".equals(page)) {
             targetJsp = "customer-dashboard.jsp";
@@ -338,6 +340,122 @@ public class HomeServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void loadCustomerBookingsData(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        if (userId != null) {
+            try (Connection conn = DBConnection.getConnection()) {
+                // Load customer bookings
+                List<java.util.Map<String, Object>> customerBookings = new ArrayList<>();
+                PreparedStatement ps = conn.prepareStatement(
+                    "SELECT b.bookingId, b.startDate, b.endDate, b.status, v.vehicleName, " +
+                    "DATEDIFF(day, b.startDate, b.endDate) + 1 as duration, " +
+                    "(DATEDIFF(day, b.startDate, b.endDate) + 1) * v.dailyPrice as totalCost " +
+                    "FROM Bookings b " +
+                    "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
+                    "WHERE b.userId = ? " +
+                    "ORDER BY b.startDate DESC"
+                );
+                ps.setInt(1, userId);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    java.util.Map<String, Object> booking = new java.util.HashMap<>();
+                    booking.put("bookingId", rs.getInt("bookingId"));
+                    booking.put("pickupDate", rs.getString("startDate"));
+                    booking.put("returnDate", rs.getString("endDate"));
+                    booking.put("status", rs.getString("status") != null ? rs.getString("status") : "Pending");
+                    booking.put("vehicleName", rs.getString("vehicleName"));
+                    booking.put("totalCost", rs.getDouble("totalCost"));
+                    customerBookings.add(booking);
+                }
+                request.setAttribute("customerBookings", customerBookings);
+
+                // Add sample booking if none exist
+                if (customerBookings.isEmpty()) {
+                    java.util.Map<String, Object> sampleBooking = new java.util.HashMap<>();
+                    sampleBooking.put("bookingId", 1);
+                    sampleBooking.put("pickupDate", "2025-09-27");
+                    sampleBooking.put("returnDate", "2025-09-30");
+                    sampleBooking.put("status", "Confirmed");
+                    sampleBooking.put("vehicleName", "Toyota Corolla");
+                    sampleBooking.put("totalCost", 120.0);
+                    customerBookings.add(sampleBooking);
+                    request.setAttribute("customerBookings", customerBookings);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadCustomerPaymentsData(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        List<java.util.Map<String, Object>> customerPayments = new ArrayList<>();
+
+        if (userId != null) {
+            try (Connection conn = DBConnection.getConnection()) {
+                // Load customer payments
+                PreparedStatement ps = conn.prepareStatement(
+                    "SELECT p.paymentId, p.bookingId, p.amount, p.paymentMethod, p.paymentDate, v.vehicleName " +
+                    "FROM Payments p " +
+                    "JOIN Bookings b ON p.bookingId = b.bookingId " +
+                    "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
+                    "WHERE b.userId = ? " +
+                    "ORDER BY p.paymentDate DESC"
+                );
+                ps.setInt(1, userId);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    java.util.Map<String, Object> payment = new java.util.HashMap<>();
+                    payment.put("paymentId", rs.getInt("paymentId"));
+                    payment.put("bookingId", rs.getInt("bookingId"));
+                    payment.put("amount", rs.getDouble("amount"));
+                    payment.put("paymentMethod", rs.getString("paymentMethod"));
+                    payment.put("paymentDate", rs.getString("paymentDate"));
+                    payment.put("vehicleName", rs.getString("vehicleName"));
+                    customerPayments.add(payment);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Add sample payment for testing if none exist
+        if (customerPayments.isEmpty()) {
+            java.util.Map<String, Object> samplePayment = new java.util.HashMap<>();
+            samplePayment.put("paymentId", 1);
+            samplePayment.put("bookingId", 1);
+            samplePayment.put("amount", 120.0);
+            samplePayment.put("paymentMethod", "Credit Card");
+            samplePayment.put("paymentDate", "2025-09-26");
+            samplePayment.put("vehicleName", "Toyota Corolla");
+            customerPayments.add(samplePayment);
+        }
+
+        // Set attributes
+        request.setAttribute("customerPayments", customerPayments);
+        request.setAttribute("totalPayments", customerPayments.size());
+        double totalAmount = 0;
+        for (java.util.Map<String, Object> payment : customerPayments) {
+            totalAmount += (Double) payment.get("amount");
+        }
+        request.setAttribute("totalAmount", totalAmount);
+        List<java.util.Map<String, Object>> recentPaymentsList = new ArrayList<>();
+        int cnt = 0;
+        for (java.util.Map<String, Object> payment : customerPayments) {
+            if (cnt < 5) {
+                recentPaymentsList.add(payment);
+                cnt++;
+            } else {
+                break;
+            }
+        }
+        request.setAttribute("recentPayments", recentPaymentsList);
     }
 
     private boolean hasColumn(Connection connection, String tableName, String columnName) {

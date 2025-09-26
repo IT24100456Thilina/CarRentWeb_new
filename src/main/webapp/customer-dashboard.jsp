@@ -332,10 +332,11 @@
         <li><a href="<c:choose><c:when test="${sessionScope.role == 'admin'}">AdminServlet</c:when><c:otherwise>HomeServlet?page=customer-dashboard</c:otherwise></c:choose>" class="active"><i class="fas fa-tachometer-alt"></i><c:choose><c:when test="${sessionScope.role == 'admin'}">Admin Panel</c:when><c:otherwise>Dashboard</c:otherwise></c:choose></a></li>
         <li><a href="HomeServlet?page=customer-vehicles"><i class="fas fa-car"></i>Vehicles</a></li>
         <li><a href="HomeServlet?page=customer-booking"><i class="fas fa-calendar-check"></i>My Bookings</a></li>
-        <li><a href="#favorites"><i class="fas fa-heart"></i>Favorites</a></li>
-        <li><a href="HomeServlet?page=customer-promotions"><i class="fas fa-tags"></i>Promotions</a></li>
-        <li><a href="HomeServlet?page=customer-feedback"><i class="fas fa-star"></i>Feedback</a></li>
-        <li><a href="#settings"><i class="fas fa-cog"></i>Settings</a></li>
+        <li><a href="HomeServlet?page=customer-promotions"><i class="fas fa-tags"></i>Special Offers</a></li>
+        <li><a href="HomeServlet?page=customer-payment"><i class="fas fa-credit-card"></i>Payment History</a></li>
+        <li><a href="HomeServlet?page=customer-feedback"><i class="fas fa-star"></i>Share Feedback</a></li>
+        <li><a href="HomeServlet?page=customer-booking"><i class="fas fa-bolt"></i>Quick Book</a></li>
+
     </ul>
 </div>
 
