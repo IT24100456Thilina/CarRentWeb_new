@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Email Campaigns - Admin - CarRent</title>
+    <title>Campaign Logs - Admin - CarRent</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -133,36 +133,6 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
         .badge {
             font-size: 0.75rem;
             font-weight: 600;
@@ -170,10 +140,9 @@
             border-radius: 0.375rem;
         }
 
-        .badge-draft { background: linear-gradient(135deg, var(--secondary-color), #475569); color: white; }
         .badge-sent { background: linear-gradient(135deg, var(--success-color), #059669); color: white; }
         .badge-failed { background: linear-gradient(135deg, var(--danger-color), #dc2626); color: white; }
-        .badge-scheduled { background: linear-gradient(135deg, var(--warning-color), #d97706); color: white; }
+        .badge-queued { background: linear-gradient(135deg, var(--warning-color), #d97706); color: white; }
 
         .table {
             margin-bottom: 0;
@@ -289,15 +258,12 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">Email Campaigns</h1>
-            <p class="text-muted">Manage and send email campaigns to customers</p>
+            <h1 class="h3 mb-0">Campaign Logs & Reports</h1>
+            <p class="text-muted">Monitor email campaign delivery and troubleshoot issues</p>
         </div>
         <div>
-            <a href="CampaignController?action=customers" class="btn btn-info me-2">
-                <i class="fas fa-users me-2"></i>View Customer Emails
-            </a>
-            <a href="CampaignController?action=create" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Create Campaign
+            <a href="CampaignController?action=list" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Campaigns
             </a>
         </div>
     </div>
@@ -316,7 +282,7 @@
         </div>
     </c:if>
 
-    <!-- Campaigns Table -->
+    <!-- Campaign Logs Table -->
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -324,116 +290,58 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Subject</th>
-                            <th>Segment</th>
+                            <th>Campaign</th>
+                            <th>Recipient</th>
                             <th>Status</th>
-                            <th>Sent</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th>Sent Date</th>
+                            <th>Error Message</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="campaign" items="${campaigns}">
+                        <c:forEach var="log" items="${campaignLogs}">
                             <tr>
-                                <td>${campaign.campaignId}</td>
+                                <td>${log.logId}</td>
                                 <td>
-                                    <strong>${campaign.subject}</strong>
-                                    <c:if test="${not empty campaign.offer}">
-                                        <br><small class="text-muted">Offer: ${campaign.offer}</small>
-                                    </c:if>
+                                    <strong>Campaign #${log.campaignId}</strong>
                                 </td>
-                                <td>
-                                    <span class="badge bg-secondary">${campaign.segment}</span>
-                                </td>
+                                <td>${log.recipientEmail}</td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${campaign.status == 'draft'}">
-                                            <span class="badge badge-draft">Draft</span>
-                                        </c:when>
-                                        <c:when test="${campaign.status == 'sent'}">
+                                        <c:when test="${log.status == 'sent'}">
                                             <span class="badge badge-sent">Sent</span>
                                         </c:when>
-                                        <c:when test="${campaign.status == 'failed'}">
+                                        <c:when test="${log.status == 'failed'}">
                                             <span class="badge badge-failed">Failed</span>
                                         </c:when>
-                                        <c:when test="${campaign.status == 'scheduled'}">
-                                            <span class="badge badge-scheduled">Scheduled</span>
+                                        <c:when test="${log.status == 'queued'}">
+                                            <span class="badge badge-queued">Queued</span>
                                         </c:when>
                                     </c:choose>
                                 </td>
+                                <td>${log.sentDate}</td>
                                 <td>
-                                    ${campaign.sentCount}
-                                    <c:if test="${not empty campaign.sentDate}">
-                                        <br><small class="text-muted">${campaign.sentDate}</small>
+                                    <c:if test="${not empty log.errorMessage}">
+                                        <span class="text-danger">${log.errorMessage}</span>
                                     </c:if>
-                                </td>
-                                <td>${campaign.createdDate}</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <c:if test="${campaign.status == 'draft'}">
-                                            <form action="CampaignController" method="post" class="d-inline">
-                                                <input type="hidden" name="action" value="send">
-                                                <input type="hidden" name="campaignId" value="${campaign.campaignId}">
-                                                <button type="submit" class="btn btn-success btn-sm"
-                                                        onclick="return confirm('Are you sure you want to send this campaign?')">
-                                                    <i class="fas fa-paper-plane"></i> Send
-                                                </button>
-                                            </form>
-                                            <a href="CampaignController?action=edit&id=${campaign.campaignId}"
-                                               class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                        </c:if>
-                                        <a href="CampaignController?action=logs" class="btn btn-info btn-sm">
-                                            <i class="fas fa-list"></i> Logs
-                                        </a>
-                                        <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="deleteCampaign('${campaign.campaignId}')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </div>
+                                    <c:if test="${empty log.errorMessage}">
+                                        <span class="text-muted">-</span>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>
-                        <c:if test="${empty campaigns}">
+                        <c:if test="${empty campaignLogs}">
                             <tr>
-                                <td colspan="7" class="text-center py-4">
+                                <td colspan="6" class="text-center py-4">
                                     <div class="text-muted">
-                                        <i class="fas fa-envelope fa-3x mb-3"></i>
-                                        <h5>No campaigns found</h5>
-                                        <p>Create your first email campaign to start engaging with customers.</p>
-                                        <a href="CampaignController?action=create" class="btn btn-primary">
-                                            <i class="fas fa-plus me-2"></i>Create First Campaign
-                                        </a>
+                                        <i class="fas fa-list fa-3x mb-3"></i>
+                                        <h5>No logs found</h5>
+                                        <p>Campaign logs will appear here once emails are sent.</p>
                                     </div>
                                 </td>
                             </tr>
                         </c:if>
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Delete Campaign</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this campaign? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" action="CampaignController" method="post" class="d-inline">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="campaignId" id="deleteCampaignId">
-                    <button type="submit" class="btn btn-danger">Delete Campaign</button>
-                </form>
             </div>
         </div>
     </div>
@@ -477,13 +385,6 @@
 
     // Theme toggle event listener
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-    // Delete campaign function
-    function deleteCampaign(campaignId) {
-        document.getElementById('deleteCampaignId').value = campaignId;
-        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        modal.show();
-    }
 </script>
 </body>
 </html>

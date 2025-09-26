@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Email Campaigns - Admin - CarRent</title>
+    <title>Customer Emails - Admin - CarRent</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -143,26 +143,6 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
         .badge {
             font-size: 0.75rem;
             font-weight: 600;
@@ -170,10 +150,8 @@
             border-radius: 0.375rem;
         }
 
-        .badge-draft { background: linear-gradient(135deg, var(--secondary-color), #475569); color: white; }
-        .badge-sent { background: linear-gradient(135deg, var(--success-color), #059669); color: white; }
-        .badge-failed { background: linear-gradient(135deg, var(--danger-color), #dc2626); color: white; }
-        .badge-scheduled { background: linear-gradient(135deg, var(--warning-color), #d97706); color: white; }
+        .badge-active { background: linear-gradient(135deg, var(--success-color), #059669); color: white; }
+        .badge-inactive { background: linear-gradient(135deg, var(--secondary-color), #475569); color: white; }
 
         .table {
             margin-bottom: 0;
@@ -216,10 +194,10 @@
             border-left: 4px solid var(--success-color);
         }
 
-        .alert-danger {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-            color: var(--danger-color);
-            border-left: 4px solid var(--danger-color);
+        .alert-info {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(3, 105, 161, 0.1));
+            color: var(--info-color);
+            border-left: 4px solid var(--info-color);
         }
 
         /* Theme Toggle */
@@ -236,6 +214,33 @@
 
         .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search and Filter */
+        .search-container {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        [data-theme="dark"] .search-container {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .form-control {
+            border-radius: 0.375rem;
+            border: 1px solid var(--light-border);
+            background: var(--light-card);
+            color: var(--light-text);
+        }
+
+        [data-theme="dark"] .form-control {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
         }
 
         /* Responsive Design */
@@ -289,151 +294,101 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">Email Campaigns</h1>
-            <p class="text-muted">Manage and send email campaigns to customers</p>
+            <h1 class="h3 mb-0">Customer Email Directory</h1>
+            <p class="text-muted">View and manage customer email addresses for campaigns</p>
         </div>
         <div>
-            <a href="CampaignController?action=customers" class="btn btn-info me-2">
-                <i class="fas fa-users me-2"></i>View Customer Emails
-            </a>
-            <a href="CampaignController?action=create" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Create Campaign
+            <a href="CampaignController?action=list" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Campaigns
             </a>
         </div>
     </div>
 
-    <!-- Success/Error Messages -->
-    <c:if test="${not empty param.success}">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${param.success}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Search and Filter -->
+    <div class="search-container">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, or username...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" id="statusFilter">
+                    <option value="">All Customers</option>
+                    <option value="active">Active Customers (Have Bookings)</option>
+                    <option value="inactive">Inactive Customers</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="exportEmails()">
+                    <i class="fas fa-download me-1"></i>Export
+                </button>
+            </div>
+            <div class="col-md-3">
+                <div class="alert alert-info mb-0 py-2">
+                    <small><i class="fas fa-info-circle me-1"></i>Total: <span id="totalCount">${customers.size()}</span> customers</small>
+                </div>
+            </div>
         </div>
-    </c:if>
-    <c:if test="${not empty param.error}">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            ${param.error}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    </c:if>
+    </div>
 
-    <!-- Campaigns Table -->
+    <!-- Customer Emails Table -->
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover" id="customersTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Subject</th>
-                            <th>Segment</th>
-                            <th>Status</th>
-                            <th>Sent</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th><i class="fas fa-user me-1"></i>Name</th>
+                            <th><i class="fas fa-envelope me-1"></i>Email</th>
+                            <th><i class="fas fa-phone me-1"></i>Phone</th>
+                            <th><i class="fas fa-at me-1"></i>Username</th>
+                            <th><i class="fas fa-chart-line me-1"></i>Status</th>
+                            <th><i class="fas fa-cogs me-1"></i>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="campaign" items="${campaigns}">
-                            <tr>
-                                <td>${campaign.campaignId}</td>
+                        <c:forEach var="customer" items="${customers}">
+                            <tr class="customer-row" data-name="${customer.fullName}" data-email="${customer.email}" data-username="${customer.username}" data-active="${customer.hasActiveBookings}">
                                 <td>
-                                    <strong>${campaign.subject}</strong>
-                                    <c:if test="${not empty campaign.offer}">
-                                        <br><small class="text-muted">Offer: ${campaign.offer}</small>
-                                    </c:if>
+                                    <strong>${customer.fullName}</strong>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary">${campaign.segment}</span>
+                                    <span class="email-text">${customer.email}</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('${customer.email}')" title="Copy email">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
                                 </td>
+                                <td>${customer.phone}</td>
+                                <td>${customer.username}</td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${campaign.status == 'draft'}">
-                                            <span class="badge badge-draft">Draft</span>
+                                        <c:when test="${customer.hasActiveBookings}">
+                                            <span class="badge badge-active">Active</span>
                                         </c:when>
-                                        <c:when test="${campaign.status == 'sent'}">
-                                            <span class="badge badge-sent">Sent</span>
-                                        </c:when>
-                                        <c:when test="${campaign.status == 'failed'}">
-                                            <span class="badge badge-failed">Failed</span>
-                                        </c:when>
-                                        <c:when test="${campaign.status == 'scheduled'}">
-                                            <span class="badge badge-scheduled">Scheduled</span>
-                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge badge-inactive">Inactive</span>
+                                        </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td>
-                                    ${campaign.sentCount}
-                                    <c:if test="${not empty campaign.sentDate}">
-                                        <br><small class="text-muted">${campaign.sentDate}</small>
-                                    </c:if>
-                                </td>
-                                <td>${campaign.createdDate}</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <c:if test="${campaign.status == 'draft'}">
-                                            <form action="CampaignController" method="post" class="d-inline">
-                                                <input type="hidden" name="action" value="send">
-                                                <input type="hidden" name="campaignId" value="${campaign.campaignId}">
-                                                <button type="submit" class="btn btn-success btn-sm"
-                                                        onclick="return confirm('Are you sure you want to send this campaign?')">
-                                                    <i class="fas fa-paper-plane"></i> Send
-                                                </button>
-                                            </form>
-                                            <a href="CampaignController?action=edit&id=${campaign.campaignId}"
-                                               class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                        </c:if>
-                                        <a href="CampaignController?action=logs" class="btn btn-info btn-sm">
-                                            <i class="fas fa-list"></i> Logs
-                                        </a>
-                                        <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="deleteCampaign('${campaign.campaignId}')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="sendTestEmail('${customer.email}')" title="Send test email">
+                                        <i class="fas fa-paper-plane"></i> Test
+                                    </button>
                                 </td>
                             </tr>
                         </c:forEach>
-                        <c:if test="${empty campaigns}">
+                        <c:if test="${empty customers}">
                             <tr>
-                                <td colspan="7" class="text-center py-4">
+                                <td colspan="6" class="text-center py-4">
                                     <div class="text-muted">
-                                        <i class="fas fa-envelope fa-3x mb-3"></i>
-                                        <h5>No campaigns found</h5>
-                                        <p>Create your first email campaign to start engaging with customers.</p>
-                                        <a href="CampaignController?action=create" class="btn btn-primary">
-                                            <i class="fas fa-plus me-2"></i>Create First Campaign
-                                        </a>
+                                        <i class="fas fa-users fa-3x mb-3"></i>
+                                        <h5>No customers found</h5>
+                                        <p>Customer data will appear here once users register.</p>
                                     </div>
                                 </td>
                             </tr>
                         </c:if>
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Delete Campaign</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this campaign? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" action="CampaignController" method="post" class="d-inline">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="campaignId" id="deleteCampaignId">
-                    <button type="submit" class="btn btn-danger">Delete Campaign</button>
-                </form>
             </div>
         </div>
     </div>
@@ -472,18 +427,100 @@
         }
     }
 
+    // Search and Filter Functionality
+    function filterCustomers() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const rows = document.querySelectorAll('.customer-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const name = row.dataset.name.toLowerCase();
+            const email = row.dataset.email.toLowerCase();
+            const username = row.dataset.username.toLowerCase();
+            const isActive = row.dataset.active === 'true';
+
+            let showRow = true;
+
+            // Search filter
+            if (searchTerm) {
+                showRow = showRow && (name.includes(searchTerm) || email.includes(searchTerm) || username.includes(searchTerm));
+            }
+
+            // Status filter
+            if (statusFilter === 'active') {
+                showRow = showRow && isActive;
+            } else if (statusFilter === 'inactive') {
+                showRow = showRow && !isActive;
+            }
+
+            row.style.display = showRow ? '' : 'none';
+            if (showRow) visibleCount++;
+        });
+
+        document.getElementById('totalCount').textContent = visibleCount;
+    }
+
+    // Copy email to clipboard
+    function copyToClipboard(email) {
+        navigator.clipboard.writeText(email).then(() => {
+            // Simple feedback
+            const btn = event.target.closest('button');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+
+            setTimeout(() => {
+                btn.innerHTML = originalIcon;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 1000);
+        });
+    }
+
+    // Send test email (placeholder)
+    function sendTestEmail(email) {
+        alert('Test email functionality would send a test message to: ' + email);
+        // In a real implementation, this would make an AJAX call to send a test email
+    }
+
+    // Export emails
+    function exportEmails() {
+        const visibleRows = document.querySelectorAll('.customer-row[style=""], .customer-row:not([style*="none"])');
+        let csvContent = 'Name,Email,Phone,Username,Status\n';
+
+        visibleRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const name = cells[0].textContent.trim();
+            const email = cells[1].querySelector('.email-text').textContent.trim();
+            const phone = cells[2].textContent.trim();
+            const username = cells[3].textContent.trim();
+            const status = cells[4].textContent.trim();
+
+            csvContent += `"${name}","${email}","${phone}","${username}","${status}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'customer-emails.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
     // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', initTheme);
+    document.addEventListener('DOMContentLoaded', function() {
+        initTheme();
+
+        // Add search and filter listeners
+        document.getElementById('searchInput').addEventListener('input', filterCustomers);
+        document.getElementById('statusFilter').addEventListener('change', filterCustomers);
+    });
 
     // Theme toggle event listener
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-    // Delete campaign function
-    function deleteCampaign(campaignId) {
-        document.getElementById('deleteCampaignId').value = campaignId;
-        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        modal.show();
-    }
 </script>
 </body>
 </html>

@@ -760,7 +760,7 @@
                                     <button class="btn btn-danger btn-sm" onclick="deleteSelectedCampaigns()">
                                         <i class="fas fa-trash me-1"></i>Delete Selected
                                     </button>
-                                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#campaignForm">
+                                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="admin-campaign-create.jsp">
                                         <i class="fas fa-plus me-1"></i>Add Campaign
                                     </button>
                                 </div>

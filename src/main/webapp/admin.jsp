@@ -75,6 +75,7 @@
                 <a class="nav-link" href="#payments"><i class="fas fa-credit-card"></i>Payments</a>
                 <a class="nav-link" href="#users"><i class="fas fa-users"></i>Users</a>
                 <a class="nav-link" href="#promotions"><i class="fas fa-tags"></i>Promotions</a>
+                <a class="nav-link" href="CampaignController"><i class="fas fa-envelope"></i>Campaigns</a>
                 <a class="nav-link" href="#feedback"><i class="fas fa-star"></i>Feedback</a>
                 <a class="nav-link" href="cargo-landing.jsp"><i class="fas fa-home"></i>Back to Site</a>
             </nav>
