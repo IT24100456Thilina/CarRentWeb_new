@@ -146,14 +146,14 @@ public class FeedbackController extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null) {
             System.err.println("FeedbackController: No session found");
-            response.sendRedirect("admin-crud.jsp?error=Session expired");
+            response.sendRedirect("AdminServlet?error=Session expired");
             return;
         }
 
         String role = (String) session.getAttribute("role");
         if (!"admin".equals(role)) {
             System.err.println("FeedbackController: Access denied - not admin");
-            response.sendRedirect("admin-crud.jsp?error=Access denied");
+            response.sendRedirect("AdminServlet?error=Access denied");
             return;
         }
 
@@ -168,7 +168,7 @@ public class FeedbackController extends HttpServlet {
             handleSingleDelete(request, response, feedbackIdStr);
         } else {
             System.err.println("FeedbackController: feedbackId or ids parameter missing");
-            response.sendRedirect("admin-crud.jsp?error=Invalid feedback ID");
+            response.sendRedirect("AdminServlet?error=Invalid feedback ID");
             return;
         }
     }
@@ -179,14 +179,14 @@ public class FeedbackController extends HttpServlet {
             feedbackId = Integer.parseInt(feedbackIdStr);
         } catch (NumberFormatException e) {
             System.err.println("FeedbackController: Invalid feedbackId format");
-            response.sendRedirect("admin-crud.jsp?error=Invalid feedback ID");
+            response.sendRedirect("AdminServlet?error=Invalid feedback ID");
             return;
         }
 
         try (Connection conn = DBConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("FeedbackController: Database connection is null!");
-                response.sendRedirect("admin-crud.jsp?error=Database connection failed");
+                response.sendRedirect("AdminServlet?error=Database connection failed");
                 return;
             }
 
@@ -202,12 +202,12 @@ public class FeedbackController extends HttpServlet {
                 response.sendRedirect("admin-crud.jsp?success=Feedback deleted");
             } else {
                 System.out.println("FeedbackController: No feedback found with ID " + feedbackId);
-                response.sendRedirect("admin-crud.jsp?error=Feedback not found");
+                response.sendRedirect("AdminServlet?error=Feedback not found");
             }
         } catch (Exception e) {
             System.err.println("FeedbackController: Exception occurred: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("admin-crud.jsp?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("AdminServlet?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 
@@ -220,7 +220,7 @@ public class FeedbackController extends HttpServlet {
                 feedbackIds.add(Integer.parseInt(idStr.trim()));
             } catch (NumberFormatException e) {
                 System.err.println("FeedbackController: Invalid feedbackId in bulk delete: " + idStr);
-                response.sendRedirect("admin-crud.jsp?error=Invalid feedback ID in list");
+                response.sendRedirect("AdminServlet?error=Invalid feedback ID in list");
                 return;
             }
         }
@@ -228,7 +228,7 @@ public class FeedbackController extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("FeedbackController: Database connection is null!");
-                response.sendRedirect("admin-crud.jsp?error=Database connection failed");
+                response.sendRedirect("AdminServlet?error=Database connection failed");
                 return;
             }
 
@@ -254,7 +254,7 @@ public class FeedbackController extends HttpServlet {
         } catch (Exception e) {
             System.err.println("FeedbackController: Exception occurred: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("admin-crud.jsp?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("AdminServlet?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 
@@ -265,21 +265,21 @@ public class FeedbackController extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null) {
             System.err.println("FeedbackController: No session found");
-            response.sendRedirect("admin-crud.jsp?error=Session expired");
+            response.sendRedirect("AdminServlet?error=Session expired");
             return;
         }
 
         String role = (String) session.getAttribute("role");
         if (!"admin".equals(role)) {
             System.err.println("FeedbackController: Access denied - not admin");
-            response.sendRedirect("admin-crud.jsp?error=Access denied");
+            response.sendRedirect("AdminServlet?error=Access denied");
             return;
         }
 
         try (Connection conn = DBConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("FeedbackController: Database connection is null!");
-                response.sendRedirect("admin-crud.jsp?error=Database connection failed");
+                response.sendRedirect("AdminServlet?error=Database connection failed");
                 return;
             }
 

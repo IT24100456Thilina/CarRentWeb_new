@@ -22,6 +22,16 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Handle success/error messages from URL parameters
+        String success = request.getParameter("success");
+        if (success != null) {
+            request.setAttribute("success", success);
+        }
+        String error = request.getParameter("error");
+        if (error != null) {
+            request.setAttribute("error", error);
+        }
+
         try (Connection conn = DBConnection.getConnection()) {
             // Vehicles (support both schemas)
             List<Map<String, Object>> cars = new ArrayList<>();

@@ -171,6 +171,20 @@
                 </div>
             </c:when>
             <c:otherwise>
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${success}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>${error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+
                 <!-- Dashboard Overview -->
                 <div id="dashboard" class="section-header">
                     <h3><i class="fas fa-chart-line me-2"></i>Dashboard Overview</h3>

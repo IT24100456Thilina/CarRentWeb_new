@@ -62,7 +62,7 @@ public class CampaignController extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Database error: " + e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("admin-campaigns.jsp?error=" + java.net.URLEncoder.encode("Database error: " + e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 
@@ -97,7 +97,7 @@ public class CampaignController extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Database error: " + e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect("admin-campaigns.jsp?error=" + java.net.URLEncoder.encode("Database error: " + e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 
