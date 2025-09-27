@@ -19,6 +19,44 @@ import java.sql.Date;
 @WebServlet("/BookingController")
 public class BookingController extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("get".equals(action)) {
+            getBooking(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
+        }
+    }
+
+    private void getBooking(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT bookingId, userId, vehicleId, startDate, endDate, status FROM Bookings WHERE bookingId = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String json = String.format(
+                    "{\"bookingId\":%d,\"userId\":%d,\"vehicleId\":%d,\"startDate\":\"%s\",\"endDate\":\"%s\",\"status\":\"%s\"}",
+                    rs.getInt("bookingId"),
+                    rs.getInt("userId"),
+                    rs.getInt("vehicleId"),
+                    rs.getString("startDate"),
+                    rs.getString("endDate"),
+                    rs.getString("status")
+                );
+                response.getWriter().write(json);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Booking not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 

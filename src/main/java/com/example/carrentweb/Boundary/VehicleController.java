@@ -34,36 +34,88 @@ public class VehicleController extends HttpServlet {
         Part filePart = request.getPart("vehicleImage");
         String imageUrl = request.getParameter("imageUrl");
 
+        System.out.println("VehicleController: handleFileUpload called");
+        System.out.println("VehicleController: imageUrl parameter: " + imageUrl);
+        System.out.println("VehicleController: filePart: " + (filePart != null ? filePart.getSubmittedFileName() : "null"));
+
         // If URL is provided, use it directly
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            System.out.println("VehicleController: Using provided URL: " + imageUrl.trim());
             return imageUrl.trim();
         }
 
         // If file is uploaded, save it and return the URL
         if (filePart != null && filePart.getSize() > 0) {
             String fileName = filePart.getSubmittedFileName();
+            System.out.println("VehicleController: File uploaded: " + fileName + ", size: " + filePart.getSize());
             if (fileName != null && !fileName.isEmpty()) {
                 // Generate unique filename to avoid conflicts
                 String extension = fileName.substring(fileName.lastIndexOf("."));
                 String uniqueFileName = UUID.randomUUID().toString() + extension;
 
                 // Create upload directory if it doesn't exist
-                Path uploadPath = Paths.get(request.getServletContext().getRealPath("/") + uploadDirectory);
+                String uploadDirPath = request.getServletContext().getRealPath("/" + uploadDirectory);
+                System.out.println("VehicleController: Upload directory path: " + uploadDirPath);
+                if (uploadDirPath == null) {
+                    throw new IOException("Cannot determine upload directory path");
+                }
+                Path uploadPath = Paths.get(uploadDirPath);
                 Files.createDirectories(uploadPath);
+                System.out.println("VehicleController: Upload directory created: " + uploadPath);
 
                 // Save the file
                 Path filePath = uploadPath.resolve(uniqueFileName);
-                try (InputStream input = filePart.getInputStream()) {
-                    Files.copy(input, filePath, StandardCopyOption.REPLACE_EXISTING);
-                }
+                filePart.write(filePath.toString());
+                System.out.println("VehicleController: File saved to: " + filePath);
 
-                // Return the relative URL to the uploaded file
-                return request.getContextPath() + "/" + uploadDirectory + uniqueFileName;
+                // Return the URL to access the uploaded file via ImageServlet
+                String url = request.getContextPath() + "/images/" + uniqueFileName;
+                System.out.println("VehicleController: Returning URL: " + url);
+                return url;
             }
         }
 
         // Return default image if no image provided
+        System.out.println("VehicleController: No image provided, using default");
         return "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400&h=300&fit=crop&crop=center";
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("get".equals(action)) {
+            getVehicle(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
+        }
+    }
+
+    private void getVehicle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl FROM Vehicles WHERE vehicleId = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String json = String.format(
+                    "{\"vehicleId\":%d,\"vehicleName\":\"%s\",\"vehicleType\":\"%s\",\"dailyPrice\":%.2f,\"available\":%b,\"imageUrl\":\"%s\"}",
+                    rs.getInt("vehicleId"),
+                    rs.getString("vehicleName").replace("\"", "\\\""),
+                    rs.getString("vehicleType").replace("\"", "\\\""),
+                    rs.getDouble("dailyPrice"),
+                    rs.getBoolean("available"),
+                    rs.getString("imageUrl") != null ? rs.getString("imageUrl").replace("\"", "\\\"") : ""
+                );
+                response.getWriter().write(json);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Vehicle not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @Override
@@ -100,18 +152,40 @@ public class VehicleController extends HttpServlet {
                      break;
                  }
                 case "update": {
-                    // Handle image upload for updates
-                    String imageUrl = handleFileUpload(request);
+                    // Handle image upload for updates - only update if a new image is provided
+                    String imageUrl = null;
+                    Part filePart = request.getPart("vehicleImage");
+                    String urlParam = request.getParameter("imageUrl");
+
+                    if ((filePart != null && filePart.getSize() > 0) || (urlParam != null && !urlParam.trim().isEmpty())) {
+                        // New image provided
+                        imageUrl = handleFileUpload(request);
+                    }
+                    // If no new image, keep existing imageUrl
 
                     try {
-                        String sql = "UPDATE Vehicles SET vehicleName=?, vehicleType=?, dailyPrice=?, available=?, imageUrl=? WHERE vehicleId=?";
-                        PreparedStatement ps = conn.prepareStatement(sql);
-                        ps.setString(1, request.getParameter("vehicleName"));
-                        ps.setString(2, request.getParameter("vehicleType"));
-                        ps.setBigDecimal(3, new java.math.BigDecimal(request.getParameter("dailyPrice")));
-                        ps.setBoolean(4, Boolean.parseBoolean(request.getParameter("available")));
-                        ps.setString(5, imageUrl);
-                        ps.setInt(6, Integer.parseInt(request.getParameter("vehicleId")));
+                        String sql;
+                        PreparedStatement ps;
+                        if (imageUrl != null) {
+                            // Update with new image
+                            sql = "UPDATE Vehicles SET vehicleName=?, vehicleType=?, dailyPrice=?, available=?, imageUrl=? WHERE vehicleId=?";
+                            ps = conn.prepareStatement(sql);
+                            ps.setString(1, request.getParameter("vehicleName"));
+                            ps.setString(2, request.getParameter("vehicleType"));
+                            ps.setBigDecimal(3, new java.math.BigDecimal(request.getParameter("dailyPrice")));
+                            ps.setBoolean(4, Boolean.parseBoolean(request.getParameter("available")));
+                            ps.setString(5, imageUrl);
+                            ps.setInt(6, Integer.parseInt(request.getParameter("vehicleId")));
+                        } else {
+                            // Update without changing image
+                            sql = "UPDATE Vehicles SET vehicleName=?, vehicleType=?, dailyPrice=?, available=? WHERE vehicleId=?";
+                            ps = conn.prepareStatement(sql);
+                            ps.setString(1, request.getParameter("vehicleName"));
+                            ps.setString(2, request.getParameter("vehicleType"));
+                            ps.setBigDecimal(3, new java.math.BigDecimal(request.getParameter("dailyPrice")));
+                            ps.setBoolean(4, Boolean.parseBoolean(request.getParameter("available")));
+                            ps.setInt(5, Integer.parseInt(request.getParameter("vehicleId")));
+                        }
                         ps.executeUpdate();
                     } catch (Exception e) {
                         String alt = "UPDATE Vehicles SET model=?, type=?, pricePerDay=?, status=? WHERE id=?";

@@ -331,44 +331,47 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteSelectedVehicles()">
                                             <i class="fas fa-trash me-1"></i>Delete Selected
                                         </button>
-                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#vehicleForm">
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#vehicleForm" onclick="resetVehicleForm()">
                                             <i class="fas fa-plus me-1"></i>Add Vehicle
                                         </button>
                                     </div>
                                 </div>
 
                                 <div id="vehicleForm" class="collapse mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <form class="row g-3" method="post" action="VehicleController" enctype="multipart/form-data">
-                                                <input type="hidden" name="action" value="add">
-                                                <div class="col-md-2"><input class="form-control" name="vehicleId" placeholder="ID" required type="number"></div>
-                                                <div class="col-md-3"><input class="form-control" name="vehicleName" placeholder="Model/Name" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="vehicleType" placeholder="Type" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="dailyPrice" placeholder="Price/Day" required></div>
-                                                <div class="col-md-2">
-                                                    <select class="form-select" name="available">
-                                                        <option value="true">Available</option>
-                                                        <option value="false">Unavailable</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-1 d-grid"><button class="btn btn-success" type="submit">Save</button></div>
-                                                <div class="col-12">
-                                                    <hr>
-                                                    <h6><i class="fas fa-image me-2"></i>Vehicle Image</h6>
-                                                    <div class="row g-3">
-                                                        <div class="col-md-6">
-                                                            <input type="file" class="form-control" name="vehicleImage" accept="image/*">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input type="url" class="form-control" name="imageUrl" placeholder="Or enter image URL">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="card">
+                                         <div class="card-header">
+                                             <h6 id="vehicleFormTitle"><i class="fas fa-plus me-2"></i>Add New Vehicle</h6>
+                                         </div>
+                                         <div class="card-body">
+                                             <form class="row g-3" method="post" action="VehicleController" enctype="multipart/form-data" id="vehicleFormElement">
+                                                 <input type="hidden" name="action" value="add" id="vehicleAction">
+                                                 <div class="col-md-2"><input class="form-control" name="vehicleId" id="vehicleId" placeholder="ID" required type="number"></div>
+                                                 <div class="col-md-3"><input class="form-control" name="vehicleName" id="vehicleName" placeholder="Model/Name" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="vehicleType" id="vehicleType" placeholder="Type" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="dailyPrice" id="vehiclePrice" placeholder="Price/Day" required></div>
+                                                 <div class="col-md-2">
+                                                     <select class="form-select" name="available" id="vehicleAvailable">
+                                                         <option value="true">Available</option>
+                                                         <option value="false">Unavailable</option>
+                                                     </select>
+                                                 </div>
+                                                 <div class="col-md-1 d-grid"><button class="btn btn-success" type="submit" id="vehicleSubmitBtn">Save</button></div>
+                                                 <div class="col-12">
+                                                     <hr>
+                                                     <h6><i class="fas fa-image me-2"></i>Vehicle Image</h6>
+                                                     <div class="row g-3">
+                                                         <div class="col-md-6">
+                                                             <input type="file" class="form-control" name="vehicleImage" id="vehicleImageFile" accept="image/*">
+                                                         </div>
+                                                         <div class="col-md-6">
+                                                             <input type="url" class="form-control" name="imageUrl" id="vehicleImageUrl" placeholder="Or enter image URL">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -420,33 +423,38 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteSelectedBookings()">
                                             <i class="fas fa-trash me-1"></i>Delete Selected
                                         </button>
-                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#bookingForm">
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#bookingForm" onclick="resetBookingForm()">
                                             <i class="fas fa-plus me-1"></i>Add Booking
                                         </button>
                                     </div>
                                 </div>
 
                                 <div id="bookingForm" class="collapse mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <form class="row g-3" method="post" action="BookingController">
-                                                <input type="hidden" name="action" value="create">
-                                                <div class="col-md-2"><input class="form-control" name="userId" placeholder="User ID" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="vehicleId" placeholder="Vehicle ID" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="pickupDate" type="date" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="returnDate" type="date" required></div>
-                                                <div class="col-md-2">
-                                                    <select class="form-select" name="status">
-                                                        <option value="Pending">Pending</option>
-                                                        <option value="Confirmed">Confirmed</option>
-                                                        <option value="Completed">Completed</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit">Create</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="card">
+                                         <div class="card-header">
+                                             <h6 id="bookingFormTitle"><i class="fas fa-plus me-2"></i>Add New Booking</h6>
+                                         </div>
+                                         <div class="card-body">
+                                             <form class="row g-3" method="post" action="BookingController" id="bookingFormElement">
+                                                 <input type="hidden" name="action" value="create" id="bookingAction">
+                                                 <input type="hidden" name="bookingId" id="bookingId">
+                                                 <div class="col-md-2"><input class="form-control" name="userId" id="bookingUserId" placeholder="User ID" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="vehicleId" id="bookingVehicleId" placeholder="Vehicle ID" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="startDate" id="bookingStartDate" type="date" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="endDate" id="bookingEndDate" type="date" required></div>
+                                                 <div class="col-md-2">
+                                                     <select class="form-select" name="status" id="bookingStatus">
+                                                         <option value="Pending">Pending</option>
+                                                         <option value="Confirmed">Confirmed</option>
+                                                         <option value="Completed">Completed</option>
+                                                         <option value="Cancelled">Cancelled</option>
+                                                     </select>
+                                                 </div>
+                                                 <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit" id="bookingSubmitBtn">Create</button></div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -489,33 +497,37 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteSelectedPayments()">
                                             <i class="fas fa-trash me-1"></i>Delete Selected
                                         </button>
-                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#paymentForm">
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#paymentForm" onclick="resetPaymentForm()">
                                             <i class="fas fa-plus me-1"></i>Add Payment
                                         </button>
                                     </div>
                                 </div>
 
                                 <div id="paymentForm" class="collapse mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <form class="row g-3" method="post" action="PaymentController">
-                                                <input type="hidden" name="action" value="create">
-                                                <div class="col-md-3"><input class="form-control" name="bookingId" placeholder="Booking ID" required></div>
-                                                <div class="col-md-3"><input class="form-control" name="amount" type="number" step="0.01" placeholder="Amount" required></div>
-                                                <div class="col-md-3">
-                                                    <select class="form-select" name="paymentMethod" required>
-                                                        <option value="">Select Method</option>
-                                                        <option value="Credit Card">Credit Card</option>
-                                                        <option value="Debit Card">Debit Card</option>
-                                                        <option value="Cash">Cash</option>
-                                                        <option value="PayPal">PayPal</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3 d-grid"><button class="btn btn-success" type="submit">Create</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="card">
+                                         <div class="card-header">
+                                             <h6 id="paymentFormTitle"><i class="fas fa-plus me-2"></i>Add New Payment</h6>
+                                         </div>
+                                         <div class="card-body">
+                                             <form class="row g-3" method="post" action="PaymentController" id="paymentFormElement">
+                                                 <input type="hidden" name="action" value="create" id="paymentAction">
+                                                 <input type="hidden" name="paymentId" id="paymentId">
+                                                 <div class="col-md-3"><input class="form-control" name="bookingId" id="paymentBookingId" placeholder="Booking ID" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="amount" id="paymentAmount" type="number" step="0.01" placeholder="Amount" required></div>
+                                                 <div class="col-md-3">
+                                                     <select class="form-select" name="paymentMethod" id="paymentMethod" required>
+                                                         <option value="">Select Method</option>
+                                                         <option value="Credit Card">Credit Card</option>
+                                                         <option value="Debit Card">Debit Card</option>
+                                                         <option value="Cash">Cash</option>
+                                                         <option value="PayPal">PayPal</option>
+                                                     </select>
+                                                 </div>
+                                                 <div class="col-md-3 d-grid"><button class="btn btn-success" type="submit" id="paymentSubmitBtn">Create</button></div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -557,26 +569,30 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteSelectedUsers()">
                                             <i class="fas fa-trash me-1"></i>Delete Selected
                                         </button>
-                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#userForm">
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#userForm" onclick="resetUserForm()">
                                             <i class="fas fa-plus me-1"></i>Add User
                                         </button>
                                     </div>
                                 </div>
 
                                 <div id="userForm" class="collapse mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <form class="row g-3" method="post" action="UserController">
-                                                <input type="hidden" name="action" value="create">
-                                                <div class="col-md-3"><input class="form-control" name="fullName" placeholder="Full Name" required></div>
-                                                <div class="col-md-3"><input class="form-control" name="username" placeholder="Username" required></div>
-                                                <div class="col-md-3"><input class="form-control" name="email" placeholder="Email" required></div>
-                                                <div class="col-md-3"><input class="form-control" name="password" placeholder="Password" required></div>
-                                                <div class="col-12 d-grid"><button class="btn btn-success" type="submit">Create User</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="card">
+                                         <div class="card-header">
+                                             <h6 id="userFormTitle"><i class="fas fa-plus me-2"></i>Add New User</h6>
+                                         </div>
+                                         <div class="card-body">
+                                             <form class="row g-3" method="post" action="UserController" id="userFormElement">
+                                                 <input type="hidden" name="action" value="create" id="userAction">
+                                                 <input type="hidden" name="userId" id="userId">
+                                                 <div class="col-md-3"><input class="form-control" name="fullName" id="userFullName" placeholder="Full Name" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="username" id="userUsername" placeholder="Username" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="email" id="userEmail" placeholder="Email" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="password" id="userPassword" placeholder="Password" required></div>
+                                                 <div class="col-12 d-grid"><button class="btn btn-success" type="submit" id="userSubmitBtn">Create User</button></div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -596,6 +612,9 @@
                                                     <td>${u.email}</td>
                                                     <td><span class="badge bg-info">${u.role}</span></td>
                                                     <td>
+                                                        <button class="btn btn-sm btn-outline-secondary action-btn me-1" onclick="editUser('${u.userId}')">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
                                                         <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="updateRole('${u.userId}', '${u.role}')">
                                                             <i class="fas fa-user-cog"></i> Update Role
                                                         </button>
@@ -618,26 +637,30 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteSelectedPromotions()">
                                             <i class="fas fa-trash me-1"></i>Delete Selected
                                         </button>
-                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#promoForm">
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#promoForm" onclick="resetPromoForm()">
                                             <i class="fas fa-plus me-1"></i>Add Promotion
                                         </button>
                                     </div>
                                 </div>
 
                                 <div id="promoForm" class="collapse mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <form class="row g-3" method="post" action="PromotionController">
-                                                <input type="hidden" name="action" value="add">
-                                                <div class="col-md-4"><input class="form-control" name="title" placeholder="Title" required></div>
-                                                <div class="col-md-4"><input class="form-control" name="description" placeholder="Description" required></div>
-                                                <div class="col-md-2"><input class="form-control" name="badge" placeholder="Badge"></div>
-                                                <div class="col-md-2"><input type="date" class="form-control" name="validTill" placeholder="Valid Till"></div>
-                                                <div class="col-12 d-grid"><button class="btn btn-success" type="submit">Create Promotion</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="card">
+                                         <div class="card-header">
+                                             <h6 id="promoFormTitle"><i class="fas fa-plus me-2"></i>Add New Promotion</h6>
+                                         </div>
+                                         <div class="card-body">
+                                             <form class="row g-3" method="post" action="PromotionController" id="promoFormElement">
+                                                 <input type="hidden" name="action" value="add" id="promoAction">
+                                                 <input type="hidden" name="id" id="promoId">
+                                                 <div class="col-md-4"><input class="form-control" name="title" id="promoTitle" placeholder="Title" required></div>
+                                                 <div class="col-md-4"><input class="form-control" name="description" id="promoDescription" placeholder="Description" required></div>
+                                                 <div class="col-md-2"><input class="form-control" name="badge" id="promoBadge" placeholder="Badge"></div>
+                                                 <div class="col-md-2"><input type="date" class="form-control" name="validTill" id="promoValidTill" placeholder="Valid Till"></div>
+                                                 <div class="col-12 d-grid"><button class="btn btn-success" type="submit" id="promoSubmitBtn">Create Promotion</button></div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -772,7 +795,7 @@
                                     <button class="btn btn-danger btn-sm" onclick="deleteSelectedCampaigns()">
                                         <i class="fas fa-trash me-1"></i>Delete Selected
                                     </button>
-                                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="admin-campaign-create.jsp">
+                                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#campaignForm" onclick="resetCampaignForm()">
                                         <i class="fas fa-plus me-1"></i>Add Campaign
                                     </button>
                                 </div>
@@ -780,21 +803,25 @@
 
                             <div id="campaignForm" class="collapse mb-4">
                                 <div class="card">
+                                    <div class="card-header">
+                                        <h6 id="campaignFormTitle"><i class="fas fa-plus me-2"></i>Add New Campaign</h6>
+                                    </div>
                                     <div class="card-body">
-                                        <form class="row g-3" method="post" action="CampaignController">
-                                            <input type="hidden" name="action" value="create">
-                                            <div class="col-md-6"><input class="form-control" name="subject" placeholder="Email Subject" required></div>
+                                        <form class="row g-3" method="post" action="CampaignController" id="campaignFormElement">
+                                            <input type="hidden" name="action" value="create" id="campaignAction">
+                                            <input type="hidden" name="campaignId" id="campaignId">
+                                            <div class="col-md-6"><input class="form-control" name="subject" id="campaignSubject" placeholder="Email Subject" required></div>
                                             <div class="col-md-6">
-                                                <select class="form-select" name="segment" required>
+                                                <select class="form-select" name="segment" id="campaignSegment" required>
                                                     <option value="">Select Segment</option>
                                                     <option value="all">All Customers</option>
                                                     <option value="active_customers">Active Customers</option>
                                                     <option value="new_customers">New Customers</option>
                                                 </select>
                                             </div>
-                                            <div class="col-12"><textarea class="form-control" name="body" rows="4" placeholder="Email Body" required></textarea></div>
-                                            <div class="col-12"><input class="form-control" name="offer" placeholder="Special Offer (optional)"></div>
-                                            <div class="col-12 d-grid"><button class="btn btn-success" type="submit">Create Campaign</button></div>
+                                            <div class="col-12"><textarea class="form-control" name="body" id="campaignBody" rows="4" placeholder="Email Body" required></textarea></div>
+                                            <div class="col-12"><input class="form-control" name="offer" id="campaignOffer" placeholder="Special Offer (optional)"></div>
+                                            <div class="col-12 d-grid"><button class="btn btn-success" type="submit" id="campaignSubmitBtn">Create Campaign</button></div>
                                         </form>
                                     </div>
                                 </div>
@@ -1100,24 +1127,187 @@
         }
 
         // Individual CRUD Operations
-        function editVehicle(id) { alert('Edit Vehicle: ' + id); }
-        function deleteVehicle(id) {
-            if (confirm('Delete vehicle ' + id + '?')) {
-                // Implement delete logic
-            }
+         function editVehicle(id) {
+             // Fetch vehicle data and populate form
+             fetch('VehicleController?action=get&id=' + id)
+                 .then(response => response.json())
+                 .then(data => {
+                     document.getElementById('vehicleAction').value = 'update';
+                     document.getElementById('vehicleId').value = data.vehicleId;
+                     document.getElementById('vehicleId').readOnly = true; // ID shouldn't be editable
+                     document.getElementById('vehicleName').value = data.vehicleName;
+                     document.getElementById('vehicleType').value = data.vehicleType;
+                     document.getElementById('vehiclePrice').value = data.dailyPrice;
+                     document.getElementById('vehicleAvailable').value = data.available.toString();
+                     // For image, show current URL but don't populate file input
+                     document.getElementById('vehicleImageUrl').value = data.imageUrl || '';
+                     document.getElementById('vehicleImageFile').value = ''; // Clear file input
+                     document.getElementById('vehicleFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Vehicle';
+                     document.getElementById('vehicleSubmitBtn').textContent = 'Update';
+                     // Show the form
+                     const form = document.getElementById('vehicleForm');
+                     if (!form.classList.contains('show')) {
+                         new bootstrap.Collapse(form).show();
+                     }
+                 })
+                 .catch(error => {
+                     alert('Error loading vehicle data: ' + error);
+                 });
+         }
+
+         function resetVehicleForm() {
+             document.getElementById('vehicleAction').value = 'add';
+             document.getElementById('vehicleId').readOnly = false;
+             document.getElementById('vehicleId').value = '';
+             document.getElementById('vehicleName').value = '';
+             document.getElementById('vehicleType').value = '';
+             document.getElementById('vehiclePrice').value = '';
+             document.getElementById('vehicleAvailable').value = 'true';
+             document.getElementById('vehicleImageFile').value = '';
+             document.getElementById('vehicleImageUrl').value = '';
+             document.getElementById('vehicleFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Vehicle';
+             document.getElementById('vehicleSubmitBtn').textContent = 'Save';
+         }
+
+         function deleteVehicle(id) {
+             if (confirm('Delete vehicle ' + id + '?')) {
+                 const form = document.createElement('form');
+                 form.method = 'post';
+                 form.action = 'VehicleController';
+                 form.style.display = 'none';
+
+                 const actionInput = document.createElement('input');
+                 actionInput.type = 'hidden';
+                 actionInput.name = 'action';
+                 actionInput.value = 'delete';
+
+                 const idInput = document.createElement('input');
+                 idInput.type = 'hidden';
+                 idInput.name = 'vehicleId';
+                 idInput.value = id;
+
+                 form.appendChild(actionInput);
+                 form.appendChild(idInput);
+                 document.body.appendChild(form);
+                 form.submit();
+             }
+         }
+
+        function editBooking(id) {
+             // Fetch booking data and populate form
+             fetch('BookingController?action=get&id=' + id)
+                 .then(response => response.json())
+                 .then(data => {
+                     document.getElementById('bookingAction').value = 'update';
+                     document.getElementById('bookingId').value = data.bookingId;
+                     document.getElementById('bookingUserId').value = data.userId;
+                     document.getElementById('bookingVehicleId').value = data.vehicleId;
+                     document.getElementById('bookingStartDate').value = data.startDate;
+                     document.getElementById('bookingEndDate').value = data.endDate;
+                     document.getElementById('bookingStatus').value = data.status;
+                     document.getElementById('bookingFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Booking';
+                     document.getElementById('bookingSubmitBtn').textContent = 'Update';
+                     // Show the form
+                     const form = document.getElementById('bookingForm');
+                     if (!form.classList.contains('show')) {
+                         new bootstrap.Collapse(form).show();
+                     }
+                 })
+                 .catch(error => {
+                     alert('Error loading booking data: ' + error);
+                 });
+         }
+
+         function resetBookingForm() {
+             document.getElementById('bookingAction').value = 'create';
+             document.getElementById('bookingId').value = '';
+             document.getElementById('bookingUserId').value = '';
+             document.getElementById('bookingVehicleId').value = '';
+             document.getElementById('bookingStartDate').value = '';
+             document.getElementById('bookingEndDate').value = '';
+             document.getElementById('bookingStatus').value = 'Pending';
+             document.getElementById('bookingFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Booking';
+             document.getElementById('bookingSubmitBtn').textContent = 'Create';
+         }
+
+         function deleteBooking(id) {
+             if (confirm('Delete booking ' + id + '? This will also delete related payments and feedback.')) {
+                 const form = document.createElement('form');
+                 form.method = 'post';
+                 form.action = 'BookingController';
+                 form.style.display = 'none';
+
+                 const actionInput = document.createElement('input');
+                 actionInput.type = 'hidden';
+                 actionInput.name = 'action';
+                 actionInput.value = 'delete';
+
+                 const idInput = document.createElement('input');
+                 idInput.type = 'hidden';
+                 idInput.name = 'bookingId';
+                 idInput.value = id;
+
+                 form.appendChild(actionInput);
+                 form.appendChild(idInput);
+                 document.body.appendChild(form);
+                 form.submit();
+             }
+         }
+
+        function editPayment(id) {
+            // Fetch payment data and populate form
+            fetch('PaymentController?action=get&id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('paymentAction').value = 'update';
+                    document.getElementById('paymentId').value = data.paymentId;
+                    document.getElementById('paymentBookingId').value = data.bookingId;
+                    document.getElementById('paymentAmount').value = data.amount;
+                    document.getElementById('paymentMethod').value = data.paymentMethod;
+                    document.getElementById('paymentFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Payment';
+                    document.getElementById('paymentSubmitBtn').textContent = 'Update';
+                    // Show the form
+                    const form = document.getElementById('paymentForm');
+                    if (!form.classList.contains('show')) {
+                        new bootstrap.Collapse(form).show();
+                    }
+                })
+                .catch(error => {
+                    alert('Error loading payment data: ' + error);
+                });
         }
 
-        function editBooking(id) { alert('Edit Booking: ' + id); }
-        function deleteBooking(id) {
-            if (confirm('Delete booking ' + id + '?')) {
-                // Implement delete logic
-            }
+        function resetPaymentForm() {
+            document.getElementById('paymentAction').value = 'create';
+            document.getElementById('paymentId').value = '';
+            document.getElementById('paymentBookingId').value = '';
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentMethod').value = '';
+            document.getElementById('paymentFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Payment';
+            document.getElementById('paymentSubmitBtn').textContent = 'Create';
         }
 
-        function editPayment(id) { alert('Edit Payment: ' + id); }
         function deletePayment(id) {
             if (confirm('Delete payment ' + id + '?')) {
-                // Implement delete logic
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = 'PaymentController';
+                form.style.display = 'none';
+
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'paymentId';
+                idInput.value = id;
+
+                form.appendChild(actionInput);
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
             }
         }
 
@@ -1135,10 +1325,62 @@
             new bootstrap.Modal(document.getElementById('roleUpdateModal')).show();
         }
 
-        function editUser(id) { alert('Edit User: ' + id); }
+        function editUser(id) {
+            // Fetch user data and populate form
+            fetch('UserController?action=get&id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('userAction').value = 'update';
+                    document.getElementById('userId').value = data.userId;
+                    document.getElementById('userFullName').value = data.fullName;
+                    document.getElementById('userUsername').value = data.username;
+                    document.getElementById('userEmail').value = data.email;
+                    document.getElementById('userPassword').value = data.password; // Note: In real app, password shouldn't be shown
+                    document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit User';
+                    document.getElementById('userSubmitBtn').textContent = 'Update User';
+                    // Show the form
+                    const form = document.getElementById('userForm');
+                    if (!form.classList.contains('show')) {
+                        new bootstrap.Collapse(form).show();
+                    }
+                })
+                .catch(error => {
+                    alert('Error loading user data: ' + error);
+                });
+        }
+
+        function resetUserForm() {
+            document.getElementById('userAction').value = 'create';
+            document.getElementById('userId').value = '';
+            document.getElementById('userFullName').value = '';
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New User';
+            document.getElementById('userSubmitBtn').textContent = 'Create User';
+        }
+
         function deleteUser(id) {
             if (confirm('Delete user ' + id + '?')) {
-                // Implement delete logic
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = 'UserController';
+                form.style.display = 'none';
+
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'userId';
+                idInput.value = id;
+
+                form.appendChild(actionInput);
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
             }
         }
 
@@ -1147,15 +1389,107 @@
             window.location.href = 'UserManagementServlet?action=discardChanges';
         }
 
-        function editPromotion(id) { alert('Edit Promotion: ' + id); }
-        function togglePromotion(id) { alert('Toggle Promotion: ' + id); }
-        function deletePromotion(id) {
-            if (confirm('Delete promotion ' + id + '?')) {
-                // Implement delete logic
+        function editPromotion(id) {
+            // Fetch promotion data and populate form
+            fetch('PromotionController?action=get&id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('promoAction').value = 'update';
+                    document.getElementById('promoId').value = data.id;
+                    document.getElementById('promoTitle').value = data.title;
+                    document.getElementById('promoDescription').value = data.description;
+                    document.getElementById('promoBadge').value = data.badge;
+                    document.getElementById('promoValidTill').value = data.validTill;
+                    document.getElementById('promoFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Promotion';
+                    document.getElementById('promoSubmitBtn').textContent = 'Update Promotion';
+                    // Show the form
+                    const form = document.getElementById('promoForm');
+                    if (!form.classList.contains('show')) {
+                        new bootstrap.Collapse(form).show();
+                    }
+                })
+                .catch(error => {
+                    alert('Error loading promotion data: ' + error);
+                });
+        }
+
+        function resetPromoForm() {
+            document.getElementById('promoAction').value = 'add';
+            document.getElementById('promoId').value = '';
+            document.getElementById('promoTitle').value = '';
+            document.getElementById('promoDescription').value = '';
+            document.getElementById('promoBadge').value = '';
+            document.getElementById('promoValidTill').value = '';
+            document.getElementById('promoFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Promotion';
+            document.getElementById('promoSubmitBtn').textContent = 'Create Promotion';
+        }
+
+        function togglePromotion(id) {
+            if (confirm('Toggle active status of promotion ' + id + '?')) {
+                // This would need a separate endpoint, for now just alert
+                alert('Toggle functionality not implemented yet');
             }
         }
 
-        function editCampaign(id) { alert('Edit Campaign: ' + id); }
+        function deletePromotion(id) {
+            if (confirm('Delete promotion ' + id + '?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = 'PromotionController';
+                form.style.display = 'none';
+
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = id;
+
+                form.appendChild(actionInput);
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function editCampaign(id) {
+            // Fetch campaign data and populate form
+            fetch('CampaignController?action=get&id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('campaignAction').value = 'update';
+                    document.getElementById('campaignId').value = data.campaignId;
+                    document.getElementById('campaignSubject').value = data.subject;
+                    document.getElementById('campaignSegment').value = data.segment;
+                    document.getElementById('campaignBody').value = data.body;
+                    document.getElementById('campaignOffer').value = data.offer || '';
+                    document.getElementById('campaignFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Campaign';
+                    document.getElementById('campaignSubmitBtn').textContent = 'Update Campaign';
+                    // Show the form
+                    const form = document.getElementById('campaignForm');
+                    if (!form.classList.contains('show')) {
+                        new bootstrap.Collapse(form).show();
+                    }
+                })
+                .catch(error => {
+                    alert('Error loading campaign data: ' + error);
+                });
+        }
+
+        function resetCampaignForm() {
+            document.getElementById('campaignAction').value = 'create';
+            document.getElementById('campaignId').value = '';
+            document.getElementById('campaignSubject').value = '';
+            document.getElementById('campaignSegment').value = '';
+            document.getElementById('campaignBody').value = '';
+            document.getElementById('campaignOffer').value = '';
+            document.getElementById('campaignFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Campaign';
+            document.getElementById('campaignSubmitBtn').textContent = 'Create Campaign';
+        }
+
         function sendCampaign(id) {
             if (confirm('Send campaign ' + id + ' to all recipients? This will send emails to all customers in the selected segment.')) {
                 // Show loading message

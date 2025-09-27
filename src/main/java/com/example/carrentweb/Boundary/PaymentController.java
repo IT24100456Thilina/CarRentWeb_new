@@ -9,13 +9,45 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 @WebServlet("/PaymentController")
 public class PaymentController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request, response);
+        String action = request.getParameter("action");
+        if ("get".equals(action)) {
+            getPayment(request, response);
+        } else {
+            doPost(request, response);
+        }
+    }
+
+    private void getPayment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT paymentId, bookingId, amount, paymentMethod FROM Payments WHERE paymentId = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String json = String.format(
+                    "{\"paymentId\":%d,\"bookingId\":%d,\"amount\":%.2f,\"paymentMethod\":\"%s\"}",
+                    rs.getInt("paymentId"),
+                    rs.getInt("bookingId"),
+                    rs.getDouble("amount"),
+                    rs.getString("paymentMethod")
+                );
+                response.getWriter().write(json);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Payment not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

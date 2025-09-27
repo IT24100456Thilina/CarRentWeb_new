@@ -45,6 +45,9 @@ public class CampaignController extends HttpServlet {
                 case "list":
                     listCampaigns(request, response, conn);
                     break;
+                case "get":
+                    getCampaign(request, response, conn);
+                    break;
                 case "create":
                     showCreateForm(request, response);
                     break;
@@ -63,6 +66,33 @@ public class CampaignController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("admin-campaigns.jsp?error=" + java.net.URLEncoder.encode("Database error: " + e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+        }
+    }
+
+    private void getCampaign(HttpServletRequest request, HttpServletResponse response, Connection conn) throws Exception {
+        response.setContentType("application/json");
+        int campaignId = Integer.parseInt(request.getParameter("id"));
+        String sql = "SELECT campaignId, subject, body, offer, segment, status, createdDate, sentDate, sentCount FROM Campaigns WHERE campaignId = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, campaignId);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            String json = String.format(
+                "{\"campaignId\":%d,\"subject\":\"%s\",\"body\":\"%s\",\"offer\":\"%s\",\"segment\":\"%s\",\"status\":\"%s\",\"createdDate\":\"%s\",\"sentDate\":\"%s\",\"sentCount\":%d}",
+                rs.getInt("campaignId"),
+                rs.getString("subject").replace("\"", "\\\""),
+                rs.getString("body").replace("\"", "\\\""),
+                rs.getString("offer") != null ? rs.getString("offer").replace("\"", "\\\"") : "",
+                rs.getString("segment"),
+                rs.getString("status"),
+                rs.getString("createdDate"),
+                rs.getString("sentDate") != null ? rs.getString("sentDate") : "",
+                rs.getInt("sentCount")
+            );
+            response.getWriter().write(json);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Campaign not found");
         }
     }
 

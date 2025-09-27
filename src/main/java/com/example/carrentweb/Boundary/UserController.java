@@ -16,7 +16,39 @@ public class UserController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request, response);
+        String action = request.getParameter("action");
+        if ("get".equals(action)) {
+            getUser(request, response);
+        } else {
+            doPost(request, response);
+        }
+    }
+
+    private void getUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT userId, fullName, username, email, password FROM Users WHERE userId = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String json = String.format(
+                    "{\"userId\":%d,\"fullName\":\"%s\",\"username\":\"%s\",\"email\":\"%s\",\"password\":\"%s\"}",
+                    rs.getInt("userId"),
+                    rs.getString("fullName").replace("\"", "\\\""),
+                    rs.getString("username").replace("\"", "\\\""),
+                    rs.getString("email").replace("\"", "\\\""),
+                    rs.getString("password").replace("\"", "\\\"")
+                );
+                response.getWriter().write(json);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
