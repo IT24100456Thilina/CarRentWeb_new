@@ -75,7 +75,7 @@
     if (request.getAttribute("userList") == null) {
         List<Map<String, Object>> users = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email FROM Users");
+            PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email, role FROM Users");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> u = new HashMap<>();
@@ -83,6 +83,7 @@
                 u.put("fullName", rs.getString("fullName"));
                 u.put("username", rs.getString("username"));
                 u.put("email", rs.getString("email"));
+                u.put("role", rs.getString("role"));
                 users.add(u);
             }
         } catch (Exception ignore) {}
@@ -341,7 +342,7 @@
                                         <div class="card-body">
                                             <form class="row g-3" method="post" action="VehicleController" enctype="multipart/form-data">
                                                 <input type="hidden" name="action" value="add">
-                                                <div class="col-md-2"><input class="form-control" name="vehicleId" placeholder="ID" required></div>
+                                                <div class="col-md-2"><input class="form-control" name="vehicleId" placeholder="ID" required type="number"></div>
                                                 <div class="col-md-3"><input class="form-control" name="vehicleName" placeholder="Model/Name" required></div>
                                                 <div class="col-md-2"><input class="form-control" name="vehicleType" placeholder="Type" required></div>
                                                 <div class="col-md-2"><input class="form-control" name="dailyPrice" placeholder="Price/Day" required></div>
@@ -374,7 +375,7 @@
                                         <thead class="table-dark">
                                             <tr>
                                                 <th><input type="checkbox" id="selectAllVehicles" onclick="toggleAllVehicles()"></th>
-                                                <th>ID</th><th>Name</th><th>Type</th><th>Price/Day</th><th>Status</th><th>Actions</th>
+                                                <th>ID</th><th>Name</th><th>Type</th><th>Price/Day</th><th>Status</th><th>Image</th><th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -386,6 +387,16 @@
                                                     <td>${car.vehicleType}</td>
                                                     <td>$${car.dailyPrice}</td>
                                                     <td><span class="badge ${car.available ? 'bg-success' : 'bg-danger'}">${car.available ? 'Available' : 'Unavailable'}</span></td>
+                                                    <td>
+                                                        <c:if test="${not empty car.imageUrl}">
+                                                            <img src="${car.imageUrl}" alt="${car.vehicleName}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                                        </c:if>
+                                                        <c:if test="${empty car.imageUrl}">
+                                                            <div style="width: 60px; height: 40px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="fas fa-image text-muted"></i>
+                                                            </div>
+                                                        </c:if>
+                                                    </td>
                                                     <td>
                                                         <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editVehicle('${car.vehicleId}')">
                                                             <i class="fas fa-edit"></i>
@@ -572,7 +583,7 @@
                                         <thead class="table-dark">
                                             <tr>
                                                 <th><input type="checkbox" id="selectAllUsers" onclick="toggleAllUsers()"></th>
-                                                <th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Actions</th>
+                                                <th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -583,9 +594,10 @@
                                                     <td>${u.fullName}</td>
                                                     <td>${u.username}</td>
                                                     <td>${u.email}</td>
+                                                    <td><span class="badge bg-info">${u.role}</span></td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editUser('${u.userId}')">
-                                                            <i class="fas fa-edit"></i>
+                                                        <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="updateRole('${u.userId}', '${u.role}')">
+                                                            <i class="fas fa-user-cog"></i> Update Role
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteUser('${u.userId}')">
                                                             <i class="fas fa-trash"></i>
@@ -823,6 +835,87 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Role Update Modal -->
+                            <div class="modal fade" id="roleUpdateModal" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Update User Role & Permissions</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form id="roleUpdateForm" method="post" action="UserManagementServlet">
+                                            <input type="hidden" name="action" value="updateRole">
+                                            <input type="hidden" name="userId" id="modalUserId">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Role</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="role" id="roleCustomer" value="customer" checked>
+                                                        <label class="form-check-label" for="roleCustomer">Customer</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="role" id="roleAdmin" value="admin">
+                                                        <label class="form-check-label" for="roleAdmin">Admin</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="role" id="roleOther" value="other">
+                                                        <label class="form-check-label" for="roleOther">Other</label>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Permissions</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="permissions" value="view" id="permView">
+                                                        <label class="form-check-label" for="permView">View</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="permissions" value="edit" id="permEdit">
+                                                        <label class="form-check-label" for="permEdit">Edit</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="permissions" value="delete" id="permDelete">
+                                                        <label class="form-check-label" for="permDelete">Delete</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Review Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Review Changes Modal -->
+                            <c:if test="${not empty sessionScope.pendingUserId}">
+                                <div class="modal fade show" id="reviewModal" tabindex="-1" style="display: block;">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Review Changes</h5>
+                                                <button type="button" class="btn-close" onclick="discardChanges()"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>User ID:</strong> ${sessionScope.pendingUserId}</p>
+                                                <p><strong>New Role:</strong> ${sessionScope.pendingRole}</p>
+                                                <p><strong>Permissions:</strong> ${sessionScope.pendingPermissions}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="UserManagementServlet" style="display: inline;">
+                                                    <input type="hidden" name="action" value="discardChanges">
+                                                    <button type="submit" class="btn btn-secondary">Discard Changes</button>
+                                                </form>
+                                                <form method="post" action="UserManagementServlet" style="display: inline;">
+                                                    <input type="hidden" name="action" value="saveChanges">
+                                                    <button type="submit" class="btn btn-success">Save Changes</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
                 </div>
@@ -1028,11 +1121,30 @@
             }
         }
 
+        function updateRole(id, currentRole) {
+            document.getElementById('modalUserId').value = id;
+            // Set current role
+            if (currentRole === 'admin') {
+                document.getElementById('roleAdmin').checked = true;
+            } else if (currentRole === 'other') {
+                document.getElementById('roleOther').checked = true;
+            } else {
+                document.getElementById('roleCustomer').checked = true;
+            }
+            // Show modal
+            new bootstrap.Modal(document.getElementById('roleUpdateModal')).show();
+        }
+
         function editUser(id) { alert('Edit User: ' + id); }
         function deleteUser(id) {
             if (confirm('Delete user ' + id + '?')) {
                 // Implement delete logic
             }
+        }
+
+        function discardChanges() {
+            // Redirect to discard
+            window.location.href = 'UserManagementServlet?action=discardChanges';
         }
 
         function editPromotion(id) { alert('Edit Promotion: ' + id); }

@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.UUID;
 
 @WebServlet("/VehicleController")
@@ -72,33 +73,32 @@ public class VehicleController extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             switch (action) {
                 case "add": {
-                    // Handle image upload
-                    String imageUrl = handleFileUpload(request);
+                     // Check if vehicleId already exists
+                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+                     String checkSql = "SELECT COUNT(*) FROM Vehicles WHERE vehicleId = ?";
+                     PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                     checkPs.setInt(1, vehicleId);
+                     ResultSet rs = checkPs.executeQuery();
+                     rs.next();
+                     if (rs.getInt(1) > 0) {
+                         response.sendRedirect("admin-crud.jsp?errorMsg=Vehicle ID already exists");
+                         return;
+                     }
 
-                    // Support both schemas: (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl)
-                    // or (id, model, type, pricePerDay, status)
-                    String sql = "INSERT INTO Vehicles(vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl) VALUES (?, ?, ?, ?, ?, ?)";
-                    try {
-                        PreparedStatement ps = conn.prepareStatement(sql);
-                        ps.setInt(1, Integer.parseInt(request.getParameter("vehicleId")));
-                        ps.setString(2, request.getParameter("vehicleName"));
-                        ps.setString(3, request.getParameter("vehicleType"));
-                        ps.setBigDecimal(4, new java.math.BigDecimal(request.getParameter("dailyPrice")));
-                        ps.setBoolean(5, Boolean.parseBoolean(request.getParameter("available")));
-                        ps.setString(6, imageUrl);
-                        ps.executeUpdate();
-                    } catch (Exception e) {
-                        String alt = "INSERT INTO Vehicles(id, model, type, pricePerDay, status) VALUES (?, ?, ?, ?, ?)";
-                        PreparedStatement ps = conn.prepareStatement(alt);
-                        ps.setInt(1, Integer.parseInt(request.getParameter("vehicleId")));
-                        ps.setString(2, request.getParameter("vehicleName"));
-                        ps.setString(3, request.getParameter("vehicleType"));
-                        ps.setBigDecimal(4, new java.math.BigDecimal(request.getParameter("dailyPrice")));
-                        ps.setString(5, request.getParameter("available"));
-                        ps.executeUpdate();
-                    }
-                    break;
-                }
+                     // Handle image upload
+                     String imageUrl = handleFileUpload(request);
+
+                     String sql = "INSERT INTO Vehicles(vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl) VALUES (?, ?, ?, ?, ?, ?)";
+                     PreparedStatement ps = conn.prepareStatement(sql);
+                     ps.setInt(1, vehicleId);
+                     ps.setString(2, request.getParameter("vehicleName"));
+                     ps.setString(3, request.getParameter("vehicleType"));
+                     ps.setBigDecimal(4, new java.math.BigDecimal(request.getParameter("dailyPrice")));
+                     ps.setBoolean(5, Boolean.parseBoolean(request.getParameter("available")));
+                     ps.setString(6, imageUrl);
+                     ps.executeUpdate();
+                     break;
+                 }
                 case "update": {
                     // Handle image upload for updates
                     String imageUrl = handleFileUpload(request);

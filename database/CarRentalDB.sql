@@ -21,7 +21,7 @@ CREATE TABLE Users (
 
 -- Vehicles Table
 CREATE TABLE Vehicles (
-    vehicleId INT PRIMARY KEY,
+    vehicleId INT IDENTITY(1,1) PRIMARY KEY,
     vehicleName NVARCHAR(100) NOT NULL,
     vehicleType NVARCHAR(50) NOT NULL,
     dailyPrice DECIMAL(10,2) NOT NULL,
@@ -125,12 +125,14 @@ INSERT INTO Users (fullName, email, phone, username, password, role) VALUES
 ('Jane Smith', 'jane@example.com', '+1123456789', 'janesmith', 'password123', 'customer');
 
 -- Insert sample vehicles
+SET IDENTITY_INSERT Vehicles ON;
 INSERT INTO Vehicles (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl) VALUES
 (1, 'Toyota Corolla', 'Sedan', 45.00, 1, 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=300&fit=crop&crop=center'),
 (2, 'Honda Civic', 'Sedan', 50.00, 1, 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop&crop=center'),
 (3, 'Jeep Wrangler', 'SUV', 80.00, 1, 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=400&h=300&fit=crop&crop=center'),
 (4, 'BMW X5', 'Luxury SUV', 120.00, 0, 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop&crop=center'),
 (5, 'Ford Transit', 'Van', 70.00, 1, 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center');
+SET IDENTITY_INSERT Vehicles OFF;
 
 -- Insert sample promotions
 INSERT INTO Promotions (title, description, badge, validTill, active) VALUES
