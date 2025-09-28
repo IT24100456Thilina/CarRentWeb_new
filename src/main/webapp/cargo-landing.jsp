@@ -1306,25 +1306,37 @@
             <div class="text-center mb-5">
                 <h2 class="section-title">What Our Customers Say</h2>
                 <p class="section-subtitle">Real feedback from our valued customers</p>
+                <div class="text-center mb-4">
+                    <c:if test="${not empty sessionScope.username && sessionScope.role == 'customer'}">
+                        <a data-bs-toggle="modal" data-bs-target="#customerFeedbackModal" class="btn btn-primary">
+                            <i class="fas fa-comments me-2"></i>Share Your Feedback
+                        </a>
+                    </c:if>
+                    <c:if test="${empty sessionScope.username}">
+                        <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Share Feedback
+                        </a>
+                    </c:if>
+                </div>
             </div>
-            <!-- Previous Feedback -->
+            <!-- Recent Customer Feedback -->
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Your Previous Feedback</h5>
-                            <span class="badge bg-primary">${customerFeedbackCount != null ? customerFeedbackCount : 0} Feedback</span>
+                            <h5 class="mb-0">Recent Customer Feedback</h5>
+                            <span class="badge bg-primary">${recentFeedback != null ? recentFeedback.size() : 0} Reviews</span>
                         </div>
                         <div class="card-body">
-                            <c:if test="${empty customerFeedbackList}">
+                            <c:if test="${empty recentFeedback}">
                                 <div class="text-center py-5">
-                                    <h6 class="text-muted mb-3">No Feedback Submitted Yet</h6>
-                                    <p class="text-muted">Your feedback history will appear here once you submit your first review.</p>
+                                    <h6 class="text-muted mb-3">No Reviews Yet</h6>
+                                    <p class="text-muted">Be the first to share your experience with CarGO!</p>
                                 </div>
                             </c:if>
-                            <c:if test="${not empty customerFeedbackList}">
+                            <c:if test="${not empty recentFeedback}">
                                 <div class="row g-3">
-                                    <c:forEach var="feedback" items="${customerFeedbackList}">
+                                    <c:forEach var="feedback" items="${recentFeedback}">
                                         <div class="col-md-6">
                                             <div class="card feedback-card h-100">
                                                 <div class="card-body">
@@ -1363,6 +1375,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
     </section>
@@ -1925,7 +1938,6 @@
     </c:if>
 
     <!-- Customer Add Feedback Modal -->
-    <c:if test="${not empty sessionScope.username && sessionScope.role == 'customer'}">
     <div class="modal fade" id="customerFeedbackModal" tabindex="-1" aria-labelledby="customerFeedbackModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -1986,6 +1998,5 @@
             </div>
         </div>
     </div>
-    </c:if>
 </body>
 </html>

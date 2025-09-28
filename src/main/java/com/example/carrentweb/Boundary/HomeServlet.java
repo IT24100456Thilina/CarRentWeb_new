@@ -186,7 +186,9 @@ public class HomeServlet extends HttpServlet {
         String page = request.getParameter("page");
         String targetJsp = "cargo-landing.jsp";
 
-        if ("customer-vehicles".equals(page)) {
+        if ("car-landing".equals(page)) {
+            targetJsp = "car-landing.jsp";
+        } else if ("customer-vehicles".equals(page)) {
             targetJsp = "customer-vehicles.jsp";
         } else if ("customer-promotions".equals(page)) {
             targetJsp = "customer-promotions.jsp";
