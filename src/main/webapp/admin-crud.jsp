@@ -544,7 +544,7 @@
                                                     <td>${p.paymentId}</td>
                                                     <td>${p.bookingId}</td>
                                                     <td>${p.customerName}</td>
-                                                    <td>$${p.amount}</td>
+                                                    <td>Rs${p.amount}</td>
                                                     <td>${p.paymentMethod}</td>
                                                     <td>
                                                         <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editPayment('${p.paymentId}')">
