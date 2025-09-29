@@ -399,7 +399,7 @@
             </select>
         </div>
         <div class="col-12 col-md-3">
-            <label class="form-label">Price Range (per hour)</label>
+            <label class="form-label">Price Range (per day)</label>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span>$</span>
                 <input id="filterMinPrice" type="number" min="0" step="1" class="form-control" placeholder="Min">
@@ -473,7 +473,7 @@
                 <div class="card-body">
                     <h5 class="car-name">${car.vehicleName}</h5>
                     <p class="car-model">Model/Year: ${car.vehicleType} 2023</p> <!-- Placeholder for model/year -->
-                    <p class="price">$${car.dailyPrice} / hour</p> <!-- Changed to per hour as per task -->
+                    <p class="price">Rs${car.dailyPrice} / day</p> <!-- Changed to per hour as per task -->
                     <div style="display: flex; gap: 0.5rem;">
                         <button class="btn btn-primary" onclick="selectVehicle('${car.vehicleId}', '${car.vehicleName}')" ${car.available == true or car.available == 1 ? '' : 'disabled'} style="flex: 1;">
                             ${car.available == true or car.available == 1 ? 'Book Now' : 'Unavailable'}

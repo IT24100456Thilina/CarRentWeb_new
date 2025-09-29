@@ -236,7 +236,7 @@
 
                         <div class="d-grid mt-4">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-lock me-2"></i>Complete Payment - $${param.amount}
+                                <i class="fas fa-lock me-2"></i>Complete Payment - Rs${param.amount}
                             </button>
                         </div>
                     </form>
@@ -288,7 +288,7 @@
                         <hr>
                         <div class="d-flex justify-content-between">
                             <strong>Total:</strong>
-                            <strong class="text-primary">$${param.amount}</strong>
+                            <strong class="text-primary">Rs${param.amount}</strong>
                         </div>
                     </c:if>
                     <c:if test="${empty bookingDetails}">
@@ -298,7 +298,7 @@
                             </div>
                             <div class="d-flex justify-content-between mt-2">
                                 <strong>Total Amount:</strong>
-                                <strong class="text-primary">$${param.amount}</strong>
+                                <strong class="text-primary">Rs${param.amount}</strong>
                             </div>
                         </div>
                     </c:if>
@@ -326,7 +326,7 @@
                             <small class="text-muted">Total Payments</small>
                         </div>
                         <div class="col-6">
-                            <div class="h4 text-primary mb-1">$${totalAmount != null ? totalAmount : 0}</div>
+                            <div class="h4 text-primary mb-1">Rs${totalAmount != null ? totalAmount : 0}</div>
                             <small class="text-muted">Total Amount</small>
                         </div>
                     </div>
@@ -367,7 +367,7 @@
                                                     <small class="text-muted">${payment.vehicleName}</small>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <div class="h6 mb-0 text-primary">$${payment.amount}</div>
+                                                    <div class="h6 mb-0 text-primary">Rs${payment.amount}</div>
                                                     <small class="text-muted">${payment.paymentMethod}</small>
                                                 </div>
                                                 <div class="col-md-2">
@@ -418,7 +418,7 @@
                                         <tr>
                                             <td>${payment.paymentDate}</td>
                                             <td>Booking #${payment.bookingId}</td>
-                                            <td class="fw-semibold">$${payment.amount}</td>
+                                            <td class="fw-semibold">Rs${payment.amount}</td>
                                             <td>${payment.paymentMethod}</td>
                                             <td><span class="badge status-success">Completed</span></td>
                                         </tr>

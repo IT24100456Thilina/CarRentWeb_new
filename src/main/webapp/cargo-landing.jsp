@@ -1185,7 +1185,7 @@
                             <h3>Luxury Sedan Collection</h3>
                             <p>Experience ultimate comfort and style with our premium sedan lineup. Perfect for business trips or special occasions.</p>
                             <div class="featured-price">
-                                <span class="price">Starting at $89/day</span>
+                                <span class="price">Starting at Rs.10000/day</span>
                             </div>
                             <a href="#booking" class="btn-rent-featured">Rent Now</a>
                         </div>
@@ -1404,7 +1404,7 @@
                             <i class="fas fa-phone"></i>
                         </div>
                         <h5>Call Us</h5>
-                        <p>+94 11 123 4567<br>Mon-Fri: 8AM-8PM</p>
+                        <p>081 123 4567<br>Mon-Fri: 8AM-8PM</p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -1413,7 +1413,7 @@
                             <i class="fas fa-envelope"></i>
                         </div>
                         <h5>Email Us</h5>
-                        <p>info@cargo.com<br>support@cargo.com</p>
+                        <p>KU07SE2030@cargo.com<br>KU07SE@cargo.com</p>
                     </div>
                 </div>
             </div>
@@ -1459,8 +1459,8 @@
                     <h6>Contact Info</h6>
                     <ul class="list-unstyled">
                         <li><i class="fas fa-map-marker-alt me-2"></i>KU-07 SE2030, SLIIT Kandy</li>
-                        <li><i class="fas fa-phone me-2"></i>+94 11 123 4567</li>
-                        <li><i class="fas fa-envelope me-2"></i>info@cargo.com</li>
+                        <li><i class="fas fa-phone me-2"></i>081 123 4567</li>
+                        <li><i class="fas fa-envelope me-2"></i>KU07SE@cargo.com</li>
                         <li><i class="fas fa-clock me-2"></i>Mon-Fri: 8AM-8PM</li>
                     </ul>
                 </div>
