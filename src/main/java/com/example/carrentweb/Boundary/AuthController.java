@@ -96,9 +96,17 @@ public class AuthController extends HttpServlet {
                 if (rs.next()) {
                     HttpSession session = request.getSession(true);
                     int userId = rs.getInt("userId");
-                    session.setAttribute("userFullName", rs.getString("fullName"));
+                    String fullName = rs.getString("fullName");
+                    session.setAttribute("userFullName", fullName);
                     session.setAttribute("userId", userId);
                     session.setAttribute("username", rs.getString("username"));
+                    session.setAttribute("userEmail", rs.getString("email"));
+                    session.setAttribute("userPhone", rs.getString("phone"));
+
+                    // Split fullName into first and last name for auto-fill
+                    String[] nameParts = fullName.split(" ", 2);
+                    session.setAttribute("userFirstName", nameParts.length > 0 ? nameParts[0] : "");
+                    session.setAttribute("userLastName", nameParts.length > 1 ? nameParts[1] : "");
 
                     // Debug logging
                     System.out.println("AuthController: Login successful for userId = " + userId);

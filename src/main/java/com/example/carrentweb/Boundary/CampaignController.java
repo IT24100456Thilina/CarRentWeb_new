@@ -243,7 +243,7 @@ public class CampaignController extends HttpServlet {
             campaign.setAdminId(rs.getInt("adminId"));
 
             request.setAttribute("campaign", campaign);
-            response.sendRedirect("admin-campaigns.jsp?error=Edit functionality not implemented in unified interface");
+            request.getRequestDispatcher("admin-campaign-edit.jsp").forward(request, response);
         } else {
             response.sendRedirect("admin-campaigns.jsp?error=Campaign not found");
         }

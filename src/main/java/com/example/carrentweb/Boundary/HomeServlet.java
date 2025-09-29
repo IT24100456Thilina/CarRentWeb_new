@@ -400,6 +400,15 @@ public class HomeServlet extends HttpServlet {
         List<java.util.Map<String, Object>> customerPayments = new ArrayList<>();
 
         if (userId != null) {
+            // Ensure user details are loaded in session for auto-fill
+            ensureUserDetailsInSession(session, userId);
+
+            // Load booking details if bookingId and amount are provided (checkout mode)
+            String bookingIdParam = request.getParameter("bookingId");
+            String amountParam = request.getParameter("amount");
+            if (bookingIdParam != null && amountParam != null) {
+                loadBookingDetailsForCheckout(request, userId, Integer.parseInt(bookingIdParam));
+            }
             try (Connection conn = DBConnection.getConnection()) {
                 // Load customer payments
                 PreparedStatement ps = conn.prepareStatement(
@@ -468,6 +477,58 @@ public class HomeServlet extends HttpServlet {
             }
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    private void ensureUserDetailsInSession(HttpSession session, Integer userId) {
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT fullName, email, phone FROM Users WHERE userId = ?");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String fullName = rs.getString("fullName");
+                session.setAttribute("userFullName", fullName);
+                session.setAttribute("userEmail", rs.getString("email"));
+                session.setAttribute("userPhone", rs.getString("phone"));
+
+                // Split fullName into first and last name for auto-fill
+                String[] nameParts = fullName.split(" ", 2);
+                session.setAttribute("userFirstName", nameParts.length > 0 ? nameParts[0] : "");
+                session.setAttribute("userLastName", nameParts.length > 1 ? nameParts[1] : "");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadBookingDetailsForCheckout(HttpServletRequest request, Integer userId, int bookingId) {
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT b.bookingId, b.startDate, b.endDate, v.vehicleName, v.dailyPrice, " +
+                "DATEDIFF(day, b.startDate, b.endDate) + 1 as duration " +
+                "FROM Bookings b " +
+                "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
+                "WHERE b.bookingId = ? AND b.userId = ?"
+            );
+            ps.setInt(1, bookingId);
+            ps.setInt(2, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                java.util.Map<String, Object> bookingDetails = new java.util.HashMap<>();
+                bookingDetails.put("bookingId", rs.getInt("bookingId"));
+                bookingDetails.put("pickupDate", rs.getString("startDate"));
+                bookingDetails.put("returnDate", rs.getString("endDate"));
+                bookingDetails.put("vehicleName", rs.getString("vehicleName"));
+                bookingDetails.put("duration", rs.getInt("duration"));
+                double dailyPrice = rs.getDouble("dailyPrice");
+                double subtotal = dailyPrice * rs.getInt("duration");
+                bookingDetails.put("subtotal", subtotal);
+                bookingDetails.put("tax", subtotal * 0.1); // 10% tax
+                bookingDetails.put("discount", 0.0); // No discount for now
+                request.setAttribute("bookingDetails", bookingDetails);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
