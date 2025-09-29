@@ -209,7 +209,7 @@
                             <div class="stat-icon mx-auto">
                                 <i class="fas fa-dollar-sign"></i>
                             </div>
-                            <div class="display-6 fw-bold text-success">$${revenue != null ? revenue : 0}</div>
+                            <div class="display-6 fw-bold text-success">Rs${revenue != null ? revenue : 0}</div>
                             <div class="text-muted">Revenue</div>
                         </div>
                     </div>
