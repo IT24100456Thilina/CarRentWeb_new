@@ -197,7 +197,7 @@
                                     <div class="form-check payment-method-option">
                                         <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="PayPal">
                                         <label class="form-check-label" for="paypal">
-                                            <i class="fab fa-paypal me-2"></i>PayPal
+                                            <i class="fab fa-paypal me-2"></i>Online
                                         </label>
                                     </div>
                                 </div>
