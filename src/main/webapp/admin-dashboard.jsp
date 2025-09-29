@@ -461,7 +461,7 @@
                                         <option value="Credit Card">Credit Card</option>
                                         <option value="Debit Card">Debit Card</option>
                                         <option value="Cash">Cash</option>
-                                        <option value="PayPal">PayPal</option>
+                                        <option value="Online">Online</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 d-grid"><button class="btn btn-success" type="submit">Save</button></div>
