@@ -185,24 +185,123 @@
             --info-color: #06b6d4;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-gray); }
-        .sidebar { background: var(--bg-white); min-height: 100vh; box-shadow: var(--shadow); position: fixed; width: 280px; z-index: 1000; }
-        .sidebar .nav-link { color: var(--text-dark); padding: 0.75rem 1.5rem; border-radius: 8px; margin: 0.25rem 1rem; transition: all 0.3s ease; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); }
-        .sidebar .nav-link i { width: 20px; margin-right: 0.75rem; }
-        .main-content { margin-left: 280px; padding: 2rem; }
-        .navbar { background: var(--bg-white); box-shadow: var(--shadow); border-bottom: 1px solid var(--border-color); }
-        .card { border-radius: 16px; box-shadow: var(--shadow); border: none; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent-color), var(--accent-dark)); border: none; transition: all 0.3s ease; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); }
-        .table { border-radius: 12px; overflow: hidden; }
-        .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border-color); transition: border-color 0.3s ease; }
-        .form-control:focus, .form-select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); }
-        .section-header { background: var(--bg-white); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
-        .section-header h3 { color: var(--text-dark); font-weight: 600; margin: 0; }
-        .crud-tabs .nav-link { border: none; color: var(--text-light); font-weight: 500; }
-        .crud-tabs .nav-link.active { background: var(--accent-color); color: white; }
-        .action-btn { padding: 0.375rem 0.75rem; font-size: 0.875rem; border-radius: 6px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+        }
+
+        .sidebar {
+            background: var(--bg-white);
+            min-height: 100vh;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 280px;
+            z-index: 1000;
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            margin: 0.25rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 1rem;   /* reduced padding to remove excess space */
+        }
+
+        .navbar {
+            background: var(--bg-white);
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 0;   /* prevent table pushing down */
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        .section-header {
+            background: var(--bg-white);
+            padding: 1rem;   /* reduced padding */
+            border-radius: 12px;
+            margin-bottom: 0.75rem; /* reduce gap */
+            box-shadow: var(--shadow);
+        }
+
+        .section-header h3 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .crud-tabs .nav-link {
+            border: none;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .crud-tabs .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+
+        /* Fix Campaign Management spacing */
+        .campaign-section {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
 
         /* Responsive Design */
         @media (max-width: 768px) {

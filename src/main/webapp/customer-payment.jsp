@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="${sessionScope.username}" readonly>
+                            <input type="email" class="form-control" value="${sessionScope.userEmail}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Phone</label>
@@ -229,7 +229,7 @@
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Cardholder Name</label>
-                                    <input type="text" class="form-control" name="cardholderName" placeholder="John Doe">
+                                    <input type="text" class="form-control" name="cardholderName" value="${sessionScope.userFullName}" placeholder="John Doe">
                                 </div>
                             </div>
                         </div>

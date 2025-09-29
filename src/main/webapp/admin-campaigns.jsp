@@ -9,25 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #64748b;
-            --accent-color: #f59e0b;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --info-color: #06b6d4;
-            --light-bg: #f8fafc;
-            --dark-bg: #0f172a;
-            --light-card: #ffffff;
-            --dark-card: #1e293b;
-            --light-text: #1e293b;
-            --dark-text: #f1f5f9;
-            --light-border: #e2e8f0;
-            --dark-border: #334155;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --primary-color: #0f172a;
+            --primary-light: #1e293b;
+            --accent-color: #3b82f6;
+            --accent-light: #60a5fa;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --text-white: #ffffff;
+            --bg-white: #ffffff;
+            --bg-gray: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] {
@@ -45,52 +41,43 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--light-text);
-            background-color: var(--light-bg);
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-gray); }
+        .sidebar { background: var(--bg-white); min-height: 100vh; box-shadow: var(--shadow); position: fixed; width: 250px; z-index: 1000; }
+        .sidebar .nav-link { color: var(--text-dark); padding: 0.75rem 1.5rem; border-radius: 8px; margin: 0.25rem 1rem; transition: all 0.3s ease; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); }
+        .sidebar .nav-link i { width: 20px; margin-right: 0.75rem; }
+        .main-content { margin-left: 250px; padding: 2rem; }
+        .navbar { background: var(--bg-white); box-shadow: var(--shadow); border-bottom: 1px solid var(--border-color); }
+        .stat-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--shadow); transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .card { border-radius: 16px; box-shadow: var(--shadow); border: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); border: none; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); }
+        .table { border-radius: 12px; overflow: hidden; }
+        .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border-color); transition: border-color 0.3s ease; }
+        .form-control:focus, .form-select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); }
+        h2 { color: var(--text-dark); font-weight: 700; }
+        .badge { border-radius: 20px; }
+        .section-header { background: var(--bg-white); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+        .section-header h3 { color: var(--text-dark); font-weight: 600; margin: 0; }
+        .stat-icon { width: 60px; height: 60px; background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin-bottom: 1rem; }
 
         [data-theme="dark"] body {
             color: var(--dark-text);
             background-color: var(--dark-bg);
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            box-shadow: var(--shadow);
-            padding: 0.75rem 0;
-            transition: all 0.3s ease;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; position: relative; min-height: auto; }
+            .main-content { margin-left: 0; }
+            .navbar { display: none; }
+            .section-header { padding: 1rem; }
+            .stat-card { margin-bottom: 1rem; }
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: white !important;
-        }
-
-        .nav-link {
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.9) !important;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-        }
-
-        .card, .table {
-            background: var(--light-card);
-            border: 1px solid var(--light-border);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: var(--shadow);
+        @media (min-width: 769px) {
+            .sidebar { display: block !important; }
         }
 
         [data-theme="dark"] .card, [data-theme="dark"] .table {
@@ -98,207 +85,126 @@
             border-color: var(--dark-border);
         }
 
-        .card-body {
-            padding: 1.25rem;
-        }
-
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--light-text);
-            margin-bottom: 0.5rem;
-        }
-
-        [data-theme="dark"] .card-title {
-            color: var(--dark-text);
-        }
-
-        .btn {
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.625rem;
-            border-radius: 0.375rem;
-        }
-
-        .badge-draft { background: linear-gradient(135deg, var(--secondary-color), #475569); color: white; }
-        .badge-sent { background: linear-gradient(135deg, var(--success-color), #059669); color: white; }
-        .badge-failed { background: linear-gradient(135deg, var(--danger-color), #dc2626); color: white; }
-        .badge-scheduled { background: linear-gradient(135deg, var(--warning-color), #d97706); color: white; }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table th {
-            background: var(--light-bg);
-            border-bottom: 2px solid var(--light-border);
-            font-weight: 600;
-            color: var(--light-text);
-            padding: 1rem 0.75rem;
-        }
-
-        [data-theme="dark"] .table th {
-            background: var(--dark-bg);
-            border-bottom-color: var(--dark-border);
-            color: var(--dark-text);
-        }
-
-        .table td {
-            padding: 1rem 0.75rem;
-            border-bottom: 1px solid var(--light-border);
-            vertical-align: middle;
-        }
-
-        [data-theme="dark"] .table td {
-            border-bottom-color: var(--dark-border);
-        }
-
-        .alert {
-            border-radius: 0.5rem;
-            border: none;
-            font-size: 0.875rem;
-            padding: 0.75rem 1rem;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-            color: var(--success-color);
-            border-left: 4px solid var(--success-color);
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-            color: var(--danger-color);
-            border-left: 4px solid var(--danger-color);
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .table-responsive {
-                font-size: 12px;
-            }
-
-            .btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.8125rem;
-            }
-        }
     </style>
 </head>
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="AdminServlet">CarRent Admin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="AdminServlet">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="AdminServlet?section=users">Users</a></li>
-                <li class="nav-item"><a class="nav-link" href="AdminServlet?section=vehicles">Vehicles</a></li>
-                <li class="nav-item"><a class="nav-link" href="AdminServlet?section=bookings">Bookings</a></li>
-                <li class="nav-item"><a class="nav-link active" href="CampaignController">Campaigns</a></li>
-                <li class="nav-item"><a class="nav-link" href="AdminServlet?section=promotions">Promotions</a></li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <button class="theme-toggle me-2" id="themeToggle" title="Toggle theme">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="HomeServlet">View Site</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="AuthController?action=logout">Logout</a>
-                </li>
-            </ul>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="p-3">
+        <h5 class="text-dark fw-bold mb-4">CarRent Admin</h5>
+        <nav class="nav flex-column">
+            <a class="nav-link" href="AdminServlet">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a class="nav-link" href="AdminServlet?section=users">
+                <i class="fas fa-users"></i> Users
+            </a>
+            <a class="nav-link" href="AdminServlet?section=vehicles">
+                <i class="fas fa-car"></i> Vehicles
+            </a>
+            <a class="nav-link" href="AdminServlet?section=bookings">
+                <i class="fas fa-calendar-check"></i> Bookings
+            </a>
+            <a class="nav-link active" href="CampaignController">
+                <i class="fas fa-envelope"></i> Campaigns
+            </a>
+            <a class="nav-link" href="AdminServlet?section=promotions">
+                <i class="fas fa-tags"></i> Promotions
+            </a>
+            <hr class="my-3">
+            <a class="nav-link" href="HomeServlet">
+                <i class="fas fa-external-link-alt"></i> View Site
+            </a>
+            <a class="nav-link" href="AuthController?action=logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Email Campaigns</span>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="section-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2>Email Campaigns</h2>
+                <p class="text-muted mb-0">Manage and send email campaigns to customers</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="CampaignController?action=customers" class="btn btn-outline-primary">
+                    <i class="fas fa-users me-2"></i>View Customers
+                </a>
+                <a href="CampaignController?action=create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </a>
+            </div>
         </div>
     </div>
-</nav>
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0">Email Campaigns</h1>
-            <p class="text-muted">Manage and send email campaigns to customers</p>
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">${campaigns.size()}</h4>
+                        <p class="text-muted mb-0">Total Campaigns</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <a href="CampaignController?action=customers" class="btn btn-info me-2">
-                <i class="fas fa-users me-2"></i>View Customer Emails
-            </a>
-            <a href="CampaignController?action=create" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Create Campaign
-            </a>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            <c:set var="sentCount" value="0"/>
+                            <c:forEach var="campaign" items="${campaigns}">
+                                <c:if test="${campaign.status == 'sent'}">
+                                    <c:set var="sentCount" value="${sentCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${sentCount}
+                        </h4>
+                        <p class="text-muted mb-0">Sent Campaigns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            <c:set var="draftCount" value="0"/>
+                            <c:forEach var="campaign" items="${campaigns}">
+                                <c:if test="${campaign.status == 'draft'}">
+                                    <c:set var="draftCount" value="${draftCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${draftCount}
+                        </h4>
+                        <p class="text-muted mb-0">Draft Campaigns</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -318,56 +224,70 @@
 
     <!-- Campaigns Table -->
     <div class="card">
-        <div class="card-body">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Subject</th>
-                            <th>Segment</th>
-                            <th>Status</th>
-                            <th>Sent</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th style="width: 5%;">ID</th>
+                            <th style="width: 25%;">Campaign Details</th>
+                            <th style="width: 10%;">Segment</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 15%;">Sent Info</th>
+                            <th style="width: 15%;">Created</th>
+                            <th style="width: 20%;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="campaign" items="${campaigns}">
                             <tr>
-                                <td>${campaign.campaignId}</td>
                                 <td>
-                                    <strong>${campaign.subject}</strong>
+                                    <span class="fw-bold text-primary">#${campaign.campaignId}</span>
+                                </td>
+                                <td>
+                                    <div class="campaign-subject">${campaign.subject}</div>
                                     <c:if test="${not empty campaign.offer}">
-                                        <br><small class="text-muted">Offer: ${campaign.offer}</small>
+                                        <div class="campaign-offer">${campaign.offer}</div>
                                     </c:if>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary">${campaign.segment}</span>
+                                    <span class="badge bg-primary">
+                                        <c:choose>
+                                            <c:when test="${campaign.segment == 'all'}">All</c:when>
+                                            <c:when test="${campaign.segment == 'active_customers'}">Active</c:when>
+                                            <c:when test="${campaign.segment == 'new_customers'}">New</c:when>
+                                            <c:otherwise>${campaign.segment}</c:otherwise>
+                                        </c:choose>
+                                    </span>
                                 </td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${campaign.status == 'draft'}">
-                                            <span class="badge badge-draft">Draft</span>
+                                            <span class="badge bg-warning text-dark">Draft</span>
                                         </c:when>
                                         <c:when test="${campaign.status == 'sent'}">
-                                            <span class="badge badge-sent">Sent</span>
+                                            <span class="badge bg-success">Sent</span>
                                         </c:when>
                                         <c:when test="${campaign.status == 'failed'}">
-                                            <span class="badge badge-failed">Failed</span>
+                                            <span class="badge bg-danger">Failed</span>
                                         </c:when>
                                         <c:when test="${campaign.status == 'scheduled'}">
-                                            <span class="badge badge-scheduled">Scheduled</span>
+                                            <span class="badge bg-info">Scheduled</span>
                                         </c:when>
+                                        <c:otherwise>
+                                            <span class="badge bg-secondary">${campaign.status}</span>
+                                        </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td>
-                                    ${campaign.sentCount}
+                                    <div class="fw-bold">${campaign.sentCount} emails</div>
                                     <c:if test="${not empty campaign.sentDate}">
-                                        <br><small class="text-muted">${campaign.sentDate}</small>
+                                        <small class="text-muted">${campaign.sentDate}</small>
                                     </c:if>
                                 </td>
-                                <td>${campaign.createdDate}</td>
+                                <td>
+                                    <div>${campaign.createdDate}</div>
+                                </td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <c:if test="${campaign.status == 'draft'}">
@@ -376,20 +296,20 @@
                                                 <input type="hidden" name="campaignId" value="${campaign.campaignId}">
                                                 <button type="submit" class="btn btn-success btn-sm"
                                                         onclick="return confirm('Are you sure you want to send this campaign?')">
-                                                    <i class="fas fa-paper-plane"></i> Send
+                                                    <i class="fas fa-paper-plane"></i>
                                                 </button>
                                             </form>
                                             <a href="CampaignController?action=edit&id=${campaign.campaignId}"
                                                class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Edit
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                         </c:if>
                                         <a href="CampaignController?action=logs" class="btn btn-info btn-sm">
-                                            <i class="fas fa-list"></i> Logs
+                                            <i class="fas fa-list"></i>
                                         </a>
                                         <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="deleteCampaign('${campaign.campaignId}')">
-                                            <i class="fas fa-trash"></i> Delete
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -397,9 +317,9 @@
                         </c:forEach>
                         <c:if test="${empty campaigns}">
                             <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <div class="text-muted">
-                                        <i class="fas fa-envelope fa-3x mb-3"></i>
+                                <td colspan="7" class="p-0">
+                                    <div class="empty-state">
+                                        <i class="fas fa-envelope"></i>
                                         <h5>No campaigns found</h5>
                                         <p>Create your first email campaign to start engaging with customers.</p>
                                         <a href="CampaignController?action=create" class="btn btn-primary">
@@ -414,6 +334,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Delete Confirmation Modal -->
