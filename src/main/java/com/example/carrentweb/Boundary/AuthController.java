@@ -68,7 +68,7 @@ public class AuthController extends HttpServlet {
                     ps.executeUpdate();
                 }
 
-                response.sendRedirect("cargo-landing.jsp?registered=1");
+                response.sendRedirect("cargo-landing.jsp?registration=success");
 
             } else if ("login".equals(action)) {
                 String username = request.getParameter("username");
@@ -128,16 +128,16 @@ public class AuthController extends HttpServlet {
                     // Role-based redirect
                     switch (userRole) {
                         case "customer":
-                            response.sendRedirect("HomeServlet?page=customer-vehicles");
+                            response.sendRedirect("HomeServlet?page=customer-vehicles&login=1");
                             break;
                         case "admin":
-                            response.sendRedirect("AdminServlet");
+                            response.sendRedirect("AdminServlet?login=1");
                             break;
                         default:
                             response.sendRedirect("cargo-landing.jsp");
                     }
                 } else {
-                    response.sendRedirect("HomeServlet");
+                    response.sendRedirect("cargo-landing.jsp?login=error");
                 }
             }
         } catch (Exception e) {

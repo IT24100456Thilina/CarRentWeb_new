@@ -542,6 +542,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         initTheme();
         document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        // Show login success message
+        if (window.location.search.includes('login=1')) {
+            alert('Login successful! Welcome back.');
+        }
     });
 </script>
 </body>

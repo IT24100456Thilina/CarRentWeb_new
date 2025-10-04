@@ -129,6 +129,12 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("showAdminPromotions", "1");
         }
 
+        // Handle login parameter
+        String login = request.getParameter("login");
+        if ("1".equals(login)) {
+            request.setAttribute("login", "1");
+        }
+
         // Load recent feedback
         List<java.util.Map<String, Object>> recentFeedback = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection()) {

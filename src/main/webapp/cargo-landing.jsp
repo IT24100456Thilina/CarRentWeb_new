@@ -1644,6 +1644,31 @@
     </script>
     </c:if>
 
+    <!-- Handle authentication messages and modals -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.get('registration') === 'success') {
+                showNotification('Registration successful! Please login to continue.');
+                // Auto-open login modal
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            }
+
+            if (urlParams.get('login') === 'error') {
+                showNotification('Login failed! Please check your credentials and try again.');
+                // Auto-open login modal
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            }
+
+            if (urlParams.get('errorMsg')) {
+                showNotification('Error: ' + decodeURIComponent(urlParams.get('errorMsg')));
+            }
+        });
+    </script>
+
     <!-- Admin Login Modal -->
     <div class="modal fade" id="adminLoginModal" tabindex="-1" aria-labelledby="adminLoginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

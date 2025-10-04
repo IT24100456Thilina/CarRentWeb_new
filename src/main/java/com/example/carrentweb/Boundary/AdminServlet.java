@@ -32,6 +32,12 @@ public class AdminServlet extends HttpServlet {
             request.setAttribute("error", error);
         }
 
+        // Handle login parameter
+        String login = request.getParameter("login");
+        if ("1".equals(login)) {
+            request.setAttribute("login", "1");
+        }
+
         try (Connection conn = DBConnection.getConnection()) {
             // Vehicles (support both schemas)
             List<Map<String, Object>> cars = new ArrayList<>();
