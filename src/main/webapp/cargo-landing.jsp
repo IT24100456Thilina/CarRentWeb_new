@@ -1008,6 +1008,260 @@
             transform: translateY(-8px) !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
         }
+
+        /* Chatbot Styles */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(204, 85, 0, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(204, 85, 0, 0.5);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            background: var(--gradient-orange);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chatbot-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .chatbot-info h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .chatbot-info span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .chatbot-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-content {
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .bot-message .message-content {
+            background: white;
+            color: var(--text-dark);
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message {
+            align-items: flex-end;
+        }
+
+        .user-message .message-content {
+            background: var(--primary-orange);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.25rem;
+            padding: 0 0.5rem;
+        }
+
+        .bot-message .message-time {
+            align-self: flex-start;
+        }
+
+        .user-message .message-time {
+            align-self: flex-end;
+        }
+
+        .chatbot-input {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .chatbot-input input:focus {
+            border-color: var(--primary-orange);
+        }
+
+        .chatbot-input button {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-orange);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(204, 85, 0, 0.3);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 576px) {
+            .chatbot-widget {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 30px);
+                height: 400px;
+                bottom: 85px;
+            }
+
+            .chatbot-toggle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.75rem 1rem;
+            align-self: flex-start;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1038,7 +1292,8 @@
                         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-center">
-                        <li class="nav-item"><a class="nav-link admin-btn" data-bs-toggle="modal" data-bs-target="#adminLoginModal">Admin</a></li>
+                        <li class="nav-item"><a class="btn-signup me-2" data-bs-toggle="modal" data-bs-target="#adminLoginModal">Admin Login</a></li>
+                        <li class="nav-item"><a class="btn-signup me-2" data-bs-toggle="modal" data-bs-target="#adminRegisterModal">Admin Register</a></li>
                         <c:if test="${empty sessionScope.username}">
                             <li class="nav-item"><a class="btn-signup" data-bs-toggle="modal" data-bs-target="#registerModal">Sign Up</a></li>
                         </c:if>
@@ -1632,7 +1887,207 @@
         // Auto-apply filters on change
         document.getElementById('filterType')?.addEventListener('change', applyFilters);
         document.getElementById('filterAvailability')?.addEventListener('change', applyFilters);
+
+        // Chatbot Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotInput = document.getElementById('chatbot-input-field');
+            const chatbotSend = document.getElementById('chatbot-send');
+            const chatbotMessages = document.getElementById('chatbot-messages');
+
+            // Toggle chatbot window
+            chatbotToggle.addEventListener('click', function() {
+                chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
+                if (chatbotWindow.style.display === 'flex') {
+                    chatbotInput.focus();
+                    scrollToBottom();
+                }
+            });
+
+            // Close chatbot
+            chatbotClose.addEventListener('click', function() {
+                chatbotWindow.style.display = 'none';
+            });
+
+            // Send message on button click
+            chatbotSend.addEventListener('click', sendMessage);
+
+            // Send message on Enter key
+            chatbotInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
+                const message = chatbotInput.value.trim();
+                if (message === '') return;
+
+                // Add user message
+                addMessage(message, 'user');
+                chatbotInput.value = '';
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Get bot response after delay
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = getBotResponse(message);
+                    addMessage(response, 'bot');
+                }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+            }
+
+            function addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = content;
+
+                const messageTime = document.createElement('div');
+                messageTime.className = 'message-time';
+                messageTime.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(messageTime);
+                chatbotMessages.appendChild(messageDiv);
+
+                scrollToBottom();
+            }
+
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message';
+                typingDiv.id = 'typing-indicator';
+
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+
+                typingDiv.appendChild(typingIndicator);
+                chatbotMessages.appendChild(typingDiv);
+                scrollToBottom();
+            }
+
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            function scrollToBottom() {
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+
+            function getBotResponse(message) {
+                const lowerMessage = message.toLowerCase();
+
+                // Car rental related responses
+                if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                    return "Hello! Welcome to CarGO. How can I help you with your car rental needs today?";
+                }
+
+                if (lowerMessage.includes('book') || lowerMessage.includes('rent') || lowerMessage.includes('reservation')) {
+                    return "To book a car, simply browse our fleet, select your preferred vehicle, choose your dates, and complete the booking form. You can also call us at 081 123 4567 for assistance.";
+                }
+
+                if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('rate')) {
+                    return "Our prices start from Rs.5000 per day depending on the vehicle type. Luxury sedans start at Rs.10000/day. Check our fleet section for detailed pricing.";
+                }
+
+                if (lowerMessage.includes('available') || lowerMessage.includes('cars') || lowerMessage.includes('fleet')) {
+                    return "We have a wide range of vehicles including sedans, SUVs, and luxury cars. You can view our current fleet in the 'Our Impressive Fleet' section above.";
+                }
+
+                if (lowerMessage.includes('document') || lowerMessage.includes('license') || lowerMessage.includes('requirement')) {
+                    return "You'll need a valid driver's license, national ID, and proof of address. International customers need a valid passport and international driving permit.";
+                }
+
+                if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('email')) {
+                    return "You can reach us at:\n• Phone: 081 123 4567\n• Email: KU07SE@cargo.com\n• Address: KU-07 SE2030, SLIIT Kandy";
+                }
+
+                if (lowerMessage.includes('location') || lowerMessage.includes('pickup') || lowerMessage.includes('drop')) {
+                    return "We offer pickup and drop-off services at major locations in Sri Lanka. Our main location is at KU-07 SE2030, SLIIT Kandy.";
+                }
+
+                if (lowerMessage.includes('insurance') || lowerMessage.includes('coverage')) {
+                    return "All our vehicles come with comprehensive insurance coverage. Additional insurance options are available for extra peace of mind.";
+                }
+
+                if (lowerMessage.includes('cancel') || lowerMessage.includes('refund') || lowerMessage.includes('policy')) {
+                    return "Cancellations can be made up to 24 hours before pickup for a full refund. Please contact us directly for cancellation requests.";
+                }
+
+                if (lowerMessage.includes('payment') || lowerMessage.includes('pay')) {
+                    return "We accept credit cards, debit cards, and bank transfers. Payment is processed securely through our system.";
+                }
+
+                if (lowerMessage.includes('hours') || lowerMessage.includes('open') || lowerMessage.includes('time')) {
+                    return "Our office hours are Monday to Friday, 8AM to 8PM. Emergency support is available 24/7.";
+                }
+
+                if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
+                    return "You're welcome! If you have any other questions, feel free to ask. Happy travels with CarGO!";
+                }
+
+                if (lowerMessage.includes('bye') || lowerMessage.includes('goodbye')) {
+                    return "Goodbye! Thank you for choosing CarGO. Have a great day!";
+                }
+
+                // Default responses
+                const defaultResponses = [
+                    "I'm here to help with your car rental questions. Could you please be more specific?",
+                    "I'd be happy to assist you with information about our services. What would you like to know?",
+                    "Let me help you with that. Could you tell me more about what you're looking for?",
+                    "I'm CarGO's virtual assistant. I can help with booking, pricing, availability, and general inquiries."
+                ];
+
+                return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            }
+        });
     </script>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-widget">
+        <div class="chatbot-toggle" id="chatbot-toggle">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="chatbot-info">
+                    <h5>CarGO Assistant</h5>
+                    <span>Online</span>
+                </div>
+                <button class="chatbot-close" id="chatbot-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Hi! I'm CarGO's virtual assistant. How can I help you today?
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input-field" placeholder="Type your message..." maxlength="500">
+                <button id="chatbot-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Auto-show admin promotions modal if parameter is set -->
     <c:if test="${showAdminPromotions == '1'}">
@@ -1651,9 +2106,22 @@
 
             if (urlParams.get('registration') === 'success') {
                 showNotification('Registration successful! Please login to continue.');
-                // Auto-open login modal
-                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-                loginModal.show();
+                // Auto-open appropriate login modal
+                if (urlParams.get('role') === 'admin') {
+                    const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
+                    adminLoginModal.show();
+                } else {
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                }
+            }
+
+            if (urlParams.get('login') === '1') {
+                showNotification('Login successful! Welcome back.');
+            }
+
+            if (urlParams.get('logout') === '1') {
+                showNotification('You have been logged out successfully.');
             }
 
             if (urlParams.get('login') === 'error') {
@@ -1665,6 +2133,10 @@
 
             if (urlParams.get('errorMsg')) {
                 showNotification('Error: ' + decodeURIComponent(urlParams.get('errorMsg')));
+            }
+
+            if (urlParams.get('successMsg')) {
+                showNotification(decodeURIComponent(urlParams.get('successMsg')));
             }
         });
     </script>
@@ -1681,6 +2153,21 @@
                     <form action="AuthController" method="post">
                         <input type="hidden" name="action" value="login">
                         <input type="hidden" name="role" value="admin">
+                        <div class="mb-3">
+                            <label class="form-label">Job Role</label>
+                            <select class="form-select" name="position" required>
+                                <option value="">Select Role</option>
+                                <option value="Fleet Supervisor">Fleet Supervisor</option>
+                                <option value="Customer Service Executive">Customer Service Executive</option>
+                                <option value="System Administrator">System Administrator</option>
+                                <option value="Marketing Executive">Marketing Executive</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Operations Manager">Operations Manager</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Executive">Executive</option>
+                                <option value="Account">Account</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Username</label>
                             <input type="text" class="form-control" name="username" required>
@@ -1761,6 +2248,25 @@
                             <div class="col-md-6">
                                 <label class="form-label">Username</label>
                                 <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Role</label>
+                                <select class="form-select" name="position" required>
+                                    <option value="">Select Role</option>
+                                    <option value="Fleet Supervisor">Fleet Supervisor</option>
+                                    <option value="Customer Service Executive">Customer Service Executive</option>
+                                    <option value="System Administrator">System Administrator</option>
+                                    <option value="Marketing Executive">Marketing Executive</option>
+                                    <option value="Accountant">Accountant</option>
+                                    <option value="Operations Manager">Operations Manager</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Executive">Executive</option>
+                                    <option value="Account">Account</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" name="department" placeholder="e.g., Management" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Password</label>

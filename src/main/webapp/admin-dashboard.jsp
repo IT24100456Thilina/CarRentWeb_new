@@ -76,6 +76,9 @@
                 <a class="nav-link" href="#users"><i class="fas fa-users"></i>Users</a>
                 <a class="nav-link" href="#promotions"><i class="fas fa-tags"></i>Promotions</a>
                 <a class="nav-link" href="CampaignController"><i class="fas fa-envelope"></i>Campaigns</a>
+                <c:if test="${sessionScope.position == 'Manager' && sessionScope.department == 'Operations'}">
+                    <a class="nav-link" href="OperationalReportServlet"><i class="fas fa-chart-line"></i>Operational Reports</a>
+                </c:if>
                 <a class="nav-link" href="#feedback"><i class="fas fa-star"></i>Feedback</a>
                 <a class="nav-link" href="cargo-landing.jsp"><i class="fas fa-home"></i>Back to Site</a>
             </nav>
@@ -93,7 +96,12 @@
             </div>
             <div class="d-flex align-items-center">
                 <c:if test="${not empty sessionScope.username}">
-                    <span class="me-3 text-muted">Welcome, ${sessionScope.userFullName}</span>
+                    <span class="me-3 text-muted">
+                        Welcome, ${sessionScope.userFullName}
+                        <c:if test="${not empty sessionScope.position}">
+                            <br><small class="text-primary">${sessionScope.position} - ${sessionScope.department}</small>
+                        </c:if>
+                    </span>
                     <a href="AuthController?action=logout" class="btn btn-outline-danger btn-sm">
                         <i class="fas fa-sign-out-alt me-1"></i>Logout
                     </a>
@@ -135,6 +143,12 @@
                                                 <button type="submit" class="btn btn-primary">Login</button>
                                             </div>
                                         </form>
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                <strong>Admin Job Roles:</strong> Marketing, Executive, Account
+                                            </small>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <form action="AuthController" method="post">
@@ -190,7 +204,10 @@
                 </c:if>
                 <c:if test="${login == '1'}">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>Login successful! Welcome back, ${sessionScope.userFullName}.
+                        <i class="fas fa-check-circle me-2"></i>Login successful! Welcome back, ${sessionScope.userFullName}
+                        <c:if test="${not empty sessionScope.position}">
+                            (${sessionScope.position} - ${sessionScope.department})
+                        </c:if>.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </c:if>
@@ -756,6 +773,98 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Show alerts for CRUD operations
+    document.addEventListener('DOMContentLoaded', function() {
+        showCrudAlerts();
+    });
+
+    function showCrudAlerts() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Booking alerts
+        if (urlParams.get('bookingUpdated') === '1') {
+            showAlert('Booking updated successfully!', 'success');
+        } else if (urlParams.get('bookingDeleted') === '1') {
+            showAlert('Booking deleted successfully!', 'success');
+        }
+
+        // Payment alerts
+        if (urlParams.get('paymentUpdated') === '1') {
+            showAlert('Payment updated successfully!', 'success');
+        } else if (urlParams.get('paymentDeleted') === '1') {
+            showAlert('Payment deleted successfully!', 'success');
+        }
+
+        // Vehicle alerts
+        if (urlParams.get('vehiclesUpdated') === '1') {
+            showAlert('Vehicle operation completed successfully!', 'success');
+        }
+
+        // User alerts
+        if (urlParams.get('userCreated') === '1') {
+            showAlert('User created successfully!', 'success');
+        } else if (urlParams.get('userUpdated') === '1') {
+            showAlert('User updated successfully!', 'success');
+        } else if (urlParams.get('userDeleted') === '1') {
+            showAlert('User deleted successfully!', 'success');
+        }
+
+        // Promotion alerts
+        if (urlParams.get('promotionsUpdated') === '1') {
+            showAlert('Promotion operation completed successfully!', 'success');
+        }
+
+        // Staff alerts
+        if (urlParams.get('staffAdded') === '1') {
+            showAlert('Staff member added successfully!', 'success');
+        } else if (urlParams.get('staffUpdated') === '1') {
+            showAlert('Staff member updated successfully!', 'success');
+        } else if (urlParams.get('staffDeleted') === '1') {
+            showAlert('Staff member deleted successfully!', 'success');
+        }
+
+        // Campaign alerts
+        if (urlParams.get('campaignCreated') === '1') {
+            showAlert('Campaign created successfully!', 'success');
+        } else if (urlParams.get('campaignUpdated') === '1') {
+            showAlert('Campaign updated successfully!', 'success');
+        } else if (urlParams.get('campaignDeleted') === '1') {
+            showAlert('Campaign deleted successfully!', 'success');
+        } else if (urlParams.get('campaignSent') === '1') {
+            showAlert('Campaign sent successfully!', 'success');
+        }
+
+        // Success messages
+        const successMsg = urlParams.get('successMsg');
+        if (successMsg) {
+            showAlert(decodeURIComponent(successMsg), 'success');
+        }
+
+        // Error messages
+        const errorMsg = urlParams.get('errorMsg');
+        if (errorMsg) {
+            showAlert(decodeURIComponent(errorMsg), 'danger');
+        }
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type == 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
 // Image preview functionality
 function previewImage(input) {
     const preview = document.getElementById('imagePreview');

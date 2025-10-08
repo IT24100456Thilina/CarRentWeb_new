@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,13 +63,26 @@ public class PaymentController extends HttpServlet {
                     String paymentMethod = request.getParameter("paymentMethod");
 
                     String sql = "INSERT INTO Payments(bookingId, amount, paymentMethod) VALUES (?, ?, ?)";
-                    PreparedStatement ps = conn.prepareStatement(sql);
+                    PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
                     ps.setInt(1, bookingId);
                     ps.setDouble(2, amount);
                     ps.setString(3, paymentMethod);
                     ps.executeUpdate();
 
-                    response.sendRedirect("HomeServlet?page=customer-feedback&bookingId=" + bookingId);
+                    // Get the generated paymentId
+                    int paymentId = 0;
+                    ResultSet rs = ps.getGeneratedKeys();
+                    if (rs.next()) {
+                        paymentId = rs.getInt(1);
+                    }
+
+                    // Update booking status to Confirmed
+                    String updateSql = "UPDATE Bookings SET status = 'Confirmed' WHERE bookingId = ?";
+                    PreparedStatement updatePs = conn.prepareStatement(updateSql);
+                    updatePs.setInt(1, bookingId);
+                    updatePs.executeUpdate();
+
+                    response.sendRedirect("HomeServlet?page=customer-bill&bookingId=" + bookingId + "&success=1");
                     break;
                 }
                 case "update": {
@@ -86,6 +100,86 @@ public class PaymentController extends HttpServlet {
                     ps.executeUpdate();
 
                     response.sendRedirect("admin-crud.jsp?paymentUpdated=1");
+                    break;
+                }
+                case "cancel": {
+                    // Customer cancel payment (only if booking is pending)
+                    HttpSession session = request.getSession(false);
+                    if (session == null || session.getAttribute("userId") == null) {
+                        response.sendRedirect("HomeServlet?page=login&errorMsg=" + java.net.URLEncoder.encode("Please login to cancel payment", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+                    int sessionUserId = (Integer) session.getAttribute("userId");
+                    int paymentId = Integer.parseInt(request.getParameter("paymentId"));
+
+                    // Check ownership via booking
+                    String checkSql = "SELECT p.status as paymentStatus, b.status as bookingStatus, b.userId FROM Payments p JOIN Bookings b ON p.bookingId = b.bookingId WHERE p.paymentId = ?";
+                    PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                    checkPs.setInt(1, paymentId);
+                    ResultSet checkRs = checkPs.executeQuery();
+                    if (checkRs.next()) {
+                        int bookingUserId = checkRs.getInt("userId");
+                        String paymentStatus = checkRs.getString("paymentStatus");
+                        String bookingStatus = checkRs.getString("bookingStatus");
+                        if (bookingUserId != sessionUserId) {
+                            response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("You can only cancel your own payments", java.nio.charset.StandardCharsets.UTF_8));
+                            return;
+                        }
+                        if (!"Pending".equals(bookingStatus)) {
+                            response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Can only cancel payments for pending bookings", java.nio.charset.StandardCharsets.UTF_8));
+                            return;
+                        }
+
+                        // Delete payment
+                        String deleteSql = "DELETE FROM Payments WHERE paymentId = ?";
+                        PreparedStatement deletePs = conn.prepareStatement(deleteSql);
+                        deletePs.setInt(1, paymentId);
+                        deletePs.executeUpdate();
+
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&successMsg=" + java.net.URLEncoder.encode("Payment cancelled successfully", java.nio.charset.StandardCharsets.UTF_8));
+                    } else {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Payment not found", java.nio.charset.StandardCharsets.UTF_8));
+                    }
+                    break;
+                }
+                case "refund": {
+                    // Customer request refund
+                    HttpSession session = request.getSession(false);
+                    if (session == null || session.getAttribute("userId") == null) {
+                        response.sendRedirect("HomeServlet?page=login&errorMsg=" + java.net.URLEncoder.encode("Please login to request refund", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+                    int sessionUserId = (Integer) session.getAttribute("userId");
+                    int paymentId = Integer.parseInt(request.getParameter("paymentId"));
+
+                    // Check ownership via booking
+                    String checkSql = "SELECT p.status as paymentStatus, b.status as bookingStatus, b.userId FROM Payments p JOIN Bookings b ON p.bookingId = b.bookingId WHERE p.paymentId = ?";
+                    PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                    checkPs.setInt(1, paymentId);
+                    ResultSet checkRs = checkPs.executeQuery();
+                    if (checkRs.next()) {
+                        int bookingUserId = checkRs.getInt("userId");
+                        String paymentStatus = checkRs.getString("paymentStatus");
+                        String bookingStatus = checkRs.getString("bookingStatus");
+                        if (bookingUserId != sessionUserId) {
+                            response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("You can only refund your own payments", java.nio.charset.StandardCharsets.UTF_8));
+                            return;
+                        }
+                        if (!"Paid".equals(paymentStatus)) {
+                            response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Payment status must be Paid to refund", java.nio.charset.StandardCharsets.UTF_8));
+                            return;
+                        }
+
+                        // Set payment status to Refunded
+                        String refundSql = "UPDATE Payments SET status = 'Refunded' WHERE paymentId = ?";
+                        PreparedStatement refundPs = conn.prepareStatement(refundSql);
+                        refundPs.setInt(1, paymentId);
+                        refundPs.executeUpdate();
+
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&successMsg=" + java.net.URLEncoder.encode("Refund requested successfully", java.nio.charset.StandardCharsets.UTF_8));
+                    } else {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Payment not found", java.nio.charset.StandardCharsets.UTF_8));
+                    }
                     break;
                 }
                 case "delete": {

@@ -127,7 +127,7 @@ public class FeedbackController extends HttpServlet {
 
             if (rowsAffected > 0) {
                 System.out.println("FeedbackController: Feedback saved successfully");
-                response.sendRedirect("HomeServlet?page=customer-dashboard");
+                response.sendRedirect("HomeServlet?page=customer-dashboard&feedback=1");
             } else {
                 System.out.println("FeedbackController: No rows affected - feedback not saved");
                 response.sendRedirect("HomeServlet?page=customer-feedback&errorMsg=No rows affected");

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Context docBase="C:/Users/praba/Desktop/CarRentWeb final 2/CarRentWeb/src/main/webapp">
+<Context docBase="C:/Users/praba/Desktop/CarRentWeb (4)add vvv/CarRentWeb (7)/CarRentWeb (5)/CarRentWeb/src/main/webapp">
   <Resources cacheMaxSize="10240">
-    <PreResources base="C:/Users/praba/Desktop/CarRentWeb final 2/CarRentWeb/target/classes" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
+    <PreResources base="C:/Users/praba/Desktop/CarRentWeb (4)add vvv/CarRentWeb (7)/CarRentWeb (5)/CarRentWeb/target/classes" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
     <PostResources base="C:/Users/praba/.m2/repository/com/microsoft/sqlserver/mssql-jdbc/11.2.0.jre17/mssql-jdbc-11.2.0.jre17.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/mssql-jdbc-11.2.0.jre17.jar"/>
     <PostResources base="C:/Users/praba/.m2/repository/com/microsoft/azure/msal4j/1.13.0/msal4j-1.13.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/msal4j-1.13.0.jar"/>
     <PostResources base="C:/Users/praba/.m2/repository/com/nimbusds/oauth2-oidc-sdk/9.35/oauth2-oidc-sdk-9.35.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/oauth2-oidc-sdk-9.35.jar"/>

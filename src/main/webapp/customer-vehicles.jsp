@@ -382,8 +382,37 @@
         <h1 style="margin-bottom: 0.5rem;">Available Vehicles</h1>
         <p style="color: #6b7280;">Choose from our wide selection of vehicles for your journey</p>
     </div>
-
-<!-- Filters -->
+    
+    <!-- Search Form -->
+    <div class="filters-section" style="margin-bottom: 2rem;">
+        <h4 style="margin-bottom: 1.5rem;">Search & Book Vehicle</h4>
+        <form action="HomeServlet" method="get" class="row g-3">
+            <input type="hidden" name="page" value="customer-vehicles">
+            <div class="col-md-3">
+                <label class="form-label">Pickup Date</label>
+                <input type="date" class="form-control" name="pickupDate" value="${param.pickupDate}" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Return Date</label>
+                <input type="date" class="form-control" name="returnDate" value="${param.returnDate}" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Vehicle Type</label>
+                <select class="form-select" name="vehicleType">
+                    <option value="">All Types</option>
+                    <option value="Sedan" ${param.vehicleType == 'Sedan' ? 'selected' : ''}>Sedan</option>
+                    <option value="SUV" ${param.vehicleType == 'SUV' ? 'selected' : ''}>SUV</option>
+                    <option value="Luxury SUV" ${param.vehicleType == 'Luxury SUV' ? 'selected' : ''}>Luxury SUV</option>
+                    <option value="Van" ${param.vehicleType == 'Van' ? 'selected' : ''}>Van</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Search Vehicles</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Filters -->
 <div class="filters-section">
     <h4 style="margin-bottom: 1.5rem;">Filters</h4>
     <div class="row g-3">
@@ -552,6 +581,19 @@
 </div>
 
 </div> <!-- End main-content -->
+
+<!-- Notification Area -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11000;">
+    <div id="notify" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">CarGO</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="notifyText">
+            Notification message here
+        </div>
+    </div>
+</div>
 
 <!-- Vehicle Details Modal -->
 <div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
@@ -730,14 +772,35 @@
         }
     }
 
+    // Notification function
+    function showNotification(message) {
+        const notifyElement = document.getElementById('notify');
+        const notifyText = document.getElementById('notifyText');
+        if (notifyElement && notifyText) {
+            notifyText.textContent = message;
+            const toast = new bootstrap.Toast(notifyElement);
+            toast.show();
+        }
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         initTheme();
         document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-        // Show login success message
-        if (window.location.search.includes('login=1')) {
-            alert('Login successful! Welcome back.');
+        // Handle URL parameters for messages
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('login') === '1') {
+            showNotification('Login successful! Welcome back.');
+        }
+
+        if (urlParams.get('successMsg')) {
+            showNotification(decodeURIComponent(urlParams.get('successMsg')));
+        }
+
+        if (urlParams.get('errorMsg')) {
+            showNotification('Error: ' + decodeURIComponent(urlParams.get('errorMsg')));
         }
     });
 </script>

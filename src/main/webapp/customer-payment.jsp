@@ -377,9 +377,14 @@
                                                     <span class="badge status-success">Completed</span>
                                                 </div>
                                                 <div class="col-md-1">
-                                                    <button class="btn btn-outline-primary btn-sm" onclick="viewPaymentDetails('${payment.paymentId}')">
-                                                        Details
-                                                    </button>
+                                                    <div class="d-flex gap-1">
+                                                        <a href="bill-download.jsp?bookingId=${payment.bookingId}" class="btn btn-outline-success btn-sm" title="Download Bill">
+                                                            <i class="fas fa-download"></i>
+                                                        </a>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="viewPaymentDetails('${payment.paymentId}')" title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -530,6 +535,33 @@
             });
         }
     });
+
+    // Show payment success alert when booking is created
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('bookingId') && urlParams.get('amount')) {
+            showAlert('Booking created successfully! Please complete your payment below.', 'success');
+        }
+    });
+
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type == 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
 
     // Auto-hide success message after 5 seconds
     setTimeout(function() {

@@ -26,7 +26,8 @@ CREATE TABLE Vehicles (
     vehicleType NVARCHAR(50) NOT NULL,
     dailyPrice DECIMAL(10,2) NOT NULL,
     available BIT NOT NULL DEFAULT 1,
-    imageUrl NVARCHAR(255) NULL
+    imageUrl NVARCHAR(255) NULL,
+    description NVARCHAR(500) NULL
 );
 
 -- Bookings Table
@@ -126,13 +127,35 @@ INSERT INTO Users (fullName, email, phone, username, password, role) VALUES
 
 -- Insert sample vehicles
 SET IDENTITY_INSERT Vehicles ON;
-INSERT INTO Vehicles (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl) VALUES
-(1, 'Toyota Corolla', 'Sedan', 45.00, 1, 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=300&fit=crop&crop=center'),
-(2, 'Honda Civic', 'Sedan', 50.00, 1, 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop&crop=center'),
-(3, 'Jeep Wrangler', 'SUV', 80.00, 1, 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=400&h=300&fit=crop&crop=center'),
-(4, 'BMW X5', 'Luxury SUV', 120.00, 0, 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop&crop=center'),
-(5, 'Ford Transit', 'Van', 70.00, 1, 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center');
+INSERT INTO Vehicles (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl, description) VALUES
+(1, 'Toyota Corolla', 'Sedan', 45.00, 1, 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=300&fit=crop&crop=center', 'A reliable and fuel-efficient sedan perfect for city driving and long trips.'),
+(2, 'Honda Civic', 'Sedan', 50.00, 1, 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop&crop=center', 'A comfortable and stylish sedan with excellent fuel economy and modern features.'),
+(3, 'Jeep Wrangler', 'SUV', 80.00, 1, 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=400&h=300&fit=crop&crop=center', 'A rugged and capable SUV ideal for off-road adventures and outdoor activities.'),
+(4, 'BMW X5', 'Luxury SUV', 120.00, 0, 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop&crop=center', 'A luxury SUV offering premium comfort, advanced technology, and superior performance.'),
+(5, 'Ford Transit', 'Van', 70.00, 1, 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center', 'A spacious van perfect for group travel, moving, or transporting cargo.');
 SET IDENTITY_INSERT Vehicles OFF;
+
+-- Insert sample bookings
+INSERT INTO Bookings (userId, vehicleId, startDate, endDate, status) VALUES
+(2, 1, '2025-09-01', '2025-09-03', 'Completed'), -- John Doe, Toyota Corolla
+(3, 2, '2025-09-05', '2025-09-07', 'Completed'), -- Jane Smith, Honda Civic
+(2, 3, '2025-09-10', '2025-09-12', 'Completed'), -- John Doe, Jeep Wrangler
+(3, 1, '2025-09-15', '2025-09-17', 'Completed'), -- Jane Smith, Toyota Corolla
+(2, 5, '2025-09-20', '2025-09-22', 'Completed'), -- John Doe, Ford Transit
+(3, 3, '2025-09-25', '2025-09-27', 'Completed'), -- Jane Smith, Jeep Wrangler
+(2, 2, '2025-10-01', '2025-10-03', 'Completed'), -- John Doe, Honda Civic (current month)
+(3, 5, '2025-10-05', '2025-10-07', 'Completed'); -- Jane Smith, Ford Transit (current month)
+
+-- Insert sample payments
+INSERT INTO Payments (bookingId, amount, paymentMethod, paymentDate) VALUES
+(1, 90.00, 'Credit Card', '2025-09-01 10:00:00'), -- 2 days * 45
+(2, 100.00, 'PayPal', '2025-09-05 14:30:00'), -- 2 days * 50
+(3, 160.00, 'Credit Card', '2025-09-10 09:15:00'), -- 2 days * 80
+(4, 90.00, 'Bank Transfer', '2025-09-15 16:45:00'), -- 2 days * 45
+(5, 140.00, 'Credit Card', '2025-09-20 11:20:00'), -- 2 days * 70
+(6, 160.00, 'PayPal', '2025-09-25 13:10:00'), -- 2 days * 80
+(7, 100.00, 'Credit Card', '2025-10-01 08:30:00'), -- 2 days * 50
+(8, 140.00, 'Bank Transfer', '2025-10-05 15:00:00'); -- 2 days * 70
 
 -- Insert sample promotions
 INSERT INTO Promotions (title, description, badge, validTill, active) VALUES

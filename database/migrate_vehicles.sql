@@ -23,13 +23,14 @@ CREATE TABLE Vehicles_New (
     vehicleType NVARCHAR(50) NOT NULL,
     dailyPrice DECIMAL(10,2) NOT NULL,
     available BIT NOT NULL DEFAULT 1,
-    imageUrl NVARCHAR(255) NULL
+    imageUrl NVARCHAR(255) NULL,
+    description NVARCHAR(500) NULL
 );
 
 -- Step 3: Copy data from old table
 SET IDENTITY_INSERT Vehicles_New ON;
-INSERT INTO Vehicles_New (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl)
-SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl
+INSERT INTO Vehicles_New (vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl, description)
+SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl, description
 FROM Vehicles;
 SET IDENTITY_INSERT Vehicles_New OFF;
 

@@ -18,6 +18,8 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @WebServlet("/VehicleController")
@@ -85,6 +87,8 @@ public class VehicleController extends HttpServlet {
         String action = request.getParameter("action");
         if ("get".equals(action)) {
             getVehicle(request, response);
+        } else if ("search".equals(action)) {
+            searchVehicles(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
         }
@@ -112,6 +116,59 @@ public class VehicleController extends HttpServlet {
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Vehicle not found");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    private void searchVehicles(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (Connection conn = DBConnection.getConnection()) {
+            String pickupDate = request.getParameter("pickupDate");
+            String returnDate = request.getParameter("returnDate");
+            String vehicleType = request.getParameter("vehicleType");
+
+            StringBuilder sql = new StringBuilder(
+                "SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl FROM Vehicles v WHERE v.available = 1"
+            );
+
+            List<Object> params = new ArrayList<>();
+
+            if (pickupDate != null && !pickupDate.trim().isEmpty() && returnDate != null && !returnDate.trim().isEmpty()) {
+                sql.append(" AND NOT EXISTS (SELECT 1 FROM Bookings b WHERE b.vehicleId = v.vehicleId AND b.status != 'Cancelled' AND b.startDate <= ? AND b.endDate >= ?)");
+                params.add(java.sql.Date.valueOf(returnDate));
+                params.add(java.sql.Date.valueOf(pickupDate));
+            }
+
+            if (vehicleType != null && !vehicleType.trim().isEmpty()) {
+                sql.append(" AND v.vehicleType = ?");
+                params.add(vehicleType);
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            StringBuilder json = new StringBuilder("[");
+            boolean first = true;
+            while (rs.next()) {
+                if (!first) json.append(",");
+                json.append(String.format(
+                    "{\"vehicleId\":%d,\"vehicleName\":\"%s\",\"vehicleType\":\"%s\",\"dailyPrice\":%.2f,\"available\":%b,\"imageUrl\":\"%s\"}",
+                    rs.getInt("vehicleId"),
+                    rs.getString("vehicleName").replace("\"", "\\\""),
+                    rs.getString("vehicleType").replace("\"", "\\\""),
+                    rs.getDouble("dailyPrice"),
+                    rs.getBoolean("available"),
+                    rs.getString("imageUrl") != null ? rs.getString("imageUrl").replace("\"", "\\\"") : ""
+                ));
+                first = false;
+            }
+            json.append("]");
+            response.getWriter().write(json.toString());
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());

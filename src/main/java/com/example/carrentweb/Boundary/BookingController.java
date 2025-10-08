@@ -81,6 +81,20 @@ public class BookingController extends HttpServlet {
                     return;
                 }
 
+                // Check vehicle availability for the dates
+                // A booking conflicts if: existing.startDate < new.endDate AND existing.endDate > new.startDate
+                String checkSql = "SELECT COUNT(*) FROM Bookings WHERE vehicleId = ? AND status != 'Cancelled' AND startDate < ? AND endDate > ?";
+                PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                checkPs.setInt(1, vehicleId);
+                checkPs.setDate(2, endDate);
+                checkPs.setDate(3, startDate);
+                ResultSet checkRs = checkPs.executeQuery();
+                checkRs.next();
+                if (checkRs.getInt(1) > 0) {
+                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Vehicle is not available for the selected dates", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+
                 Booking booking = new Booking(userId, vehicleId, startDate.toString(), endDate.toString(), "Pending");
                 String sql = "INSERT INTO Bookings(userId, vehicleId, startDate, endDate, status) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -148,6 +162,113 @@ public class BookingController extends HttpServlet {
                 ps.setInt(6, bookingId);
                 ps.executeUpdate();
                 response.sendRedirect("AdminServlet?bookingUpdated=1");
+            } else if ("cancel".equalsIgnoreCase(action)) {
+                // Customer cancel booking
+                HttpSession session = request.getSession(false);
+                if (session == null || session.getAttribute("userId") == null) {
+                    response.sendRedirect("HomeServlet?page=login&errorMsg=" + java.net.URLEncoder.encode("Please login to cancel booking", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+                int sessionUserId = (Integer) session.getAttribute("userId");
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+
+                // Check if booking belongs to user
+                String checkSql = "SELECT userId, status FROM Bookings WHERE bookingId = ?";
+                PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                checkPs.setInt(1, bookingId);
+                ResultSet checkRs = checkPs.executeQuery();
+                if (checkRs.next()) {
+                    int bookingUserId = checkRs.getInt("userId");
+                    String currentStatus = checkRs.getString("status");
+                    if (bookingUserId != sessionUserId) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("You can only cancel your own bookings", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+                    if ("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Cannot cancel booking with status: " + currentStatus, java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+
+                    // Update booking status to Cancelled
+                    String updateSql = "UPDATE Bookings SET status = 'Cancelled' WHERE bookingId = ?";
+                    PreparedStatement updatePs = conn.prepareStatement(updateSql);
+                    updatePs.setInt(1, bookingId);
+                    updatePs.executeUpdate();
+
+                    // If there's a payment, set it to Refunded
+                    String paymentSql = "UPDATE Payments SET status = 'Refunded' WHERE bookingId = ? AND status = 'Paid'";
+                    PreparedStatement paymentPs = conn.prepareStatement(paymentSql);
+                    paymentPs.setInt(1, bookingId);
+                    paymentPs.executeUpdate();
+
+                    response.sendRedirect("HomeServlet?page=customer-dashboard&successMsg=" + java.net.URLEncoder.encode("Booking cancelled successfully", java.nio.charset.StandardCharsets.UTF_8));
+                } else {
+                    response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Booking not found", java.nio.charset.StandardCharsets.UTF_8));
+                }
+            } else if ("edit".equalsIgnoreCase(action)) {
+                // Customer edit booking
+                HttpSession session = request.getSession(false);
+                if (session == null || session.getAttribute("userId") == null) {
+                    response.sendRedirect("HomeServlet?page=login&errorMsg=" + java.net.URLEncoder.encode("Please login to edit booking", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+                int sessionUserId = (Integer) session.getAttribute("userId");
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                String pickup = request.getParameter("pickupDate");
+                String drop = request.getParameter("returnDate");
+                Date startDate = Date.valueOf(pickup);
+                Date endDate = Date.valueOf(drop);
+
+                // Check if booking belongs to user and is editable
+                String checkSql = "SELECT userId, status, vehicleId FROM Bookings WHERE bookingId = ?";
+                PreparedStatement checkPs = conn.prepareStatement(checkSql);
+                checkPs.setInt(1, bookingId);
+                ResultSet checkRs = checkPs.executeQuery();
+                if (checkRs.next()) {
+                    int bookingUserId = checkRs.getInt("userId");
+                    String currentStatus = checkRs.getString("status");
+                    int vehicleId = checkRs.getInt("vehicleId");
+                    if (bookingUserId != sessionUserId) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("You can only edit your own bookings", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+                    if (!"Pending".equals(currentStatus)) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Can only edit pending bookings", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+
+                    if (!startDate.before(endDate)) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+
+                    // Check vehicle availability for new dates
+                    // A booking conflicts if: existing.startDate < new.endDate AND existing.endDate > new.startDate
+                    String availSql = "SELECT COUNT(*) FROM Bookings WHERE vehicleId = ? AND status != 'Cancelled' AND bookingId != ? AND startDate < ? AND endDate > ?";
+                    PreparedStatement availPs = conn.prepareStatement(availSql);
+                    availPs.setInt(1, vehicleId);
+                    availPs.setInt(2, bookingId);
+                    availPs.setDate(3, endDate);
+                    availPs.setDate(4, startDate);
+                    ResultSet availRs = availPs.executeQuery();
+                    availRs.next();
+                    if (availRs.getInt(1) > 0) {
+                        response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Vehicle not available for selected dates", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+
+                    // Update booking
+                    String updateSql = "UPDATE Bookings SET startDate = ?, endDate = ? WHERE bookingId = ?";
+                    PreparedStatement updatePs = conn.prepareStatement(updateSql);
+                    updatePs.setDate(1, startDate);
+                    updatePs.setDate(2, endDate);
+                    updatePs.setInt(3, bookingId);
+                    updatePs.executeUpdate();
+
+                    response.sendRedirect("HomeServlet?page=customer-dashboard&successMsg=" + java.net.URLEncoder.encode("Booking updated successfully", java.nio.charset.StandardCharsets.UTF_8));
+                } else {
+                    response.sendRedirect("HomeServlet?page=customer-dashboard&errorMsg=" + java.net.URLEncoder.encode("Booking not found", java.nio.charset.StandardCharsets.UTF_8));
+                }
             } else if ("delete".equalsIgnoreCase(action)) {
                 String idsParam = request.getParameter("ids");
                 String[] idArray;

@@ -45,63 +45,111 @@ public class AuthController extends HttpServlet {
                 String password = request.getParameter("password");
                 String role = normalizeRole(request.getParameter("role"));
 
-                boolean hasRoleColumn = hasColumn(conn, "Users", "role");
+                if ("admin".equals(role)) {
+                    // For admin, register in Staff table
+                    String position = request.getParameter("position");
+                    String department = request.getParameter("department");
+                    if (position == null || position.trim().isEmpty()) {
+                        position = "Executive"; // default
+                    }
+                    if (department == null || department.trim().isEmpty()) {
+                        department = "Management"; // default
+                    }
 
-                if (hasRoleColumn) {
-                    String sql = "INSERT INTO Users(fullName, email, phone, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
+                    String sql = "INSERT INTO Staff(fullName, email, phone, username, password, position, department, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ps.setString(1, fullName);
                     ps.setString(2, email);
                     ps.setString(3, phone);
                     ps.setString(4, username);
                     ps.setString(5, password);
-                    ps.setString(6, role);
+                    ps.setString(6, position);
+                    ps.setString(7, department);
+                    ps.setBoolean(8, true);
                     ps.executeUpdate();
                 } else {
-                    String sql = "INSERT INTO Users(fullName, email, phone, username, password) VALUES (?, ?, ?, ?, ?)";
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ps.setString(1, fullName);
-                    ps.setString(2, email);
-                    ps.setString(3, phone);
-                    ps.setString(4, username);
-                    ps.setString(5, password);
-                    ps.executeUpdate();
+                    // For customer, register in Users table
+                    boolean hasRoleColumn = hasColumn(conn, "Users", "role");
+
+                    if (hasRoleColumn) {
+                        String sql = "INSERT INTO Users(fullName, email, phone, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setString(1, fullName);
+                        ps.setString(2, email);
+                        ps.setString(3, phone);
+                        ps.setString(4, username);
+                        ps.setString(5, password);
+                        ps.setString(6, role);
+                        ps.executeUpdate();
+                    } else {
+                        String sql = "INSERT INTO Users(fullName, email, phone, username, password) VALUES (?, ?, ?, ?, ?)";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setString(1, fullName);
+                        ps.setString(2, email);
+                        ps.setString(3, phone);
+                        ps.setString(4, username);
+                        ps.setString(5, password);
+                        ps.executeUpdate();
+                    }
                 }
 
-                response.sendRedirect("cargo-landing.jsp?registration=success");
+                if ("admin".equals(role)) {
+                    response.sendRedirect("cargo-landing.jsp?registration=success&role=admin");
+                } else {
+                    response.sendRedirect("cargo-landing.jsp?registration=success");
+                }
 
             } else if ("login".equals(action)) {
                 String username = request.getParameter("username");
                 String password = request.getParameter("password");
                 String role = normalizeRole(request.getParameter("role"));
 
-                boolean hasRoleColumn = hasColumn(conn, "Users", "role");
-
                 ResultSet rs;
-                if (hasRoleColumn) {
-                    String sql = "SELECT * FROM Users WHERE username=? AND password=? AND role=?";
+                if ("admin".equals(role)) {
+                    // For admin, check Staff table
+                    String sql = "SELECT * FROM Staff WHERE username=? AND password=? AND isActive=?";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ps.setString(1, username);
                     ps.setString(2, password);
-                    ps.setString(3, role);
+                    ps.setBoolean(3, true);
                     rs = ps.executeQuery();
                 } else {
-                    String sql = "SELECT * FROM Users WHERE username=? AND password=?";
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ps.setString(1, username);
-                    ps.setString(2, password);
-                    rs = ps.executeQuery();
+                    // For customer, check Users table
+                    boolean hasRoleColumn = hasColumn(conn, "Users", "role");
+
+                    if (hasRoleColumn) {
+                        String sql = "SELECT * FROM Users WHERE username=? AND password=? AND role=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setString(1, username);
+                        ps.setString(2, password);
+                        ps.setString(3, role);
+                        rs = ps.executeQuery();
+                    } else {
+                        String sql = "SELECT * FROM Users WHERE username=? AND password=?";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        ps.setString(1, username);
+                        ps.setString(2, password);
+                        rs = ps.executeQuery();
+                    }
                 }
 
                 if (rs.next()) {
                     HttpSession session = request.getSession(true);
-                    int userId = rs.getInt("userId");
                     String fullName = rs.getString("fullName");
                     session.setAttribute("userFullName", fullName);
-                    session.setAttribute("userId", userId);
                     session.setAttribute("username", rs.getString("username"));
                     session.setAttribute("userEmail", rs.getString("email"));
                     session.setAttribute("userPhone", rs.getString("phone"));
+
+                    if ("admin".equals(role)) {
+                        int staffId = rs.getInt("staffId");
+                        session.setAttribute("userId", staffId);
+                        session.setAttribute("position", rs.getString("position"));
+                        session.setAttribute("department", rs.getString("department"));
+                    } else {
+                        int userId = rs.getInt("userId");
+                        session.setAttribute("userId", userId);
+                    }
 
                     // Split fullName into first and last name for auto-fill
                     String[] nameParts = fullName.split(" ", 2);
@@ -109,29 +157,32 @@ public class AuthController extends HttpServlet {
                     session.setAttribute("userLastName", nameParts.length > 1 ? nameParts[1] : "");
 
                     // Debug logging
-                    System.out.println("AuthController: Login successful for userId = " + userId);
-                    System.out.println("AuthController: username = " + rs.getString("username"));
+                    System.out.println("AuthController: Login successful for username = " + rs.getString("username"));
 
-                    // Set role from database if available, otherwise from request
-                    String userRole;
-                    try {
-                        userRole = rs.getString("role");
-                        if (userRole == null || userRole.trim().isEmpty()) {
-                            userRole = normalizeRole(role);
-                        }
-                    } catch (Exception e) {
-                        // Role column doesn't exist, use request parameter
-                        userRole = normalizeRole(role);
-                    }
-                    session.setAttribute("role", userRole);
+                    session.setAttribute("role", role);
 
                     // Role-based redirect
-                    switch (userRole) {
+                    switch (role) {
                         case "customer":
                             response.sendRedirect("HomeServlet?page=customer-vehicles&login=1");
                             break;
                         case "admin":
-                            response.sendRedirect("AdminServlet?login=1");
+                            // Check position and department for specific redirects
+                            String position = rs.getString("position");
+                            String department = rs.getString("department");
+                            if ("Marketing Executive".equals(position)) {
+                                response.sendRedirect("admin-campaign-create.jsp?login=1");
+                            } else if ("Accountant".equals(position)) {
+                                response.sendRedirect("IncomeReportServlet?login=1");
+                            } else if ("Customer Service".equals(department) || "Customer Service Executive".equals(position)) {
+                                response.sendRedirect("CustomerServiceServlet?login=1");
+                            } else if ("Fleet Supervisor".equals(position) || "Fleet Management".equals(department)) {
+                                response.sendRedirect("FleetSupervisorServlet?action=viewFleet&login=1");
+                            } else if ("Operations Manager".equals(position) || "Operations".equals(department)) {
+                                response.sendRedirect("OperationalReportServlet?login=1");
+                            } else {
+                                response.sendRedirect("AdminServlet?login=1");
+                            }
                             break;
                         default:
                             response.sendRedirect("cargo-landing.jsp");

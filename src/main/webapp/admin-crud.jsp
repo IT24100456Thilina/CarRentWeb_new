@@ -75,7 +75,7 @@
     if (request.getAttribute("userList") == null) {
         List<Map<String, Object>> users = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email, role FROM Users");
+            PreparedStatement ps = conn.prepareStatement("SELECT userId, fullName, username, email, role, isActive FROM Users");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> u = new HashMap<>();
@@ -84,6 +84,7 @@
                 u.put("username", rs.getString("username"));
                 u.put("email", rs.getString("email"));
                 u.put("role", rs.getString("role"));
+                u.put("isActive", rs.getBoolean("isActive"));
                 users.add(u);
             }
         } catch (Exception ignore) {}
@@ -154,6 +155,27 @@
             }
         } catch (Exception ignore) {}
         request.setAttribute("feedbackList", feedbackList);
+    }
+
+    if (request.getAttribute("staffList") == null) {
+        List<Map<String, Object>> staffList = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT staffId, fullName, email, phone, username, position, department, isActive FROM Staff ORDER BY staffId");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> s = new HashMap<>();
+                s.put("staffId", rs.getInt("staffId"));
+                s.put("fullName", rs.getString("fullName"));
+                s.put("email", rs.getString("email"));
+                s.put("phone", rs.getString("phone"));
+                s.put("username", rs.getString("username"));
+                s.put("position", rs.getString("position"));
+                s.put("department", rs.getString("department"));
+                s.put("isActive", rs.getBoolean("isActive"));
+                staffList.add(s);
+            }
+        } catch (Exception ignore) {}
+        request.setAttribute("staffList", staffList);
     }
 %>
 <!DOCTYPE html>
@@ -412,6 +434,11 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback-tab-pane" type="button" role="tab">
                                     <i class="fas fa-star me-1"></i>Feedback
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-tab-pane" type="button" role="tab">
+                                    <i class="fas fa-users-cog me-1"></i>Staff
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
@@ -680,13 +707,22 @@
                                              <h6 id="userFormTitle"><i class="fas fa-plus me-2"></i>Add New User</h6>
                                          </div>
                                          <div class="card-body">
-                                             <form class="row g-3" method="post" action="UserController" id="userFormElement">
+                                             <form class="row g-3" method="post" action="UserManagementServlet" id="userFormElement">
                                                  <input type="hidden" name="action" value="create" id="userAction">
                                                  <input type="hidden" name="userId" id="userId">
                                                  <div class="col-md-3"><input class="form-control" name="fullName" id="userFullName" placeholder="Full Name" required></div>
                                                  <div class="col-md-3"><input class="form-control" name="username" id="userUsername" placeholder="Username" required></div>
-                                                 <div class="col-md-3"><input class="form-control" name="email" id="userEmail" placeholder="Email" required></div>
-                                                 <div class="col-md-3"><input class="form-control" name="password" id="userPassword" placeholder="Password" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="email" id="userEmail" placeholder="Email" type="email" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="password" id="userPassword" placeholder="Password" type="password" required></div>
+                                                 <div class="col-md-3"><input class="form-control" name="phone" id="userPhone" placeholder="Phone"></div>
+                                                 <div class="col-md-3">
+                                                     <select class="form-select" name="role" id="userRole" required>
+                                                         <option value="customer">Customer</option>
+                                                         <option value="staff">Staff</option>
+                                                         <option value="executive">Executive</option>
+                                                         <option value="admin">Admin</option>
+                                                     </select>
+                                                 </div>
                                                  <div class="col-12 d-grid"><button class="btn btn-success" type="submit" id="userSubmitBtn">Create User</button></div>
                                              </form>
                                          </div>
@@ -698,7 +734,7 @@
                                         <thead class="table-dark">
                                             <tr>
                                                 <th><input type="checkbox" id="selectAllUsers" onclick="toggleAllUsers()"></th>
-                                                <th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Actions</th>
+                                                <th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -710,13 +746,21 @@
                                                     <td>${u.username}</td>
                                                     <td>${u.email}</td>
                                                     <td><span class="badge bg-info">${u.role}</span></td>
+                                                    <td><span class="badge ${u.isActive ? 'bg-success' : 'bg-danger'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
                                                     <td>
                                                         <button class="btn btn-sm btn-outline-secondary action-btn me-1" onclick="editUser('${u.userId}')">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="updateRole('${u.userId}', '${u.role}')">
-                                                            <i class="fas fa-user-cog"></i> Update Role
-                                                        </button>
+                                                        <c:if test="${u.isActive}">
+                                                            <button class="btn btn-sm btn-outline-warning action-btn me-1" onclick="deactivateUser('${u.userId}')">
+                                                                <i class="fas fa-ban"></i> Deactivate
+                                                            </button>
+                                                        </c:if>
+                                                        <c:if test="${not u.isActive}">
+                                                            <button class="btn btn-sm btn-outline-success action-btn me-1" onclick="activateUser('${u.userId}')">
+                                                                <i class="fas fa-check"></i> Activate
+                                                            </button>
+                                                        </c:if>
                                                         <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteUser('${u.userId}')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
@@ -864,6 +908,97 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Staff CRUD -->
+                        <div class="tab-pane fade" id="staff-tab-pane" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4><i class="fas fa-users-cog me-2"></i>Staff Management</h4>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-danger btn-sm" onclick="deleteSelectedStaff()">
+                                        <i class="fas fa-trash me-1"></i>Delete Selected
+                                    </button>
+                                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#staffForm" onclick="resetStaffForm()">
+                                        <i class="fas fa-plus me-1"></i>Add Staff
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="staffForm" class="collapse mb-4">
+                                 <div class="card">
+                                     <div class="card-header">
+                                         <h6 id="staffFormTitle"><i class="fas fa-plus me-2"></i>Add New Staff Member</h6>
+                                     </div>
+                                     <div class="card-body">
+                                         <form class="row g-3" method="post" action="AddStaffServlet" id="staffFormElement">
+                                             <input type="hidden" name="action" value="add" id="staffAction">
+                                             <div class="col-md-3"><input class="form-control" name="fullName" id="staffFullName" placeholder="Full Name" required></div>
+                                             <div class="col-md-3"><input class="form-control" name="email" id="staffEmail" placeholder="Email" type="email" required></div>
+                                             <div class="col-md-2"><input class="form-control" name="phone" id="staffPhone" placeholder="Phone" required></div>
+                                             <div class="col-md-2"><input class="form-control" name="username" id="staffUsername" placeholder="Username" required></div>
+                                             <div class="col-md-2"><input class="form-control" name="password" id="staffPassword" placeholder="Password" type="password" required></div>
+                                             <div class="col-md-3">
+                                                 <select class="form-select" name="position" id="staffPosition" required>
+                                                     <option value="">Select Position</option>
+                                                     <option value="Manager">Manager</option>
+                                                     <option value="Supervisor">Supervisor</option>
+                                                     <option value="Staff">Staff</option>
+                                                     <option value="Driver">Driver</option>
+                                                     <option value="Mechanic">Mechanic</option>
+                                                     <option value="Cleaner">Cleaner</option>
+                                                     <option value="Other">Other</option>
+                                                 </select>
+                                             </div>
+                                             <div class="col-md-3">
+                                                 <select class="form-select" name="department" id="staffDepartment" required>
+                                                     <option value="">Select Department</option>
+                                                     <option value="Management">Management</option>
+                                                     <option value="Operations">Operations</option>
+                                                     <option value="Maintenance">Maintenance</option>
+                                                     <option value="Customer Service">Customer Service</option>
+                                                     <option value="Sales">Sales</option>
+                                                     <option value="HR">HR</option>
+                                                     <option value="Other">Other</option>
+                                                 </select>
+                                             </div>
+                                             <div class="col-12 d-grid"><button class="btn btn-success" type="submit" id="staffSubmitBtn">Add Staff Member</button></div>
+                                         </form>
+                                     </div>
+                                 </div>
+                             </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllStaff" onclick="toggleAllStaff()"></th>
+                                            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Position</th><th>Department</th><th>Status</th><th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="staff" items="${staffList}">
+                                            <tr>
+                                                <td><input type="checkbox" class="staff-checkbox" value="${staff.staffId}"></td>
+                                                <td>${staff.staffId}</td>
+                                                <td>${staff.fullName}</td>
+                                                <td>${staff.email}</td>
+                                                <td>${staff.phone}</td>
+                                                <td><span class="badge bg-info">${staff.position}</span></td>
+                                                <td><span class="badge bg-secondary">${staff.department}</span></td>
+                                                <td><span class="badge ${staff.isActive ? 'bg-success' : 'bg-danger'}">${staff.isActive ? 'Active' : 'Inactive'}</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editStaff('${staff.staffId}')">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteStaff('${staff.staffId}')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -1085,6 +1220,11 @@
         <input type="hidden" name="ids" id="deleteFeedbackIds">
     </form>
 
+    <form id="deleteStaffForm" method="post" action="AddStaffServlet" style="display: none;">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="ids" id="deleteStaffIds">
+    </form>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Select All Functions
@@ -1127,6 +1267,12 @@
         function toggleAllFeedback() {
             const selectAll = document.getElementById('selectAllFeedback');
             const checkboxes = document.querySelectorAll('.feedback-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        function toggleAllStaff() {
+            const selectAll = document.getElementById('selectAllStaff');
+            const checkboxes = document.querySelectorAll('.staff-checkbox');
             checkboxes.forEach(cb => cb.checked = selectAll.checked);
         }
 
@@ -1222,6 +1368,19 @@
             if (confirm('Delete ' + ids.length + ' selected feedback entries?')) {
                 document.getElementById('deleteFeedbackIds').value = ids.join(',');
                 document.getElementById('deleteFeedbackForm').submit();
+            }
+        }
+
+        function deleteSelectedStaff() {
+            const selected = document.querySelectorAll('.staff-checkbox:checked');
+            if (selected.length === 0) {
+                alert('Please select staff to delete.');
+                return;
+            }
+            const ids = Array.from(selected).map(cb => cb.value);
+            if (confirm('Delete ' + ids.length + ' selected staff members?')) {
+                document.getElementById('deleteStaffIds').value = ids.join(',');
+                document.getElementById('deleteStaffForm').submit();
             }
         }
 
@@ -1425,39 +1584,95 @@
         }
 
         function editUser(id) {
-            // Fetch user data and populate form
-            fetch('UserController?action=get&id=' + id)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('userAction').value = 'update';
-                    document.getElementById('userId').value = data.userId;
-                    document.getElementById('userFullName').value = data.fullName;
-                    document.getElementById('userUsername').value = data.username;
-                    document.getElementById('userEmail').value = data.email;
-                    document.getElementById('userPassword').value = data.password; // Note: In real app, password shouldn't be shown
-                    document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit User';
-                    document.getElementById('userSubmitBtn').textContent = 'Update User';
-                    // Show the form
-                    const form = document.getElementById('userForm');
-                    if (!form.classList.contains('show')) {
-                        new bootstrap.Collapse(form).show();
-                    }
-                })
-                .catch(error => {
-                    alert('Error loading user data: ' + error);
-                });
-        }
+             // Fetch user data and populate form
+             fetch('UserManagementServlet?action=get&id=' + id)
+                 .then(response => response.json())
+                 .then(data => {
+                     document.getElementById('userAction').value = 'update';
+                     document.getElementById('userId').value = data.userId;
+                     document.getElementById('userFullName').value = data.fullName;
+                     document.getElementById('userUsername').value = data.username;
+                     document.getElementById('userEmail').value = data.email;
+                     document.getElementById('userPhone').value = data.phone || '';
+                     document.getElementById('userRole').value = data.role;
+                     // Don't populate password for security
+                     document.getElementById('userPassword').required = false;
+                     document.getElementById('userPassword').placeholder = 'Leave empty to keep current password';
+                     document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit User';
+                     document.getElementById('userSubmitBtn').textContent = 'Update User';
+                     // Show the form
+                     const form = document.getElementById('userForm');
+                     if (!form.classList.contains('show')) {
+                         new bootstrap.Collapse(form).show();
+                     }
+                 })
+                 .catch(error => {
+                     alert('Error loading user data: ' + error);
+                 });
+         }
 
         function resetUserForm() {
-            document.getElementById('userAction').value = 'create';
-            document.getElementById('userId').value = '';
-            document.getElementById('userFullName').value = '';
-            document.getElementById('userUsername').value = '';
-            document.getElementById('userEmail').value = '';
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New User';
-            document.getElementById('userSubmitBtn').textContent = 'Create User';
-        }
+             document.getElementById('userAction').value = 'create';
+             document.getElementById('userId').value = '';
+             document.getElementById('userFullName').value = '';
+             document.getElementById('userUsername').value = '';
+             document.getElementById('userEmail').value = '';
+             document.getElementById('userPhone').value = '';
+             document.getElementById('userPassword').value = '';
+             document.getElementById('userPassword').required = true;
+             document.getElementById('userPassword').placeholder = 'Password';
+             document.getElementById('userRole').value = 'customer';
+             document.getElementById('userFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New User';
+             document.getElementById('userSubmitBtn').textContent = 'Create User';
+         }
+
+         function deactivateUser(id) {
+             if (confirm('Deactivate user ' + id + '? The user will not be able to log in.')) {
+                 const form = document.createElement('form');
+                 form.method = 'post';
+                 form.action = 'UserManagementServlet';
+                 form.style.display = 'none';
+
+                 const actionInput = document.createElement('input');
+                 actionInput.type = 'hidden';
+                 actionInput.name = 'action';
+                 actionInput.value = 'deactivate';
+
+                 const idInput = document.createElement('input');
+                 idInput.type = 'hidden';
+                 idInput.name = 'userId';
+                 idInput.value = id;
+
+                 form.appendChild(actionInput);
+                 form.appendChild(idInput);
+                 document.body.appendChild(form);
+                 form.submit();
+             }
+         }
+
+         function activateUser(id) {
+             if (confirm('Activate user ' + id + '? The user will be able to log in again.')) {
+                 const form = document.createElement('form');
+                 form.method = 'post';
+                 form.action = 'UserManagementServlet';
+                 form.style.display = 'none';
+
+                 const actionInput = document.createElement('input');
+                 actionInput.type = 'hidden';
+                 actionInput.name = 'action';
+                 actionInput.value = 'activate';
+
+                 const idInput = document.createElement('input');
+                 idInput.type = 'hidden';
+                 idInput.name = 'userId';
+                 idInput.value = id;
+
+                 form.appendChild(actionInput);
+                 form.appendChild(idInput);
+                 document.body.appendChild(form);
+                 form.submit();
+             }
+         }
 
         function deleteUser(id) {
             if (confirm('Delete user ' + id + '?')) {
@@ -1554,6 +1769,69 @@
             }
         }
 
+        function editStaff(id) {
+            // Fetch staff data and populate form
+            fetch('AddStaffServlet?action=get&id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('staffAction').value = 'update';
+                    document.getElementById('staffFullName').value = data.fullName;
+                    document.getElementById('staffEmail').value = data.email;
+                    document.getElementById('staffPhone').value = data.phone;
+                    document.getElementById('staffUsername').value = data.username;
+                    document.getElementById('staffPassword').value = data.passwordHash;
+                    document.getElementById('staffPosition').value = data.position;
+                    document.getElementById('staffDepartment').value = data.department;
+                    document.getElementById('staffFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Staff Member';
+                    document.getElementById('staffSubmitBtn').textContent = 'Update Staff Member';
+                    // Show the form
+                    const form = document.getElementById('staffForm');
+                    if (!form.classList.contains('show')) {
+                        new bootstrap.Collapse(form).show();
+                    }
+                })
+                .catch(error => {
+                    alert('Error loading staff data: ' + error);
+                });
+        }
+
+        function resetStaffForm() {
+            document.getElementById('staffAction').value = 'add';
+            document.getElementById('staffFullName').value = '';
+            document.getElementById('staffEmail').value = '';
+            document.getElementById('staffPhone').value = '';
+            document.getElementById('staffUsername').value = '';
+            document.getElementById('staffPassword').value = '';
+            document.getElementById('staffPosition').value = '';
+            document.getElementById('staffDepartment').value = '';
+            document.getElementById('staffFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Staff Member';
+            document.getElementById('staffSubmitBtn').textContent = 'Add Staff Member';
+        }
+
+        function deleteStaff(id) {
+            if (confirm('Delete staff member ' + id + '?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = 'AddStaffServlet';
+                form.style.display = 'none';
+
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'staffId';
+                idInput.value = id;
+
+                form.appendChild(actionInput);
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
         function editCampaign(id) {
             // Fetch campaign data and populate form
             fetch('CampaignController?action=get&id=' + id)
@@ -1639,7 +1917,114 @@
                     campaignsTab.click();
                 }
             }
+
+            // Show alerts for CRUD operations
+            showCrudAlerts();
         });
+
+        function showCrudAlerts() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Booking alerts
+            if (urlParams.get('bookingUpdated') === '1') {
+                showAlert('Booking updated successfully!', 'success');
+            } else if (urlParams.get('bookingDeleted') === '1') {
+                showAlert('Booking deleted successfully!', 'success');
+            }
+
+            // Payment alerts
+            if (urlParams.get('paymentUpdated') === '1') {
+                showAlert('Payment updated successfully!', 'success');
+            } else if (urlParams.get('paymentDeleted') === '1') {
+                showAlert('Payment deleted successfully!', 'success');
+            }
+
+            // Vehicle alerts
+            if (urlParams.get('vehiclesUpdated') === '1') {
+                showAlert('Vehicle operation completed successfully!', 'success');
+            }
+
+            // User alerts
+            if (urlParams.get('userCreated') === '1') {
+                showAlert('User created successfully!', 'success');
+            } else if (urlParams.get('userUpdated') === '1') {
+                showAlert('User updated successfully!', 'success');
+            } else if (urlParams.get('userDeleted') === '1') {
+                showAlert('User deleted successfully!', 'success');
+            }
+
+            // Promotion alerts
+            if (urlParams.get('promotionsUpdated') === '1') {
+                showAlert('Promotion operation completed successfully!', 'success');
+            }
+
+            // Staff alerts
+            if (urlParams.get('staffAdded') === '1') {
+                showAlert('Staff member added successfully!', 'success');
+            } else if (urlParams.get('staffUpdated') === '1') {
+                showAlert('Staff member updated successfully!', 'success');
+            } else if (urlParams.get('staffDeleted') === '1') {
+                showAlert('Staff member deleted successfully!', 'success');
+            }
+
+            // Campaign alerts
+            if (urlParams.get('campaignCreated') === '1') {
+                showAlert('Campaign created successfully!', 'success');
+            } else if (urlParams.get('campaignUpdated') === '1') {
+                showAlert('Campaign updated successfully!', 'success');
+            } else if (urlParams.get('campaignDeleted') === '1') {
+                showAlert('Campaign deleted successfully!', 'success');
+            } else if (urlParams.get('campaignSent') === '1') {
+                showAlert('Campaign sent successfully!', 'success');
+            }
+
+            // Success messages
+            const successMsg = urlParams.get('successMsg');
+            if (successMsg) {
+                showAlert(decodeURIComponent(successMsg), 'success');
+            }
+    
+            // Error messages
+            const errorMsg = urlParams.get('errorMsg');
+            if (errorMsg) {
+                showAlert(decodeURIComponent(errorMsg), 'danger');
+            }
+    
+            // Other messages
+            const success = urlParams.get('success');
+            if (success) {
+                showAlert(decodeURIComponent(success), 'success');
+            }
+    
+            const error = urlParams.get('error');
+            if (error) {
+                showAlert(decodeURIComponent(error), 'danger');
+            }
+    
+            const cancelled = urlParams.get('cancelled');
+            if (cancelled) {
+                showAlert(decodeURIComponent(cancelled), 'info');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type == 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
     </script>
 </body>
 </html>

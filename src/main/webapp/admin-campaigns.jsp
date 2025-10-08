@@ -142,6 +142,9 @@
                 <a href="CampaignController?action=customers" class="btn btn-outline-primary">
                     <i class="fas fa-users me-2"></i>View Customers
                 </a>
+                <a href="CampaignController?action=performance" class="btn btn-outline-success">
+                    <i class="fas fa-chart-bar me-2"></i>Performance
+                </a>
                 <a href="CampaignController?action=create" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Create Campaign
                 </a>
@@ -230,12 +233,13 @@
                     <thead>
                         <tr>
                             <th style="width: 5%;">ID</th>
-                            <th style="width: 25%;">Campaign Details</th>
-                            <th style="width: 10%;">Segment</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 15%;">Sent Info</th>
-                            <th style="width: 15%;">Created</th>
-                            <th style="width: 20%;">Actions</th>
+                            <th style="width: 20%;">Campaign Details</th>
+                            <th style="width: 8%;">Segment</th>
+                            <th style="width: 8%;">Status</th>
+                            <th style="width: 12%;">Sent Info</th>
+                            <th style="width: 10%;">Performance</th>
+                            <th style="width: 12%;">Created</th>
+                            <th style="width: 25%;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -286,6 +290,17 @@
                                     </c:if>
                                 </td>
                                 <td>
+                                    <c:if test="${campaign.status == 'sent'}">
+                                        <div class="text-center">
+                                            <div class="small text-muted">Open: <strong>${campaign.openRate}%</strong></div>
+                                            <div class="small text-muted">Click: <strong>${campaign.clickRate}%</strong></div>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${campaign.status != 'sent'}">
+                                        <span class="text-muted small">-</span>
+                                    </c:if>
+                                </td>
+                                <td>
                                     <div>${campaign.createdDate}</div>
                                 </td>
                                 <td>
@@ -317,7 +332,7 @@
                         </c:forEach>
                         <c:if test="${empty campaigns}">
                             <tr>
-                                <td colspan="7" class="p-0">
+                                <td colspan="8" class="p-0">
                                     <div class="empty-state">
                                         <i class="fas fa-envelope"></i>
                                         <h5>No campaigns found</h5>

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Campaign - Admin - CarRent</title>
+    <title>Create Promotion - Admin - CarRent</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -88,10 +88,10 @@
             <a class="nav-link" href="AdminServlet?section=bookings">
                 <i class="fas fa-calendar-check"></i> Bookings
             </a>
-            <a class="nav-link active" href="CampaignController">
+            <a class="nav-link" href="CampaignController">
                 <i class="fas fa-envelope"></i> Campaigns
             </a>
-            <a class="nav-link" href="AdminServlet?section=promotions">
+            <a class="nav-link active" href="AdminServlet?section=promotions">
                 <i class="fas fa-tags"></i> Promotions
             </a>
             <hr class="my-3">
@@ -110,7 +110,7 @@
     <!-- Top Navbar -->
     <nav class="navbar">
         <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Create Campaign</span>
+            <span class="navbar-brand mb-0 h1">Create Promotion</span>
         </div>
     </nav>
 
@@ -118,15 +118,12 @@
     <div class="section-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
-                <h2>Create New Campaign</h2>
-                <p class="text-muted mb-0">Design and launch your next email marketing campaign</p>
+                <h2>Create New Promotion</h2>
+                <p class="text-muted mb-0">Design and launch your next promotional offer</p>
             </div>
             <div>
-                <a href="admin-promotion-create.jsp" class="btn btn-outline-success me-2">
-                    <i class="fas fa-tags me-2"></i>Create Promotion
-                </a>
-                <a href="CampaignController?action=list" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Campaigns
+                <a href="AdminServlet?section=promotions" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Promotions
                 </a>
             </div>
         </div>
@@ -137,62 +134,108 @@
             <div class="card">
                 <div class="card-body p-5">
 
-                    <form action="CampaignController" method="post">
-                        <input type="hidden" name="action" value="create">
+                    <form action="PromotionController" method="post">
+                        <input type="hidden" name="action" value="add">
 
-                        <!-- Campaign Details Section -->
+                        <!-- Promotion Details Section -->
                         <div class="form-section mb-5">
                             <h4 class="section-title mb-4">
-                                <i class="fas fa-info-circle me-2 text-primary"></i>Campaign Details
+                                <i class="fas fa-info-circle me-2 text-primary"></i>Promotion Details
                             </h4>
                             <div class="row g-4">
                                 <div class="col-md-8">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" name="subject" id="subject" required
-                                                placeholder="Enter compelling email subject">
-                                        <label for="subject">
-                                            <i class="fas fa-envelope me-2"></i>Email Subject *
+                                        <input type="text" class="form-control" name="title" id="title" required
+                                               placeholder="Enter promotion title">
+                                        <label for="title">
+                                            <i class="fas fa-tag me-2"></i>Promotion Title *
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating">
-                                        <select class="form-select" name="segment" id="segment" required>
-                                            <option value="">Select segment</option>
-                                            <option value="all">All Customers</option>
-                                            <option value="active_customers">Active Customers</option>
-                                            <option value="new_customers">New Customers (30 days)</option>
-                                        </select>
-                                        <label for="segment">
-                                            <i class="fas fa-users me-2"></i>Target Segment *
+                                        <input type="text" class="form-control" name="badge" id="badge"
+                                               placeholder="e.g., HOT, NEW, SALE">
+                                        <label for="badge">
+                                            <i class="fas fa-certificate me-2"></i>Badge (Optional)
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" name="offer" id="offer"
-                                                placeholder="e.g., 20% off next booking, Free upgrade, etc.">
-                                        <label for="offer">
-                                            <i class="fas fa-gift me-2"></i>Special Offer (Optional)
+                                        <textarea class="form-control" name="description" id="description" rows="4" required
+                                                  placeholder="Describe the promotion details, terms, and conditions."></textarea>
+                                        <label for="description">
+                                            <i class="fas fa-file-alt me-2"></i>Description *
                                         </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Email Content Section -->
+                        <!-- Discount Settings Section -->
                         <div class="form-section mb-5">
                             <h4 class="section-title mb-4">
-                                <i class="fas fa-edit me-2 text-primary"></i>Email Content
+                                <i class="fas fa-percent me-2 text-primary"></i>Discount Settings
                             </h4>
                             <div class="row g-4">
-                                <div class="col-12">
+                                <div class="col-md-6">
                                     <div class="form-floating">
-                                        <textarea class="form-control" name="body" id="body" rows="10" required
-                                                  placeholder="Write your email content here. Include personalized greetings, offer details, and call-to-action."></textarea>
-                                        <label for="body">
-                                            <i class="fas fa-file-alt me-2"></i>Email Body *
+                                        <input type="text" class="form-control" name="discountCode" id="discountCode"
+                                               placeholder="e.g., SAVE20, WELCOME10">
+                                        <label for="discountCode">
+                                            <i class="fas fa-key me-2"></i>Discount Code (Optional)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="discountType" id="discountType" required>
+                                            <option value="percentage">Percentage</option>
+                                            <option value="fixed">Fixed Amount</option>
+                                        </select>
+                                        <label for="discountType">
+                                            <i class="fas fa-calculator me-2"></i>Discount Type *
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" name="discountValue" id="discountValue"
+                                               step="0.01" min="0" placeholder="e.g., 20.00">
+                                        <label for="discountValue">
+                                            <i class="fas fa-dollar-sign me-2"></i>Value *
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validity & Type Section -->
+                        <div class="form-section mb-5">
+                            <h4 class="section-title mb-4">
+                                <i class="fas fa-calendar me-2 text-primary"></i>Validity & Type
+                            </h4>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" name="validTill" id="validTill">
+                                        <label for="validTill">
+                                            <i class="fas fa-calendar-times me-2"></i>Valid Until (Optional)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="type" id="type" required>
+                                            <option value="general">General</option>
+                                            <option value="seasonal">Seasonal</option>
+                                            <option value="loyalty">Loyalty</option>
+                                            <option value="first_time">First Time</option>
+                                        </select>
+                                        <label for="type">
+                                            <i class="fas fa-layer-group me-2"></i>Promotion Type *
                                         </label>
                                     </div>
                                 </div>
@@ -205,26 +248,26 @@
                                 <div class="d-flex align-items-start">
                                     <i class="fas fa-lightbulb fa-2x text-info me-3 mt-1"></i>
                                     <div>
-                                        <h5 class="alert-heading mb-3">Tips for Effective Campaigns</h5>
+                                        <h5 class="alert-heading mb-3">Tips for Effective Promotions</h5>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="d-flex align-items-center mb-2">
                                                     <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Use personalized greetings like "Dear [Name]"</span>
+                                                    <span>Use clear, compelling titles</span>
                                                 </div>
                                                 <div class="d-flex align-items-center mb-2">
                                                     <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Include clear call-to-action buttons</span>
+                                                    <span>Set reasonable discount values</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="d-flex align-items-center mb-2">
                                                     <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Mention any special offers or promotions</span>
+                                                    <span>Specify clear validity periods</span>
                                                 </div>
                                                 <div class="d-flex align-items-center mb-2">
                                                     <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Keep the message concise and engaging</span>
+                                                    <span>Choose appropriate promotion types</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -236,9 +279,9 @@
                         <!-- Action Buttons -->
                         <div class="d-flex gap-3 justify-content-center mt-5">
                             <button type="submit" class="btn btn-primary btn-lg px-5">
-                                <i class="fas fa-save me-2"></i>Save Campaign
+                                <i class="fas fa-save me-2"></i>Create Promotion
                             </button>
-                            <a href="CampaignController?action=list" class="btn btn-secondary btn-lg px-5">
+                            <a href="AdminServlet?section=promotions" class="btn btn-secondary btn-lg px-5">
                                 <i class="fas fa-times me-2"></i>Cancel
                             </a>
                         </div>

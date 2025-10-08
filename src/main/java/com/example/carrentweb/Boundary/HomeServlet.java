@@ -22,52 +22,8 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Load vehicles from DB (support both possible schemas); fallback to sample if fails/empty
-        List<java.util.Map<String, Object>> cars = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection()) {
-            try {
-                PreparedStatement ps = conn.prepareStatement("SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl FROM Vehicles");
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    java.util.Map<String, Object> c = new java.util.HashMap<>();
-                    c.put("vehicleId", rs.getInt("vehicleId"));
-                    c.put("vehicleName", rs.getString("vehicleName"));
-                    c.put("vehicleType", rs.getString("vehicleType"));
-                    c.put("dailyPrice", rs.getDouble("dailyPrice"));
-                    Object avail = rs.getObject("available");
-                    c.put("available", avail);
-                    c.put("imageUrl", rs.getString("imageUrl"));
-                    cars.add(c);
-                }
-            } catch (Exception e1) {
-                PreparedStatement ps = conn.prepareStatement("SELECT id, model, type, pricePerDay, status FROM Vehicles");
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    java.util.Map<String, Object> c = new java.util.HashMap<>();
-                    c.put("vehicleId", rs.getInt("id"));
-                    c.put("vehicleName", rs.getString("model"));
-                    c.put("vehicleType", rs.getString("type"));
-                    c.put("dailyPrice", rs.getDouble("pricePerDay"));
-                    Object avail = rs.getObject("status");
-                    c.put("available", avail);
-                    c.put("imageUrl", null);
-                    cars.add(c);
-                }
-            }
-        } catch (Exception ignore) {}
-
-        if (cars.isEmpty()) {
-            java.util.Map<String, Object> c1 = new java.util.HashMap<>();
-            c1.put("vehicleId", 1); c1.put("vehicleName", "Toyota Corolla"); c1.put("vehicleType", "Sedan"); c1.put("dailyPrice", 45); c1.put("available", true); c1.put("imageUrl", "corolla.jpg");
-            java.util.Map<String, Object> c2 = new java.util.HashMap<>();
-            c2.put("vehicleId", 2); c2.put("vehicleName", "Honda Civic"); c2.put("vehicleType", "Sedan"); c2.put("dailyPrice", 50); c2.put("available", true); c2.put("imageUrl", "civic.jpg");
-            java.util.Map<String, Object> c3 = new java.util.HashMap<>();
-            c3.put("vehicleId", 3); c3.put("vehicleName", "Jeep Wrangler"); c3.put("vehicleType", "SUV"); c3.put("dailyPrice", 80); c3.put("available", true); c3.put("imageUrl", "jeep.jpg");
-            java.util.Map<String, Object> c4 = new java.util.HashMap<>();
-            c4.put("vehicleId", 4); c4.put("vehicleName", "BMW X5"); c4.put("vehicleType", "Luxury SUV"); c4.put("dailyPrice", 120); c4.put("available", false); c4.put("imageUrl", "bmw.jpg");
-            cars.add(c1); cars.add(c2); cars.add(c3); cars.add(c4);
-        }
-        request.setAttribute("carList", cars);
+        // Load vehicles from DB based on search parameters
+        loadVehicles(request);
 
         // Promotions
         List<java.util.Map<String,String>> promotions = new ArrayList<>();
@@ -212,6 +168,9 @@ public class HomeServlet extends HttpServlet {
         } else if ("customer-dashboard".equals(page)) {
             targetJsp = "customer-dashboard.jsp";
             loadCustomerDashboardData(request, response);
+        } else if ("customer-bill".equals(page)) {
+            loadCustomerBillData(request, response);
+            targetJsp = "customer-bill.jsp";
         }
 
         // Forward to appropriate JSP
@@ -418,12 +377,12 @@ public class HomeServlet extends HttpServlet {
             try (Connection conn = DBConnection.getConnection()) {
                 // Load customer payments
                 PreparedStatement ps = conn.prepareStatement(
-                    "SELECT p.paymentId, p.bookingId, p.amount, p.paymentMethod, p.paymentDate, v.vehicleName " +
+                    "SELECT p.paymentId, p.bookingId, p.amount, p.paymentMethod, v.vehicleName " +
                     "FROM Payments p " +
                     "JOIN Bookings b ON p.bookingId = b.bookingId " +
                     "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
                     "WHERE b.userId = ? " +
-                    "ORDER BY p.paymentDate DESC"
+                    "ORDER BY p.paymentId DESC"
                 );
                 ps.setInt(1, userId);
                 ResultSet rs = ps.executeQuery();
@@ -433,7 +392,7 @@ public class HomeServlet extends HttpServlet {
                     payment.put("bookingId", rs.getInt("bookingId"));
                     payment.put("amount", rs.getDouble("amount"));
                     payment.put("paymentMethod", rs.getString("paymentMethod"));
-                    payment.put("paymentDate", rs.getString("paymentDate"));
+                    payment.put("paymentDate", "N/A"); // Placeholder since column doesn't exist
                     payment.put("vehicleName", rs.getString("vehicleName"));
                     customerPayments.add(payment);
                 }
@@ -536,5 +495,195 @@ public class HomeServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadCustomerBillData(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        String bookingIdParam = request.getParameter("bookingId");
+        System.out.println("HomeServlet: loadCustomerBillData called");
+        System.out.println("HomeServlet: bookingIdParam = " + bookingIdParam);
+        System.out.println("HomeServlet: userId = " + userId);
+
+        if (bookingIdParam == null || bookingIdParam.trim().isEmpty()) {
+            // Set error message for missing booking ID
+            request.setAttribute("billError", "Booking ID is required to view bill details. Please check your booking ID or contact support.");
+            System.out.println("HomeServlet: Missing bookingId parameter");
+            return;
+        }
+
+        try {
+            int bookingId = Integer.parseInt(bookingIdParam);
+
+            // If no user is logged in, try to find the booking owner for viewing
+            if (userId == null) {
+                try (Connection conn = DBConnection.getConnection()) {
+                    PreparedStatement ps = conn.prepareStatement("SELECT userId FROM Bookings WHERE bookingId = ?");
+                    ps.setInt(1, bookingId);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        userId = rs.getInt("userId");
+                        System.out.println("HomeServlet: Found booking owner userId = " + userId);
+                    } else {
+                        request.setAttribute("billError", "Unable to load bill details. The specified booking ID was not found. Please check your booking ID or contact support.");
+                        System.out.println("HomeServlet: Booking not found for bookingId = " + bookingId);
+                        return;
+                    }
+                } catch (Exception e) {
+                    request.setAttribute("billError", "Unable to load bill details. Please check your booking ID or contact support.");
+                    System.out.println("HomeServlet: Error finding booking owner: " + e.getMessage());
+                    return;
+                }
+            }
+
+            try (Connection conn = DBConnection.getConnection()) {
+                // First try to load complete bill details (with payment)
+                PreparedStatement ps = conn.prepareStatement(
+                    "SELECT b.bookingId, b.startDate, b.endDate, b.status as bookingStatus, " +
+                    "p.paymentId, p.amount, p.paymentMethod, p.status as paymentStatus, " +
+                    "v.vehicleName, v.dailyPrice, v.imageUrl, v.description as vehicleDescription, " +
+                    "DATEDIFF(day, b.startDate, b.endDate) + 1 as duration, " +
+                    "b.startDate as bookingDate, p.paymentDate as paymentDate " +
+                    "FROM Bookings b " +
+                    "JOIN Payments p ON b.bookingId = p.bookingId " +
+                    "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
+                    "WHERE b.bookingId = ? AND b.userId = ?"
+                );
+                ps.setInt(1, bookingId);
+                ps.setInt(2, userId);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    // Payment exists - show complete bill
+                    System.out.println("HomeServlet: Found payment record for bookingId = " + bookingId);
+                    java.util.Map<String, Object> billDetails = new java.util.HashMap<>();
+                    billDetails.put("bookingId", rs.getInt("bookingId"));
+                    billDetails.put("paymentId", rs.getInt("paymentId"));
+                    billDetails.put("startDate", rs.getString("startDate"));
+                    billDetails.put("endDate", rs.getString("endDate"));
+                    billDetails.put("bookingStatus", rs.getString("bookingStatus"));
+                    billDetails.put("paymentStatus", rs.getString("paymentStatus"));
+                    billDetails.put("vehicleName", rs.getString("vehicleName"));
+                    billDetails.put("vehicleImage", rs.getString("imageUrl"));
+                    billDetails.put("vehicleDescription", rs.getString("vehicleDescription"));
+                    billDetails.put("dailyRate", rs.getDouble("dailyPrice"));
+                    billDetails.put("duration", rs.getInt("duration"));
+                    billDetails.put("totalAmount", rs.getDouble("amount"));
+                    billDetails.put("paymentMethod", rs.getString("paymentMethod"));
+                    billDetails.put("bookingDate", rs.getString("bookingDate"));
+                    billDetails.put("paymentDate", rs.getString("paymentDate"));
+                    billDetails.put("isPreview", false);
+
+                    request.setAttribute("billDetails", billDetails);
+                    System.out.println("HomeServlet: billDetails set with payment data");
+                } else {
+                    // Payment doesn't exist - show booking preview
+                    System.out.println("HomeServlet: No payment record found, trying booking preview for bookingId = " + bookingId);
+                    PreparedStatement bookingPs = conn.prepareStatement(
+                        "SELECT b.bookingId, b.startDate, b.endDate, b.status as bookingStatus, " +
+                        "v.vehicleName, v.dailyPrice, v.imageUrl, v.description as vehicleDescription, " +
+                        "DATEDIFF(day, b.startDate, b.endDate) + 1 as duration, " +
+                        "b.startDate as bookingDate " +
+                        "FROM Bookings b " +
+                        "JOIN Vehicles v ON b.vehicleId = v.vehicleId " +
+                        "WHERE b.bookingId = ? AND b.userId = ?"
+                    );
+                    bookingPs.setInt(1, bookingId);
+                    bookingPs.setInt(2, userId);
+                    ResultSet bookingRs = bookingPs.executeQuery();
+
+                    if (bookingRs.next()) {
+                        System.out.println("HomeServlet: Found booking record for preview");
+                        java.util.Map<String, Object> billDetails = new java.util.HashMap<>();
+                        billDetails.put("bookingId", bookingRs.getInt("bookingId"));
+                        billDetails.put("startDate", bookingRs.getString("startDate"));
+                        billDetails.put("endDate", bookingRs.getString("endDate"));
+                        billDetails.put("bookingStatus", bookingRs.getString("bookingStatus"));
+                        billDetails.put("vehicleName", bookingRs.getString("vehicleName"));
+                        billDetails.put("vehicleImage", bookingRs.getString("imageUrl"));
+                        billDetails.put("vehicleDescription", bookingRs.getString("vehicleDescription"));
+                        billDetails.put("dailyRate", bookingRs.getDouble("dailyPrice"));
+                        billDetails.put("duration", bookingRs.getInt("duration"));
+                        double totalAmount = bookingRs.getDouble("dailyPrice") * bookingRs.getInt("duration");
+                        billDetails.put("totalAmount", totalAmount);
+                        billDetails.put("bookingDate", bookingRs.getString("bookingDate"));
+                        billDetails.put("isPreview", true);
+
+                        request.setAttribute("billDetails", billDetails);
+                        System.out.println("HomeServlet: billDetails set with preview data");
+                    } else {
+                        request.setAttribute("billError", "Unable to load bill details. The specified booking ID was not found or you don't have permission to view it. Please check your booking ID or contact support.");
+                        System.out.println("HomeServlet: No booking record found for userId = " + userId + ", bookingId = " + bookingId);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("billError", "Invalid booking ID format. Please check your booking ID or contact support.");
+                System.out.println("HomeServlet: Invalid booking ID format: " + bookingIdParam);
+            } catch (Exception e) {
+                request.setAttribute("billError", "Unable to load bill details due to a system error. Please try again later or contact support.");
+                System.out.println("HomeServlet: Error in loadCustomerBillData: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("billError", "Invalid booking ID format. Please check your booking ID or contact support.");
+            System.out.println("HomeServlet: Invalid booking ID format: " + bookingIdParam);
+        }
+    }
+
+    private void loadVehicles(HttpServletRequest request) {
+        List<java.util.Map<String, Object>> cars = new ArrayList<>();
+        String pickupDate = request.getParameter("pickupDate");
+        String returnDate = request.getParameter("returnDate");
+        String vehicleType = request.getParameter("vehicleType");
+
+        try (Connection conn = DBConnection.getConnection()) {
+            StringBuilder sql = new StringBuilder(
+                "SELECT vehicleId, vehicleName, vehicleType, dailyPrice, available, imageUrl FROM Vehicles v WHERE 1=1"
+            );
+
+            List<Object> params = new ArrayList<>();
+
+            if (pickupDate != null && !pickupDate.trim().isEmpty() && returnDate != null && !returnDate.trim().isEmpty()) {
+                sql.append(" AND v.available = 1 AND NOT EXISTS (SELECT 1 FROM Bookings b WHERE b.vehicleId = v.vehicleId AND b.status != 'Cancelled' AND b.startDate < ? AND b.endDate > ?)");
+                params.add(java.sql.Date.valueOf(returnDate));
+                params.add(java.sql.Date.valueOf(pickupDate));
+            } else {
+                sql.append(" AND v.available = 1");
+            }
+
+            if (vehicleType != null && !vehicleType.trim().isEmpty()) {
+                sql.append(" AND v.vehicleType = ?");
+                params.add(vehicleType);
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                java.util.Map<String, Object> c = new java.util.HashMap<>();
+                c.put("vehicleId", rs.getInt("vehicleId"));
+                c.put("vehicleName", rs.getString("vehicleName"));
+                c.put("vehicleType", rs.getString("vehicleType"));
+                c.put("dailyPrice", rs.getDouble("dailyPrice"));
+                c.put("available", rs.getBoolean("available"));
+                c.put("imageUrl", rs.getString("imageUrl"));
+                cars.add(c);
+            }
+        } catch (Exception e) {
+            // Fallback to sample data if DB fails
+            java.util.Map<String, Object> c1 = new java.util.HashMap<>();
+            c1.put("vehicleId", 1); c1.put("vehicleName", "Toyota Corolla"); c1.put("vehicleType", "Sedan"); c1.put("dailyPrice", 45); c1.put("available", true); c1.put("imageUrl", "corolla.jpg");
+            java.util.Map<String, Object> c2 = new java.util.HashMap<>();
+            c2.put("vehicleId", 2); c2.put("vehicleName", "Honda Civic"); c2.put("vehicleType", "Sedan"); c2.put("dailyPrice", 50); c2.put("available", true); c2.put("imageUrl", "civic.jpg");
+            java.util.Map<String, Object> c3 = new java.util.HashMap<>();
+            c3.put("vehicleId", 3); c3.put("vehicleName", "Jeep Wrangler"); c3.put("vehicleType", "SUV"); c3.put("dailyPrice", 80); c3.put("available", true); c3.put("imageUrl", "jeep.jpg");
+            cars.add(c1); cars.add(c2); cars.add(c3);
+        }
+
+        request.setAttribute("carList", cars);
     }
 }

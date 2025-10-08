@@ -6,6 +6,7 @@ public class Payment {
     private double amount;
     private String paymentMethod;
     private String paymentDate; // Added paymentDate field
+    private String status; // Added status field
 
     public Payment() {}
 
@@ -13,6 +14,7 @@ public class Payment {
         this.bookingId = bookingId;
         this.amount = amount;
         this.paymentMethod = paymentMethod;
+        this.status = "Paid"; // Default status
     }
 
     public Payment(int bookingId, double amount, String paymentMethod, String paymentDate) {
@@ -20,6 +22,15 @@ public class Payment {
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.paymentDate = paymentDate;
+        this.status = "Paid"; // Default status
+    }
+
+    public Payment(int bookingId, double amount, String paymentMethod, String paymentDate, String status) {
+        this.bookingId = bookingId;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.paymentDate = paymentDate;
+        this.status = status;
     }
 
     // Getters and Setters
@@ -37,4 +48,7 @@ public class Payment {
 
     public String getPaymentDate() { return paymentDate; }
     public void setPaymentDate(String paymentDate) { this.paymentDate = paymentDate; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

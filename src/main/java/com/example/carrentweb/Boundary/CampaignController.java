@@ -60,6 +60,9 @@ public class CampaignController extends HttpServlet {
                 case "customers":
                     listCustomerEmails(request, response, conn);
                     break;
+                case "performance":
+                    getCampaignPerformanceData(request, response, conn);
+                    break;
                 default:
                     listCampaigns(request, response, conn);
             }
@@ -133,27 +136,49 @@ public class CampaignController extends HttpServlet {
 
     private void listCampaigns(HttpServletRequest request, HttpServletResponse response, Connection conn)
             throws Exception {
-        List<Campaign> campaigns = new ArrayList<>();
-        String sql = "SELECT * FROM Campaigns ORDER BY createdDate DESC";
+        List<Map<String, Object>> campaignsWithPerformance = new ArrayList<>();
+        String sql = "SELECT c.*, " +
+            "COUNT(DISTINCT co.recipientEmail) as uniqueOpens, " +
+            "COUNT(DISTINCT cc.recipientEmail) as uniqueClicks " +
+            "FROM Campaigns c " +
+            "LEFT JOIN CampaignOpens co ON c.campaignId = co.campaignId " +
+            "LEFT JOIN CampaignClicks cc ON c.campaignId = cc.campaignId " +
+            "GROUP BY c.campaignId, c.subject, c.body, c.offer, c.segment, c.status, c.createdDate, c.sentDate, c.sentCount, c.adminId " +
+            "ORDER BY c.createdDate DESC";
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
-            Campaign campaign = new Campaign();
-            campaign.setCampaignId(rs.getInt("campaignId"));
-            campaign.setSubject(rs.getString("subject"));
-            campaign.setBody(rs.getString("body"));
-            campaign.setOffer(rs.getString("offer"));
-            campaign.setSegment(rs.getString("segment"));
-            campaign.setStatus(rs.getString("status"));
-            campaign.setCreatedDate(rs.getString("createdDate"));
-            campaign.setSentDate(rs.getString("sentDate"));
-            campaign.setSentCount(rs.getInt("sentCount"));
-            campaign.setAdminId(rs.getInt("adminId"));
-            campaigns.add(campaign);
+            Map<String, Object> campaignData = new HashMap<>();
+            campaignData.put("campaignId", rs.getInt("campaignId"));
+            campaignData.put("subject", rs.getString("subject"));
+            campaignData.put("body", rs.getString("body"));
+            campaignData.put("offer", rs.getString("offer"));
+            campaignData.put("segment", rs.getString("segment"));
+            campaignData.put("status", rs.getString("status"));
+            campaignData.put("createdDate", rs.getString("createdDate"));
+            campaignData.put("sentDate", rs.getString("sentDate"));
+            campaignData.put("sentCount", rs.getInt("sentCount"));
+            campaignData.put("adminId", rs.getInt("adminId"));
+
+            // Performance data
+            int sentCount = rs.getInt("sentCount");
+            int uniqueOpens = rs.getInt("uniqueOpens");
+            int uniqueClicks = rs.getInt("uniqueClicks");
+
+            campaignData.put("uniqueOpens", uniqueOpens);
+            campaignData.put("uniqueClicks", uniqueClicks);
+
+            double openRate = sentCount > 0 ? (double) uniqueOpens / sentCount * 100 : 0;
+            double clickRate = sentCount > 0 ? (double) uniqueClicks / sentCount * 100 : 0;
+
+            campaignData.put("openRate", Math.round(openRate * 100.0) / 100.0);
+            campaignData.put("clickRate", Math.round(clickRate * 100.0) / 100.0);
+
+            campaignsWithPerformance.add(campaignData);
         }
 
-        request.setAttribute("campaigns", campaigns);
+        request.setAttribute("campaigns", campaignsWithPerformance);
         request.getRequestDispatcher("admin-campaigns.jsp").forward(request, response);
     }
 
@@ -513,7 +538,33 @@ public class CampaignController extends HttpServlet {
         // Add footer
         body.append(footerText.replace("{recipient}", recipientEmail));
 
+        // Add tracking pixel for open tracking (invisible image)
+        String trackingPixelUrl = generateTrackingPixelUrl(campaign.getCampaignId(), recipientEmail);
+        body.append("\n\n<img src=\"").append(trackingPixelUrl).append("\" width=\"1\" height=\"1\" style=\"display:none;\" alt=\"\" />");
+
         return body.toString();
+    }
+
+    private String generateTrackingPixelUrl(int campaignId, String recipientEmail) {
+        try {
+            // Encode email for URL safety
+            String encodedEmail = java.net.URLEncoder.encode(recipientEmail, java.nio.charset.StandardCharsets.UTF_8.toString());
+            return "http://localhost:8080/CarRentWeb/CampaignTracking?action=open&cid=" + campaignId + "&email=" + encodedEmail;
+        } catch (Exception e) {
+            System.err.println("Error encoding tracking URL: " + e.getMessage());
+            return "";
+        }
+    }
+
+    private String makeTrackableLink(String originalUrl, int campaignId, String recipientEmail) {
+        try {
+            String encodedUrl = java.net.URLEncoder.encode(originalUrl, java.nio.charset.StandardCharsets.UTF_8.toString());
+            String encodedEmail = java.net.URLEncoder.encode(recipientEmail, java.nio.charset.StandardCharsets.UTF_8.toString());
+            return "http://localhost:8080/CarRentWeb/CampaignTracking?action=click&cid=" + campaignId + "&email=" + encodedEmail + "&url=" + encodedUrl;
+        } catch (Exception e) {
+            System.err.println("Error encoding trackable link: " + e.getMessage());
+            return originalUrl;
+        }
     }
 
     private void logEmailResult(int campaignId, String email, String status, String errorMessage, Connection conn) throws Exception {
@@ -621,5 +672,126 @@ public class CampaignController extends HttpServlet {
         ps.setString(4, errorMessage);
         ps.setInt(5, sendId);
         ps.executeUpdate();
+    }
+
+    private Map<String, Object> getCampaignPerformance(int campaignId, Connection conn) throws Exception {
+        Map<String, Object> performance = new HashMap<>();
+
+        // Get basic campaign info and sent count
+        String campaignSql = "SELECT c.subject, c.sentCount, c.sentDate FROM Campaigns c WHERE c.campaignId = ?";
+        PreparedStatement campaignPs = conn.prepareStatement(campaignSql);
+        campaignPs.setInt(1, campaignId);
+        ResultSet campaignRs = campaignPs.executeQuery();
+
+        if (!campaignRs.next()) {
+            throw new Exception("Campaign not found");
+        }
+
+        int sentCount = campaignRs.getInt("sentCount");
+        performance.put("subject", campaignRs.getString("subject"));
+        performance.put("sentCount", sentCount);
+        performance.put("sentDate", campaignRs.getString("sentDate"));
+
+        // Get unique opens
+        String opensSql = "SELECT COUNT(DISTINCT recipientEmail) as uniqueOpens FROM CampaignOpens WHERE campaignId = ?";
+        PreparedStatement opensPs = conn.prepareStatement(opensSql);
+        opensPs.setInt(1, campaignId);
+        ResultSet opensRs = opensPs.executeQuery();
+        int uniqueOpens = opensRs.next() ? opensRs.getInt("uniqueOpens") : 0;
+        performance.put("uniqueOpens", uniqueOpens);
+
+        // Get unique clicks and total clicks
+        String clicksSql = "SELECT COUNT(DISTINCT recipientEmail) as uniqueClicks, COUNT(*) as totalClicks FROM CampaignClicks WHERE campaignId = ?";
+        PreparedStatement clicksPs = conn.prepareStatement(clicksSql);
+        clicksPs.setInt(1, campaignId);
+        ResultSet clicksRs = clicksPs.executeQuery();
+        int uniqueClicks = clicksRs.next() ? clicksRs.getInt("uniqueClicks") : 0;
+        int totalClicks = clicksRs.next() ? clicksRs.getInt("totalClicks") : 0;
+        performance.put("uniqueClicks", uniqueClicks);
+        performance.put("totalClicks", totalClicks);
+
+        // Calculate rates
+        double openRate = sentCount > 0 ? (double) uniqueOpens / sentCount * 100 : 0;
+        double clickRate = sentCount > 0 ? (double) uniqueClicks / sentCount * 100 : 0;
+
+        performance.put("openRate", Math.round(openRate * 100.0) / 100.0);
+        performance.put("clickRate", Math.round(clickRate * 100.0) / 100.0);
+
+        return performance;
+    }
+
+    private List<Map<String, Object>> getCampaignPerformanceSummary(Connection conn) throws Exception {
+        List<Map<String, Object>> summary = new ArrayList<>();
+
+        String sql = "SELECT " +
+            "c.campaignId, c.subject, c.sentDate, c.sentCount, " +
+            "COUNT(DISTINCT co.recipientEmail) as uniqueOpens, " +
+            "COUNT(DISTINCT cc.recipientEmail) as uniqueClicks, " +
+            "COUNT(cc.clickId) as totalClicks " +
+            "FROM Campaigns c " +
+            "LEFT JOIN CampaignOpens co ON c.campaignId = co.campaignId " +
+            "LEFT JOIN CampaignClicks cc ON c.campaignId = cc.campaignId " +
+            "WHERE c.status = 'sent' " +
+            "GROUP BY c.campaignId, c.subject, c.sentDate, c.sentCount " +
+            "ORDER BY c.sentDate DESC";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Map<String, Object> campaign = new HashMap<>();
+            campaign.put("campaignId", rs.getInt("campaignId"));
+            campaign.put("subject", rs.getString("subject"));
+            campaign.put("sentDate", rs.getString("sentDate"));
+            campaign.put("sentCount", rs.getInt("sentCount"));
+
+            int sentCount = rs.getInt("sentCount");
+            int uniqueOpens = rs.getInt("uniqueOpens");
+            int uniqueClicks = rs.getInt("uniqueClicks");
+            int totalClicks = rs.getInt("totalClicks");
+
+            campaign.put("uniqueOpens", uniqueOpens);
+            campaign.put("uniqueClicks", uniqueClicks);
+            campaign.put("totalClicks", totalClicks);
+
+            double openRate = sentCount > 0 ? (double) uniqueOpens / sentCount * 100 : 0;
+            double clickRate = sentCount > 0 ? (double) uniqueClicks / sentCount * 100 : 0;
+
+            campaign.put("openRate", Math.round(openRate * 100.0) / 100.0);
+            campaign.put("clickRate", Math.round(clickRate * 100.0) / 100.0);
+
+            summary.add(campaign);
+        }
+
+        return summary;
+    }
+
+    private void getCampaignPerformanceData(HttpServletRequest request, HttpServletResponse response, Connection conn) throws Exception {
+        String campaignIdStr = request.getParameter("id");
+
+        if (campaignIdStr != null) {
+            // Get performance for specific campaign
+            int campaignId = Integer.parseInt(campaignIdStr);
+            Map<String, Object> performance = getCampaignPerformance(campaignId, conn);
+
+            response.setContentType("application/json");
+            String json = String.format(
+                "{\"campaignId\":%d,\"subject\":\"%s\",\"sentCount\":%d,\"uniqueOpens\":%d,\"uniqueClicks\":%d,\"totalClicks\":%d,\"openRate\":%.2f,\"clickRate\":%.2f}",
+                campaignId,
+                performance.get("subject").toString().replace("\"", "\\\""),
+                (Integer) performance.get("sentCount"),
+                (Integer) performance.get("uniqueOpens"),
+                (Integer) performance.get("uniqueClicks"),
+                (Integer) performance.get("totalClicks"),
+                (Double) performance.get("openRate"),
+                (Double) performance.get("clickRate")
+            );
+            response.getWriter().write(json);
+        } else {
+            // Get performance summary for all campaigns
+            List<Map<String, Object>> summary = getCampaignPerformanceSummary(conn);
+            request.setAttribute("performanceSummary", summary);
+            request.getRequestDispatcher("admin-campaign-performance.jsp").forward(request, response);
+        }
     }
 }

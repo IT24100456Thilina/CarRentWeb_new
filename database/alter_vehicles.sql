@@ -23,7 +23,8 @@ CREATE TABLE Vehicles (
     vehicleType NVARCHAR(50) NOT NULL,
     dailyPrice DECIMAL(10,2) NOT NULL,
     available BIT NOT NULL DEFAULT 1,
-    imageUrl NVARCHAR(255) NULL
+    imageUrl NVARCHAR(255) NULL,
+    description NVARCHAR(500) NULL
 );
 GO
 

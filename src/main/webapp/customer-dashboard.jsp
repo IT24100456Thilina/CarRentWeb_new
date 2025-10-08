@@ -490,6 +490,19 @@
 
 </div> <!-- End main-content -->
 
+<!-- Notification Area -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11000;">
+<div id="notify" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <strong class="me-auto">CarGO</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="notifyText">
+        Notification message here
+    </div>
+</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Theme Management
@@ -538,14 +551,39 @@
         }
     });
 
+    // Notification function
+    function showNotification(message) {
+        const notifyElement = document.getElementById('notify');
+        const notifyText = document.getElementById('notifyText');
+        if (notifyElement && notifyText) {
+            notifyText.textContent = message;
+            const toast = new bootstrap.Toast(notifyElement);
+            toast.show();
+        }
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         initTheme();
         document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-        // Show login success message
-        if (window.location.search.includes('login=1')) {
-            alert('Login successful! Welcome back.');
+        // Handle URL parameters for messages
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('login') === '1') {
+            showNotification('Login successful! Welcome back.');
+        }
+
+        if (urlParams.get('feedback') === '1') {
+            showNotification('Thank you for your feedback! We appreciate your input.');
+        }
+
+        if (urlParams.get('successMsg')) {
+            showNotification(decodeURIComponent(urlParams.get('successMsg')));
+        }
+
+        if (urlParams.get('errorMsg')) {
+            showNotification('Error: ' + decodeURIComponent(urlParams.get('errorMsg')));
         }
     });
 </script>
