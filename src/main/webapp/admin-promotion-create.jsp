@@ -1,9 +1,38 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page import="com.example.carrentweb.ControlSql.DBConnection" %>
+<%
+    // Load promotions data
+    if (request.getAttribute("promotions") == null) {
+        List<Map<String, String>> promotions = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT id, title, description, badge, discountCode, discountType, discountValue, validTill, active, type, createdDate FROM Promotions ORDER BY createdDate DESC");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, String> p = new HashMap<>();
+                p.put("id", String.valueOf(rs.getInt("id")));
+                p.put("title", rs.getString("title"));
+                p.put("description", rs.getString("description"));
+                p.put("badge", rs.getString("badge"));
+                p.put("discountCode", rs.getString("discountCode"));
+                p.put("discountType", rs.getString("discountType"));
+                p.put("discountValue", rs.getString("discountValue"));
+                p.put("validTill", rs.getString("validTill"));
+                p.put("active", String.valueOf(rs.getBoolean("active")));
+                p.put("type", rs.getString("type"));
+                p.put("createdDate", rs.getString("createdDate"));
+                promotions.add(p);
+            }
+        } catch (Exception ignore) {}
+        request.setAttribute("promotions", promotions);
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Promotion - Admin - CarRent</title>
+    <title>Promotions Management - Admin - CarRent</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -79,19 +108,10 @@
             <a class="nav-link" href="AdminServlet">
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
-            <a class="nav-link" href="AdminServlet?section=users">
-                <i class="fas fa-users"></i> Users
-            </a>
-            <a class="nav-link" href="AdminServlet?section=vehicles">
-                <i class="fas fa-car"></i> Vehicles
-            </a>
-            <a class="nav-link" href="AdminServlet?section=bookings">
-                <i class="fas fa-calendar-check"></i> Bookings
-            </a>
             <a class="nav-link" href="CampaignController">
                 <i class="fas fa-envelope"></i> Campaigns
             </a>
-            <a class="nav-link active" href="AdminServlet?section=promotions">
+            <a class="nav-link active" href="admin-promotion-create.jsp">
                 <i class="fas fa-tags"></i> Promotions
             </a>
             <hr class="my-3">
@@ -110,7 +130,7 @@
     <!-- Top Navbar -->
     <nav class="navbar">
         <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Create Promotion</span>
+            <span class="navbar-brand mb-0 h1">Promotions Management</span>
         </div>
     </nav>
 
@@ -118,175 +138,336 @@
     <div class="section-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
-                <h2>Create New Promotion</h2>
-                <p class="text-muted mb-0">Design and launch your next promotional offer</p>
+                <h2>Promotions Management</h2>
+                <p class="text-muted mb-0">Create, manage and monitor promotional offers</p>
             </div>
             <div>
-                <a href="AdminServlet?section=promotions" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Promotions
-                </a>
+                <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#promotionForm" onclick="resetPromotionForm()">
+                    <i class="fas fa-plus me-2"></i>Create Promotion
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card">
-                <div class="card-body p-5">
-
-                    <form action="PromotionController" method="post">
-                        <input type="hidden" name="action" value="add">
-
-                        <!-- Promotion Details Section -->
-                        <div class="form-section mb-5">
-                            <h4 class="section-title mb-4">
-                                <i class="fas fa-info-circle me-2 text-primary"></i>Promotion Details
-                            </h4>
-                            <div class="row g-4">
-                                <div class="col-md-8">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="title" id="title" required
-                                               placeholder="Enter promotion title">
-                                        <label for="title">
-                                            <i class="fas fa-tag me-2"></i>Promotion Title *
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="badge" id="badge"
-                                               placeholder="e.g., HOT, NEW, SALE">
-                                        <label for="badge">
-                                            <i class="fas fa-certificate me-2"></i>Badge (Optional)
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <textarea class="form-control" name="description" id="description" rows="4" required
-                                                  placeholder="Describe the promotion details, terms, and conditions."></textarea>
-                                        <label for="description">
-                                            <i class="fas fa-file-alt me-2"></i>Description *
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Discount Settings Section -->
-                        <div class="form-section mb-5">
-                            <h4 class="section-title mb-4">
-                                <i class="fas fa-percent me-2 text-primary"></i>Discount Settings
-                            </h4>
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="discountCode" id="discountCode"
-                                               placeholder="e.g., SAVE20, WELCOME10">
-                                        <label for="discountCode">
-                                            <i class="fas fa-key me-2"></i>Discount Code (Optional)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="discountType" id="discountType" required>
-                                            <option value="percentage">Percentage</option>
-                                            <option value="fixed">Fixed Amount</option>
-                                        </select>
-                                        <label for="discountType">
-                                            <i class="fas fa-calculator me-2"></i>Discount Type *
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating">
-                                        <input type="number" class="form-control" name="discountValue" id="discountValue"
-                                               step="0.01" min="0" placeholder="e.g., 20.00">
-                                        <label for="discountValue">
-                                            <i class="fas fa-dollar-sign me-2"></i>Value *
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Validity & Type Section -->
-                        <div class="form-section mb-5">
-                            <h4 class="section-title mb-4">
-                                <i class="fas fa-calendar me-2 text-primary"></i>Validity & Type
-                            </h4>
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input type="date" class="form-control" name="validTill" id="validTill">
-                                        <label for="validTill">
-                                            <i class="fas fa-calendar-times me-2"></i>Valid Until (Optional)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="type" id="type" required>
-                                            <option value="general">General</option>
-                                            <option value="seasonal">Seasonal</option>
-                                            <option value="loyalty">Loyalty</option>
-                                            <option value="first_time">First Time</option>
-                                        </select>
-                                        <label for="type">
-                                            <i class="fas fa-layer-group me-2"></i>Promotion Type *
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tips Section -->
-                        <div class="form-section mb-5">
-                            <div class="alert alert-info border-0 rounded-4 p-4" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(3, 105, 161, 0.1));">
-                                <div class="d-flex align-items-start">
-                                    <i class="fas fa-lightbulb fa-2x text-info me-3 mt-1"></i>
-                                    <div>
-                                        <h5 class="alert-heading mb-3">Tips for Effective Promotions</h5>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Use clear, compelling titles</span>
-                                                </div>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Set reasonable discount values</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Specify clear validity periods</span>
-                                                </div>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-check-circle text-success me-2"></i>
-                                                    <span>Choose appropriate promotion types</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-3 justify-content-center mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg px-5">
-                                <i class="fas fa-save me-2"></i>Create Promotion
-                            </button>
-                            <a href="AdminServlet?section=promotions" class="btn btn-secondary btn-lg px-5">
-                                <i class="fas fa-times me-2"></i>Cancel
-                            </a>
-                        </div>
-                    </form>
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">${promotions.size()}</h4>
+                        <p class="text-muted mb-0">Total Promotions</p>
+                    </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            <c:set var="activeCount" value="0"/>
+                            <c:forEach var="promo" items="${promotions}">
+                                <c:if test="${promo.active == 'true'}">
+                                    <c:set var="activeCount" value="${activeCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${activeCount}
+                        </h4>
+                        <p class="text-muted mb-0">Active Promotions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            <c:set var="expiringCount" value="0"/>
+                            <c:forEach var="promo" items="${promotions}">
+                                <c:if test="${not empty promo.validTill and promo.active == 'true'}">
+                                    <c:set var="expiringCount" value="${expiringCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${expiringCount}
+                        </h4>
+                        <p class="text-muted mb-0">With Expiry Date</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <c:if test="${not empty param.promotionAdded}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Promotion created successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+    <c:if test="${not empty param.promotionUpdated}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Promotion updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+    <c:if test="${not empty param.promotionDeleted}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Promotion deleted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+    <c:if test="${not empty param.promotionToggled}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Promotion status toggled successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+
+    <!-- Create/Edit Promotion Form -->
+    <div id="promotionForm" class="collapse mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 id="promotionFormTitle"><i class="fas fa-plus me-2"></i>Create New Promotion</h6>
+            </div>
+            <div class="card-body">
+                <form action="PromotionController" method="post" id="promotionFormElement">
+                    <input type="hidden" name="action" value="add" id="promotionAction">
+                    <input type="hidden" name="id" id="promotionId">
+
+                    <!-- Promotion Details Section -->
+                    <div class="form-section mb-4">
+                        <h4 class="section-title mb-4">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>Promotion Details
+                        </h4>
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" name="title" id="title" required
+                                            placeholder="Enter promotion title">
+                                    <label for="title">
+                                        <i class="fas fa-tag me-2"></i>Promotion Title *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" name="badge" id="badge"
+                                            placeholder="e.g., HOT, NEW, SALE">
+                                    <label for="badge">
+                                        <i class="fas fa-certificate me-2"></i>Badge (Optional)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" name="description" id="description" rows="4" required
+                                              placeholder="Describe the promotion details, terms, and conditions."></textarea>
+                                    <label for="description">
+                                        <i class="fas fa-file-alt me-2"></i>Description *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Discount Settings Section -->
+                    <div class="form-section mb-4">
+                        <h4 class="section-title mb-4">
+                            <i class="fas fa-percent me-2 text-primary"></i>Discount Settings
+                        </h4>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" name="discountCode" id="discountCode"
+                                            placeholder="e.g., SAVE20, WELCOME10">
+                                    <label for="discountCode">
+                                        <i class="fas fa-key me-2"></i>Discount Code (Optional)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" name="discountType" id="discountType" required>
+                                        <option value="percentage">Percentage</option>
+                                        <option value="fixed">Fixed Amount</option>
+                                    </select>
+                                    <label for="discountType">
+                                        <i class="fas fa-calculator me-2"></i>Discount Type *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" name="discountValue" id="discountValue"
+                                            step="0.01" min="0" placeholder="e.g., 20.00" required>
+                                    <label for="discountValue">
+                                        <i class="fas fa-dollar-sign me-2"></i>Value *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validity & Type Section -->
+                    <div class="form-section mb-4">
+                        <h4 class="section-title mb-4">
+                            <i class="fas fa-calendar me-2 text-primary"></i>Validity & Type
+                        </h4>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" name="validTill" id="validTill">
+                                    <label for="validTill">
+                                        <i class="fas fa-calendar-times me-2"></i>Valid Until (Optional)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" name="type" id="type" required>
+                                        <option value="general">General</option>
+                                        <option value="seasonal">Seasonal</option>
+                                        <option value="loyalty">Loyalty</option>
+                                        <option value="first_time">First Time</option>
+                                    </select>
+                                    <label for="type">
+                                        <i class="fas fa-layer-group me-2"></i>Promotion Type *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="promotionSubmitBtn">
+                            <i class="fas fa-save me-2"></i>Create Promotion
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg px-5" data-bs-toggle="collapse" data-bs-target="#promotionForm">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotions Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">ID</th>
+                            <th style="width: 25%;">Promotion Details</th>
+                            <th style="width: 15%;">Discount</th>
+                            <th style="width: 10%;">Type</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 15%;">Valid Until</th>
+                            <th style="width: 12%;">Created</th>
+                            <th style="width: 18%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="promo" items="${promotions}">
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary">#${promo.id}</span>
+                                </td>
+                                <td>
+                                    <div class="promotion-title">${promo.title}</div>
+                                    <c:if test="${not empty promo.badge}">
+                                        <span class="badge bg-warning text-dark">${promo.badge}</span>
+                                    </c:if>
+                                    <c:if test="${not empty promo.description}">
+                                        <div class="small text-muted mt-1">${promo.description}</div>
+                                    </c:if>
+                                </td>
+                                <td>
+                                    <c:if test="${not empty promo.discountCode}">
+                                        <div class="fw-bold">${promo.discountCode}</div>
+                                    </c:if>
+                                    <div class="small text-muted">
+                                        <c:choose>
+                                            <c:when test="${promo.discountType == 'percentage'}">
+                                                ${promo.discountValue}% off
+                                            </c:when>
+                                            <c:otherwise>
+                                                Rs.${promo.discountValue} off
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">${promo.type}</span>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${promo.active == 'true'}">
+                                            <span class="badge bg-success">Active</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${not empty promo.validTill}">
+                                            ${promo.validTill}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">No expiry</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <div>${promo.createdDate}</div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editPromotion('${promo.id}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning action-btn me-1" onclick="togglePromotion('${promo.id}')">
+                                            <i class="fas fa-toggle-${promo.active == 'true' ? 'off' : 'on'}"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger action-btn" onclick="deletePromotion('${promo.id}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty promotions}">
+                            <tr>
+                                <td colspan="8" class="p-0">
+                                    <div class="empty-state">
+                                        <i class="fas fa-tags"></i>
+                                        <h5>No promotions found</h5>
+                                        <p>Create your first promotional offer to start attracting customers.</p>
+                                        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#promotionForm" onclick="resetPromotionForm()">
+                                            <i class="fas fa-plus me-2"></i>Create First Promotion
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:if>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -294,6 +475,101 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Promotion CRUD Functions
+    function editPromotion(id) {
+        // Fetch promotion data and populate form
+        fetch('PromotionController?action=get&id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('promotionAction').value = 'update';
+                document.getElementById('promotionId').value = data.id;
+                document.getElementById('title').value = data.title;
+                document.getElementById('description').value = data.description;
+                document.getElementById('badge').value = data.badge || '';
+                document.getElementById('discountCode').value = data.discountCode || '';
+                document.getElementById('discountType').value = data.discountType;
+                document.getElementById('discountValue').value = data.discountValue;
+                document.getElementById('validTill').value = data.validTill || '';
+                document.getElementById('type').value = data.type;
+                document.getElementById('promotionFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Promotion';
+                document.getElementById('promotionSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Promotion';
+                // Show the form
+                const form = document.getElementById('promotionForm');
+                if (!form.classList.contains('show')) {
+                    new bootstrap.Collapse(form).show();
+                }
+                // Scroll to form
+                form.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                alert('Error loading promotion data: ' + error);
+            });
+    }
+
+    function resetPromotionForm() {
+        document.getElementById('promotionAction').value = 'add';
+        document.getElementById('promotionId').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('badge').value = '';
+        document.getElementById('discountCode').value = '';
+        document.getElementById('discountType').value = 'percentage';
+        document.getElementById('discountValue').value = '';
+        document.getElementById('validTill').value = '';
+        document.getElementById('type').value = 'general';
+        document.getElementById('promotionFormTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Create New Promotion';
+        document.getElementById('promotionSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Create Promotion';
+    }
+
+    function togglePromotion(id) {
+        if (confirm('Toggle active status of promotion ' + id + '?')) {
+            // Create a form to toggle the promotion
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = 'PromotionController';
+            form.style.display = 'none';
+
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'toggle';
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+
+            form.appendChild(actionInput);
+            form.appendChild(idInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function deletePromotion(id) {
+        if (confirm('Delete promotion ' + id + '? This action cannot be undone.')) {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = 'PromotionController';
+            form.style.display = 'none';
+
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'delete';
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+
+            form.appendChild(actionInput);
+            form.appendChild(idInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
     // Theme Management
     function initTheme() {
         const savedTheme = localStorage.getItem('theme') || 'light';

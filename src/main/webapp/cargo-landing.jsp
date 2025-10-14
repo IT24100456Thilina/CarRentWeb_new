@@ -245,14 +245,24 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)),
-                        url('https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1920&h=1080&fit=crop&crop=center') center/cover no-repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
             padding: 150px 0 100px;
             position: relative;
             min-height: 100vh;
             display: flex;
             align-items: center;
             color: white;
+            overflow: hidden;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
         }
 
         .hero-overlay {
@@ -1320,7 +1330,10 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="hero-overlay"></div>
+        <div class="hero-background">
+            <div class="hero-bg-image" style="background-image: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&h=1080&fit=crop&crop=center');"></div>
+            <div class="hero-bg-overlay"></div>
+        </div>
         <div class="container">
             <div class="hero-content">
                 <c:choose>
@@ -1333,11 +1346,11 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <h1 class="hero-title">Your Journey, Your Car, Your Way</h1>
-                        <p class="hero-description">Experience the freedom of the open road with our extensive fleet of luxury and economy vehicles. Book online in minutes and enjoy hassle-free rentals.</p>
+                        <h1 class="hero-title">Drive Your Dreams with CarGO</h1>
+                        <p class="hero-description">Experience premium car rentals with our extensive fleet of luxury and economy vehicles. Seamless booking, exceptional service, and unforgettable journeys await.</p>
                         <div class="d-flex gap-3 flex-wrap">
-                            <a href="#vehicles" class="btn-get-started">Get Started</a>
-                            <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn-outline-started">Customer Dashboard</a>
+                            <a href="#vehicles" class="btn-get-started">Explore Fleet</a>
+                            <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn-outline-started">Sign In</a>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -1349,30 +1362,30 @@
                             <i class="fas fa-car"></i>
                         </div>
                         <div class="highlight-content">
-                            <h3>50+ Cars Available</h3>
-                            <p>Wide selection for every need</p>
+                            <h3>50+ Premium Vehicles</h3>
+                            <p>Curated selection for every journey</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="highlight-card">
                         <div class="highlight-icon">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-shield-alt"></i>
                         </div>
                         <div class="highlight-content">
-                            <h3>Trusted by 10K+ Users</h3>
-                            <p>Satisfied customers worldwide</p>
+                            <h3>Trusted by 10K+ Customers</h3>
+                            <p>Excellence in service since 2020</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="highlight-card">
                         <div class="highlight-icon">
-                            <i class="fas fa-calendar-check"></i>
+                            <i class="fas fa-clock"></i>
                         </div>
                         <div class="highlight-content">
-                            <h3>Easy Booking</h3>
-                            <p>Book in minutes, drive away</p>
+                            <h3>Instant Booking</h3>
+                            <p>Reserve in seconds, drive immediately</p>
                         </div>
                     </div>
                 </div>
@@ -1888,8 +1901,106 @@
         document.getElementById('filterType')?.addEventListener('change', applyFilters);
         document.getElementById('filterAvailability')?.addEventListener('change', applyFilters);
 
+        // Email Domain Validation
+        function validateEmailDomain(email) {
+            if (!email) return false;
+            const allowedDomains = ['@gmail.com', '@my.sliit.lk'];
+            return allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
+        }
+
+        function showEmailValidation(emailInput, isValid) {
+            // Remove existing validation message
+            const existingMsg = emailInput.parentNode.querySelector('.email-validation-msg');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+
+            // Add validation message
+            const msg = document.createElement('div');
+            msg.className = 'email-validation-msg mt-1';
+            msg.style.fontSize = '0.875rem';
+
+            if (!emailInput.value.trim()) {
+                msg.innerHTML = '<span style="color: #6c757d;">Please enter an email address</span>';
+            } else if (!isValid) {
+                msg.innerHTML = '<span style="color: #dc3545;">Email must end with @gmail.com or @my.sliit.lk</span>';
+                emailInput.style.borderColor = '#dc3545';
+            } else {
+                msg.innerHTML = '<span style="color: #198754;">✓ Valid email domain</span>';
+                emailInput.style.borderColor = '#198754';
+            }
+
+            emailInput.parentNode.appendChild(msg);
+        }
+
+        function setupEmailValidation() {
+            // Admin registration email validation
+            const adminEmailInput = document.querySelector('#adminRegisterModal input[name="email"]');
+            if (adminEmailInput) {
+                adminEmailInput.addEventListener('input', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+                adminEmailInput.addEventListener('blur', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+            }
+
+            // Customer registration email validation
+            const customerEmailInput = document.querySelector('#registerModal input[name="email"]');
+            if (customerEmailInput) {
+                customerEmailInput.addEventListener('input', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+                customerEmailInput.addEventListener('blur', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+            }
+        }
+
+        // Form validation on submit
+        function validateRegistrationForm(form) {
+            const emailInput = form.querySelector('input[name="email"]');
+            if (emailInput) {
+                const isValid = validateEmailDomain(emailInput.value);
+                if (!isValid) {
+                    showEmailValidation(emailInput, false);
+                    emailInput.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // Chatbot Functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Setup email validation
+            setupEmailValidation();
+
+            // Add form validation to registration forms
+            const adminForm = document.querySelector('#adminRegisterModal form');
+            if (adminForm) {
+                adminForm.addEventListener('submit', function(e) {
+                    if (!validateRegistrationForm(this)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+
+            const customerForm = document.querySelector('#registerModal form');
+            if (customerForm) {
+                customerForm.addEventListener('submit', function(e) {
+                    if (!validateRegistrationForm(this)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+
             const chatbotToggle = document.getElementById('chatbot-toggle');
             const chatbotWindow = document.getElementById('chatbot-window');
             const chatbotClose = document.getElementById('chatbot-close');
@@ -2163,9 +2274,6 @@
                                 <option value="Marketing Executive">Marketing Executive</option>
                                 <option value="Accountant">Accountant</option>
                                 <option value="Operations Manager">Operations Manager</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Account">Account</option>
                             </select>
                         </div>
                         <div class="mb-3">

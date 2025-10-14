@@ -297,6 +297,12 @@
                             <a href="HomeServlet?page=customer-feedback&bookingId=${billDetails.bookingId}" class="btn btn-success">
                                 <i class="fas fa-star me-2"></i>Share Your Feedback
                             </a>
+                            <a href="BookingController?action=cancel&bookingId=${billDetails.bookingId}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                <i class="fas fa-times me-2"></i>Cancel Booking
+                            </a>
+                            <a href="PaymentController?action=refund&paymentId=${billDetails.paymentId}" class="btn btn-warning" onclick="return confirm('Are you sure you want to request a refund?')">
+                                <i class="fas fa-undo me-2"></i>Refund Payment
+                            </a>
                         </c:if>
                         <c:if test="${billDetails.isPreview}">
                             <a href="customer-payment.jsp?bookingId=${billDetails.bookingId}&amount=${billDetails.totalAmount}" class="btn btn-success">

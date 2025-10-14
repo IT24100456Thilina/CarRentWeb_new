@@ -46,6 +46,9 @@ public class AddStaffServlet extends HttpServlet {
                 case "add":
                     addStaff(request, response);
                     break;
+                case "update":
+                    updateStaff(request, response);
+                    break;
                 case "delete":
                     deleteStaff(request, response);
                     break;
@@ -99,13 +102,81 @@ public class AddStaffServlet extends HttpServlet {
         staffDAO.addStaff(staff);
 
         // Redirect with success message
-        response.sendRedirect("admin-crud.jsp?successMsg=" + java.net.URLEncoder.encode("Staff member added successfully", java.nio.charset.StandardCharsets.UTF_8));
+        response.sendRedirect("admin-crud.jsp?staffAdded=1");
+    }
+    private void updateStaff(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        // Get form parameters
+        String staffIdParam = request.getParameter("staffId");
+        if (staffIdParam == null || staffIdParam.trim().isEmpty()) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Staff ID is required", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+        int staffId = Integer.parseInt(staffIdParam);
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String position = request.getParameter("position");
+        String department = request.getParameter("department");
+
+        // Basic validation
+        if (fullName == null || fullName.trim().isEmpty() ||
+            email == null || email.trim().isEmpty() ||
+            phone == null || phone.trim().isEmpty() ||
+            username == null || username.trim().isEmpty() ||
+            position == null || position.trim().isEmpty() ||
+            department == null || department.trim().isEmpty()) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("All fields are required", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
+        // Get existing staff
+        Staff existingStaff = staffDAO.getStaffById(staffId);
+        if (existingStaff == null) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Staff member not found", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
+        // Check if username already exists (excluding current)
+        if (!existingStaff.getUsername().equals(username) && staffDAO.isUsernameExists(username)) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Username already exists", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
+        // Check if email already exists (excluding current)
+        if (!existingStaff.getEmail().equals(email) && staffDAO.isEmailExists(email)) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Email already exists", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
+        // Update staff object
+        existingStaff.setFullName(fullName);
+        existingStaff.setEmail(email);
+        existingStaff.setPhone(phone);
+        existingStaff.setUsername(username);
+        if (password != null && !password.trim().isEmpty()) {
+            existingStaff.setPasswordHash(password); // Assuming password is hashed in DAO
+        }
+        existingStaff.setPosition(position);
+        existingStaff.setDepartment(department);
+
+        // Update in database
+        staffDAO.updateStaff(existingStaff);
+
+        // Redirect with success message
+        response.sendRedirect("admin-crud.jsp?staffUpdated=1");
     }
 
     private void getStaff(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         response.setContentType("application/json");
         try {
-            int staffId = Integer.parseInt(request.getParameter("id"));
+            String idParam = request.getParameter("id");
+            if (idParam == null || idParam.trim().isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Staff ID is required");
+                return;
+            }
+            int staffId = Integer.parseInt(idParam);
             Staff staff = staffDAO.getStaffById(staffId);
 
             if (staff != null) {
@@ -137,16 +208,28 @@ public class AddStaffServlet extends HttpServlet {
             // Bulk delete
             String[] idArray = idsParam.split(",");
             for (String id : idArray) {
-                int staffId = Integer.parseInt(id.trim());
-                staffDAO.deleteStaff(staffId);
+                String trimmedId = id.trim();
+                if (trimmedId.isEmpty()) continue;
+                try {
+                    int staffId = Integer.parseInt(trimmedId);
+                    staffDAO.deleteStaff(staffId);
+                } catch (NumberFormatException e) {
+                    // Skip invalid IDs
+                    continue;
+                }
             }
         } else {
             // Single delete
-            int staffId = Integer.parseInt(request.getParameter("staffId"));
+            String staffIdParam = request.getParameter("staffId");
+            if (staffIdParam == null || staffIdParam.trim().isEmpty()) {
+                response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Staff ID is required", java.nio.charset.StandardCharsets.UTF_8));
+                return;
+            }
+            int staffId = Integer.parseInt(staffIdParam);
             staffDAO.deleteStaff(staffId);
         }
 
         // Redirect with success message
-        response.sendRedirect("admin-crud.jsp?successMsg=" + java.net.URLEncoder.encode("Staff member(s) deleted successfully", java.nio.charset.StandardCharsets.UTF_8));
+        response.sendRedirect("admin-crud.jsp?staffDeleted=1");
     }
 }

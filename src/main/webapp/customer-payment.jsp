@@ -29,6 +29,8 @@
         .payment-method-option:hover { border-color: #667eea; background-color: rgba(102,126,234,0.05); }
         .payment-method-option input:checked ~ label { color: #667eea; font-weight: 600; }
         .breadcrumb { background: transparent; }
+        .form-control.is-warning { border-color: #fd7e14; }
+        .form-control.is-warning:focus { border-color: #fd7e14; box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25); }
     </style>
 </head>
 <body>
@@ -209,6 +211,15 @@
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Discount Code -->
+                        <div class="mb-3">
+                            <label class="form-label">Discount Code (Optional)</label>
+                            <input type="text" class="form-control" name="discountCode" id="discountCode" placeholder="Enter discount code">
+                            <div class="form-text">
+                                <small class="text-muted" id="availableCodesText">Loading available discount codes...</small>
                             </div>
                         </div>
 
@@ -534,6 +545,73 @@
                 e.target.value = value;
             });
         }
+
+        // Global variable to store available discount codes
+        let availableDiscountCodes = [];
+
+        // Fetch available discount codes
+        function loadAvailableDiscountCodes() {
+            fetch('PromotionController?action=listActive')
+                .then(response => response.json())
+                .then(data => {
+                    availableDiscountCodes = data;
+                    updateAvailableCodesDisplay();
+                })
+                .catch(error => {
+                    console.error('Error loading discount codes:', error);
+                    document.getElementById('availableCodesText').innerHTML = '<small class="text-muted">Unable to load discount codes. Validation will occur during payment.</small>';
+                });
+        }
+
+        // Update the display of available codes
+        function updateAvailableCodesDisplay() {
+            const textElement = document.getElementById('availableCodesText');
+            if (availableDiscountCodes.length > 0) {
+                const codesList = availableDiscountCodes.map(code => `${code.code} (${code.display})`).join(', ');
+                textElement.innerHTML = `<small class="text-muted">Available codes: ${codesList}</small>`;
+            } else {
+                textElement.innerHTML = '<small class="text-muted">No discount codes currently available.</small>';
+            }
+        }
+
+        // Check if a discount code is valid
+        function isValidDiscountCode(code) {
+            return availableDiscountCodes.some(promo => promo.code.toUpperCase() === code.toUpperCase());
+        }
+
+        // Discount code input handling
+        const discountCodeInput = document.getElementById('discountCode');
+        if (discountCodeInput) {
+            discountCodeInput.addEventListener('input', function(e) {
+                // Convert to uppercase
+                e.target.value = e.target.value.toUpperCase();
+            });
+
+            discountCodeInput.addEventListener('blur', function(e) {
+                const code = e.target.value.trim();
+                if (code && !isValidDiscountCode(code)) {
+                    // Show warning for unknown codes (validation happens on server)
+                    e.target.classList.add('is-warning');
+                    if (!e.target.nextElementSibling || !e.target.nextElementSibling.classList.contains('discount-warning')) {
+                        const warning = document.createElement('div');
+                        warning.className = 'form-text discount-warning text-warning';
+                        warning.innerHTML = '<small>Unknown discount code. It will be validated during payment.</small>';
+                        e.target.parentNode.insertBefore(warning, e.target.nextSibling);
+                    }
+                } else {
+                    e.target.classList.remove('is-warning');
+                    const warning = e.target.parentNode.querySelector('.discount-warning');
+                    if (warning) {
+                        warning.remove();
+                    }
+                }
+            });
+        }
+
+        // Load discount codes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAvailableDiscountCodes();
+        });
     });
 
     // Show payment success alert when booking is created

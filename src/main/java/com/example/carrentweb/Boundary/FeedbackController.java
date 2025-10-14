@@ -199,7 +199,7 @@ public class FeedbackController extends HttpServlet {
 
             if (rowsAffected > 0) {
                 System.out.println("FeedbackController: Feedback deleted successfully");
-                response.sendRedirect("admin-crud.jsp?success=Feedback deleted");
+                response.sendRedirect("admin-crud.jsp?feedbackDeleted=1");
             } else {
                 System.out.println("FeedbackController: No feedback found with ID " + feedbackId);
                 response.sendRedirect("AdminServlet?error=Feedback not found");
@@ -250,7 +250,7 @@ public class FeedbackController extends HttpServlet {
             ps.close();
 
             System.out.println("FeedbackController: Bulk feedback delete completed, rows affected: " + rowsAffected);
-            response.sendRedirect("admin-crud.jsp?success=" + rowsAffected + " feedback entries deleted");
+            response.sendRedirect("admin-crud.jsp?feedbackDeleted=1");
         } catch (Exception e) {
             System.err.println("FeedbackController: Exception occurred: " + e.getMessage());
             e.printStackTrace();
@@ -290,7 +290,7 @@ public class FeedbackController extends HttpServlet {
             ps.close();
 
             System.out.println("FeedbackController: All feedback deleted successfully, rows affected: " + rowsAffected);
-            response.sendRedirect("admin-crud.jsp?success=All feedback deleted (" + rowsAffected + " entries)");
+            response.sendRedirect("admin-crud.jsp?feedbackDeleted=1");
         } catch (Exception e) {
             System.err.println("FeedbackController: Exception occurred: " + e.getMessage());
             e.printStackTrace();

@@ -345,12 +345,6 @@
             <nav class="nav flex-column">
                 <a class="nav-link" href="AdminServlet"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
                 <a class="nav-link active" href="admin-crud.jsp"><i class="fas fa-database"></i>CRUD Management</a>
-                <a class="nav-link" href="#vehicles"><i class="fas fa-car"></i>Vehicles</a>
-                <a class="nav-link" href="#bookings"><i class="fas fa-calendar-check"></i>Bookings</a>
-                <a class="nav-link" href="#payments"><i class="fas fa-credit-card"></i>Payments</a>
-                <a class="nav-link" href="#users"><i class="fas fa-users"></i>Users</a>
-                <a class="nav-link" href="#promotions"><i class="fas fa-tags"></i>Promotions</a>
-                <a class="nav-link" href="#campaigns"><i class="fas fa-envelope"></i>Campaigns</a>
                 <a class="nav-link" href="cargo-landing.jsp"><i class="fas fa-home"></i>Back to Site</a>
             </nav>
         </div>
@@ -419,11 +413,6 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments-tab-pane" type="button" role="tab">
                                     <i class="fas fa-credit-card me-1"></i>Payments
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab">
-                                    <i class="fas fa-users me-1"></i>Users
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
@@ -938,6 +927,7 @@
                                      <div class="card-body">
                                          <form class="row g-3" method="post" action="AddStaffServlet" id="staffFormElement">
                                              <input type="hidden" name="action" value="add" id="staffAction">
+                                             <input type="hidden" name="staffId" id="staffId">
                                              <div class="col-md-3"><input class="form-control" name="fullName" id="staffFullName" placeholder="Full Name" required></div>
                                              <div class="col-md-3"><input class="form-control" name="email" id="staffEmail" placeholder="Email" type="email" required></div>
                                              <div class="col-md-2"><input class="form-control" name="phone" id="staffPhone" placeholder="Phone" required></div>
@@ -946,6 +936,12 @@
                                              <div class="col-md-3">
                                                  <select class="form-select" name="position" id="staffPosition" required>
                                                      <option value="">Select Position</option>
+                                                     <option value="Marketing Executive">Marketing Executive</option>
+                                                     <option value="Operations Manager">Operations Manager</option>
+                                                     <option value="System Administrator">System Administrator</option>
+                                                     <option value="Customer Service Executive">Customer Service Executive</option>
+                                                     <option value="Fleet Supervisor">Fleet Supervisor</option>
+                                                     <option value="Accountant">Accountant</option>
                                                      <option value="Manager">Manager</option>
                                                      <option value="Supervisor">Supervisor</option>
                                                      <option value="Staff">Staff</option>
@@ -1775,6 +1771,7 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('staffAction').value = 'update';
+                    document.getElementById('staffId').value = data.staffId;
                     document.getElementById('staffFullName').value = data.fullName;
                     document.getElementById('staffEmail').value = data.email;
                     document.getElementById('staffPhone').value = data.phone;
@@ -1797,6 +1794,7 @@
 
         function resetStaffForm() {
             document.getElementById('staffAction').value = 'add';
+            document.getElementById('staffId').value = '';
             document.getElementById('staffFullName').value = '';
             document.getElementById('staffEmail').value = '';
             document.getElementById('staffPhone').value = '';
@@ -1940,8 +1938,12 @@
             }
 
             // Vehicle alerts
-            if (urlParams.get('vehiclesUpdated') === '1') {
-                showAlert('Vehicle operation completed successfully!', 'success');
+            if (urlParams.get('vehicleAdded') === '1') {
+                showAlert('Vehicle added successfully!', 'success');
+            } else if (urlParams.get('vehicleUpdated') === '1') {
+                showAlert('Vehicle updated successfully!', 'success');
+            } else if (urlParams.get('vehicleDeleted') === '1') {
+                showAlert('Vehicle deleted successfully!', 'success');
             }
 
             // User alerts
@@ -1954,8 +1956,12 @@
             }
 
             // Promotion alerts
-            if (urlParams.get('promotionsUpdated') === '1') {
-                showAlert('Promotion operation completed successfully!', 'success');
+            if (urlParams.get('promotionAdded') === '1') {
+                showAlert('Promotion added successfully!', 'success');
+            } else if (urlParams.get('promotionUpdated') === '1') {
+                showAlert('Promotion updated successfully!', 'success');
+            } else if (urlParams.get('promotionDeleted') === '1') {
+                showAlert('Promotion deleted successfully!', 'success');
             }
 
             // Staff alerts
@@ -1976,6 +1982,20 @@
                 showAlert('Campaign deleted successfully!', 'success');
             } else if (urlParams.get('campaignSent') === '1') {
                 showAlert('Campaign sent successfully!', 'success');
+            }
+
+            // Feedback alerts
+            if (urlParams.get('feedbackDeleted') === '1') {
+                showAlert('Feedback deleted successfully!', 'success');
+            }
+
+            // Staff alerts
+            if (urlParams.get('staffAdded') === '1') {
+                showAlert('Staff member added successfully!', 'success');
+            } else if (urlParams.get('staffUpdated') === '1') {
+                showAlert('Staff member updated successfully!', 'success');
+            } else if (urlParams.get('staffDeleted') === '1') {
+                showAlert('Staff member deleted successfully!', 'success');
             }
 
             // Success messages
@@ -2025,6 +2045,106 @@
                 }
             }, 5000);
         }
+
+        // Email Domain Validation
+        function validateEmailDomain(email) {
+            if (!email) return false;
+            const allowedDomains = ['@gmail.com', '@my.sliit.lk'];
+            return allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
+        }
+
+        function showEmailValidation(emailInput, isValid) {
+            // Remove existing validation message
+            const existingMsg = emailInput.parentNode.querySelector('.email-validation-msg');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+
+            // Add validation message
+            const msg = document.createElement('div');
+            msg.className = 'email-validation-msg mt-1';
+            msg.style.fontSize = '0.875rem';
+
+            if (!emailInput.value.trim()) {
+                msg.innerHTML = '<span style="color: #6c757d;">Please enter an email address</span>';
+            } else if (!isValid) {
+                msg.innerHTML = '<span style="color: #dc3545;">Email must end with @gmail.com or @my.sliit.lk</span>';
+                emailInput.style.borderColor = '#dc3545';
+            } else {
+                msg.innerHTML = '<span style="color: #198754;">✓ Valid email domain</span>';
+                emailInput.style.borderColor = '#198754';
+            }
+
+            emailInput.parentNode.appendChild(msg);
+        }
+
+        function setupEmailValidation() {
+            // User form email validation
+            const userEmailInput = document.getElementById('userEmail');
+            if (userEmailInput) {
+                userEmailInput.addEventListener('input', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+                userEmailInput.addEventListener('blur', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+            }
+
+            // Staff form email validation
+            const staffEmailInput = document.getElementById('staffEmail');
+            if (staffEmailInput) {
+                staffEmailInput.addEventListener('input', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+                staffEmailInput.addEventListener('blur', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+            }
+        }
+
+        // Form validation on submit
+        function validateRegistrationForm(form) {
+            const emailInput = form.querySelector('input[name="email"]');
+            if (emailInput) {
+                const isValid = validateEmailDomain(emailInput.value);
+                if (!isValid) {
+                    showEmailValidation(emailInput, false);
+                    emailInput.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Initialize email validation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEmailValidation();
+
+            // Add form validation to user and staff forms
+            const userForm = document.getElementById('userFormElement');
+            if (userForm) {
+                userForm.addEventListener('submit', function(e) {
+                    if (!validateRegistrationForm(this)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+
+            const staffForm = document.getElementById('staffFormElement');
+            if (staffForm) {
+                staffForm.addEventListener('submit', function(e) {
+                    if (!validateRegistrationForm(this)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

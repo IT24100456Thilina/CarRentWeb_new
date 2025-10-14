@@ -87,11 +87,101 @@ public class StaffDAOImpl {
     }
 
     public void deleteStaff(int staffId) throws SQLException {
-        String sql = "DELETE FROM Staff WHERE staffId = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            // Check if staff member has associated campaigns
+            String checkCampaignsSql = "SELECT COUNT(*) FROM Campaigns WHERE adminId = ?";
+            try (PreparedStatement checkPs = conn.prepareStatement(checkCampaignsSql)) {
+                checkPs.setInt(1, staffId);
+                ResultSet rs = checkPs.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Find another active staff member to transfer campaigns to (preferably a manager)
+                    String findReplacementSql = "SELECT TOP 1 staffId FROM Staff WHERE staffId != ? AND isActive = 1 AND position = 'Manager' ORDER BY staffId";
+                    try (PreparedStatement findPs = conn.prepareStatement(findReplacementSql)) {
+                        findPs.setInt(1, staffId);
+                        ResultSet replacementRs = findPs.executeQuery();
+                        if (replacementRs.next()) {
+                            int replacementStaffId = replacementRs.getInt("staffId");
+
+                            // Transfer campaigns to the replacement staff member
+                            String transferSql = "UPDATE Campaigns SET adminId = ? WHERE adminId = ?";
+                            try (PreparedStatement transferPs = conn.prepareStatement(transferSql)) {
+                                transferPs.setInt(1, replacementStaffId);
+                                transferPs.setInt(2, staffId);
+                                transferPs.executeUpdate();
+                            }
+
+                            // Also transfer SendCampaign records
+                            String transferSendCampaignSql = "UPDATE SendCampaign SET initiatedBy = ? WHERE initiatedBy = ?";
+                            try (PreparedStatement transferSendPs = conn.prepareStatement(transferSendCampaignSql)) {
+                                transferSendPs.setInt(1, replacementStaffId);
+                                transferSendPs.setInt(2, staffId);
+                                transferSendPs.executeUpdate();
+                            }
+                        } else {
+                            // If no manager found, find any other active staff member
+                            String findAnyReplacementSql = "SELECT TOP 1 staffId FROM Staff WHERE staffId != ? AND isActive = 1 ORDER BY staffId";
+                            try (PreparedStatement findAnyPs = conn.prepareStatement(findAnyReplacementSql)) {
+                                findAnyPs.setInt(1, staffId);
+                                ResultSet anyReplacementRs = findAnyPs.executeQuery();
+                                if (anyReplacementRs.next()) {
+                                    int replacementStaffId = anyReplacementRs.getInt("staffId");
+
+                                    // Transfer campaigns to the replacement staff member
+                                    String transferSql = "UPDATE Campaigns SET adminId = ? WHERE adminId = ?";
+                                    try (PreparedStatement transferPs = conn.prepareStatement(transferSql)) {
+                                        transferPs.setInt(1, replacementStaffId);
+                                        transferPs.setInt(2, staffId);
+                                        transferPs.executeUpdate();
+                                    }
+
+                                    // Also transfer SendCampaign records
+                                    String transferSendCampaignSql = "UPDATE SendCampaign SET initiatedBy = ? WHERE initiatedBy = ?";
+                                    try (PreparedStatement transferSendPs = conn.prepareStatement(transferSendCampaignSql)) {
+                                        transferSendPs.setInt(1, replacementStaffId);
+                                        transferSendPs.setInt(2, staffId);
+                                        transferSendPs.executeUpdate();
+                                    }
+                                } else {
+                                    // No other active staff members, rollback and throw exception
+                                    conn.rollback();
+                                    throw new SQLException("Cannot delete staff member: No replacement staff available for associated campaigns");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Now delete the staff member
+            String deleteSql = "DELETE FROM Staff WHERE staffId = ?";
+            try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+                deletePs.setInt(1, staffId);
+                deletePs.executeUpdate();
+            }
+
+            conn.commit(); // Commit transaction
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback on error
+                } catch (SQLException rollbackEx) {
+                    // Log rollback error if needed
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Reset auto-commit
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    // Log close error if needed
+                }
+            }
         }
     }
 

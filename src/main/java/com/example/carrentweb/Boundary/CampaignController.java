@@ -301,9 +301,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-campaigns.jsp?success=Campaign created successfully");
+            response.sendRedirect("admin-crud.jsp?campaignCreated=1");
         } else {
-            response.sendRedirect("admin-campaigns.jsp?error=Failed to create campaign");
+            response.sendRedirect("admin-crud.jsp?error=Failed to create campaign");
         }
     }
 
@@ -325,9 +325,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-campaigns.jsp?success=Campaign updated successfully");
+            response.sendRedirect("admin-crud.jsp?campaignUpdated=1");
         } else {
-            response.sendRedirect("admin-campaigns.jsp?error=Failed to update campaign");
+            response.sendRedirect("admin-crud.jsp?error=Failed to update campaign");
         }
     }
 
@@ -354,9 +354,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-campaigns.jsp?success=Campaign deleted successfully");
+            response.sendRedirect("admin-crud.jsp?campaignDeleted=1");
         } else {
-            response.sendRedirect("admin-campaigns.jsp?error=Failed to delete campaign");
+            response.sendRedirect("admin-crud.jsp?error=Failed to delete campaign");
         }
     }
 
@@ -418,7 +418,7 @@ public class CampaignController extends HttpServlet {
             // Update SendCampaign as completed
             updateSendCampaignCompletion(sendId, sentCount, recipients.size() - sentCount, null, conn);
 
-            response.sendRedirect("admin-campaigns.jsp?success=Campaign sent successfully to " + sentCount + " recipients");
+            response.sendRedirect("admin-crud.jsp?campaignSent=1");
         } catch (MessagingException e) {
             // Log error and alert admin
             logEmailServerError(campaignId, "Email server error: " + e.getMessage(), conn);
@@ -593,7 +593,9 @@ public class CampaignController extends HttpServlet {
         if (session == null) return false;
 
         String role = (String) session.getAttribute("role");
-        return "admin".equals(role);
+        String position = (String) session.getAttribute("position");
+
+        return "admin".equals(role) || "Marketing Executive".equals(position);
     }
 
     private boolean hasRoleColumn(Connection conn) {

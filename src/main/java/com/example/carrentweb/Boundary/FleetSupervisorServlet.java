@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
@@ -82,6 +83,14 @@ public class FleetSupervisorServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Check if user is logged in as Fleet Supervisor
+        HttpSession session = request.getSession(false);
+        if (session == null || !"admin".equals(session.getAttribute("role")) ||
+            !"Fleet Supervisor".equals(session.getAttribute("position"))) {
+            response.sendRedirect(request.getContextPath() + "/cargo-landing.jsp?error=access_denied");
+            return;
+        }
+
         String action = request.getParameter("action");
         if ("viewFleet".equals(action)) {
             viewFleetStatus(request, response);
@@ -127,11 +136,21 @@ public class FleetSupervisorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Check if user is logged in as Fleet Supervisor
+        HttpSession session = request.getSession(false);
+        if (session == null || !"admin".equals(session.getAttribute("role")) ||
+            !"Fleet Supervisor".equals(session.getAttribute("position"))) {
+            response.sendRedirect(request.getContextPath() + "/cargo-landing.jsp?error=access_denied");
+            return;
+        }
+
         String action = request.getParameter("action");
         if ("add".equals(action)) {
             addVehicle(request, response);
         } else if ("update".equals(action)) {
             updateVehicle(request, response);
+        } else if ("delete".equals(action)) {
+            deleteVehicle(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
         }
@@ -297,6 +316,52 @@ public class FleetSupervisorServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("errorMsg", "Database error: " + e.getMessage());
             showEditForm(request, response);
+        }
+    }
+
+    private void deleteVehicle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try (Connection conn = DBConnection.getConnection()) {
+            String idsParam = request.getParameter("ids");
+            if (idsParam != null && !idsParam.trim().isEmpty()) {
+                // Bulk delete
+                String[] idArray = idsParam.split(",");
+                try {
+                    String sql = "DELETE FROM Vehicles WHERE vehicleId=?";
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    for (String id : idArray) {
+                        ps.setInt(1, Integer.parseInt(id.trim()));
+                        ps.executeUpdate();
+                    }
+                } catch (Exception e) {
+                    String alt = "DELETE FROM Vehicles WHERE id=?";
+                    PreparedStatement ps = conn.prepareStatement(alt);
+                    for (String id : idArray) {
+                        ps.setInt(1, Integer.parseInt(id.trim()));
+                        ps.executeUpdate();
+                    }
+                }
+            } else {
+                // Single delete
+                try {
+                    String sql = "DELETE FROM Vehicles WHERE vehicleId=?";
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("vehicleId")));
+                    ps.executeUpdate();
+                } catch (Exception e) {
+                    String alt = "DELETE FROM Vehicles WHERE id=?";
+                    PreparedStatement ps = conn.prepareStatement(alt);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("vehicleId")));
+                    ps.executeUpdate();
+                }
+            }
+
+            request.setAttribute("successMsg", "Vehicle(s) deleted successfully");
+            viewFleetStatus(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg", "Database error: " + e.getMessage());
+            viewFleetStatus(request, response);
         }
     }
 }

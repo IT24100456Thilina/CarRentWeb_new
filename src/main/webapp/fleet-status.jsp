@@ -180,8 +180,11 @@
                                     <a href="FleetSupervisorServlet?action=edit&vehicleId=<%= vehicleId %>" class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails(<%= vehicleId %>)">
+                                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewDetails(<%= vehicleId %>)">
                                         <i class="fas fa-eye"></i> Details
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteVehicle(<%= vehicleId %>)">
+                                        <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </td>
                             </tr>
@@ -232,6 +235,37 @@
             // For now, redirect to edit page. Could be enhanced to show modal with details
             window.location.href = 'FleetSupervisorServlet?action=edit&vehicleId=' + vehicleId;
         }
+
+        function deleteVehicle(vehicleId) {
+            if (confirm('Are you sure you want to delete this vehicle? This action cannot be undone.')) {
+                // Create a form and submit it
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'FleetSupervisorServlet';
+
+                var actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+                form.appendChild(actionInput);
+
+                var vehicleIdInput = document.createElement('input');
+                vehicleIdInput.type = 'hidden';
+                vehicleIdInput.name = 'vehicleId';
+                vehicleIdInput.value = vehicleId;
+                form.appendChild(vehicleIdInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Show success message popup if present
+        <% if (request.getAttribute("successMsg") != null) { %>
+            window.onload = function() {
+                alert('<%= request.getAttribute("successMsg") %>');
+            };
+        <% } %>
     </script>
 </body>
 </html>
