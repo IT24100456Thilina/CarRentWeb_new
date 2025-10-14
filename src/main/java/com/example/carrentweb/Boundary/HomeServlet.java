@@ -107,6 +107,35 @@ public class HomeServlet extends HttpServlet {
                 recentFeedback.add(f);
             }
         } catch (Exception ignore) {}
+        if (recentFeedback.isEmpty()) {
+            // Add sample feedback if none in DB
+            java.util.Map<String, Object> f1 = new java.util.HashMap<>();
+            f1.put("feedbackId", 1);
+            f1.put("bookingId", null);
+            f1.put("comments", "Excellent service! The car was in perfect condition and the booking process was seamless.");
+            f1.put("rating", 5);
+            f1.put("dateSubmitted", "2025-09-15");
+            f1.put("fullName", "John Doe");
+            recentFeedback.add(f1);
+
+            java.util.Map<String, Object> f2 = new java.util.HashMap<>();
+            f2.put("feedbackId", 2);
+            f2.put("bookingId", null);
+            f2.put("comments", "Great experience with CarGO. Will definitely recommend to friends!");
+            f2.put("rating", 4);
+            f2.put("dateSubmitted", "2025-09-10");
+            f2.put("fullName", "Jane Smith");
+            recentFeedback.add(f2);
+
+            java.util.Map<String, Object> f3 = new java.util.HashMap<>();
+            f3.put("feedbackId", 3);
+            f3.put("bookingId", null);
+            f3.put("comments", "Professional staff and well-maintained vehicles. Highly satisfied!");
+            f3.put("rating", 5);
+            f3.put("dateSubmitted", "2025-09-05");
+            f3.put("fullName", "Mike Johnson");
+            recentFeedback.add(f3);
+        }
         request.setAttribute("recentFeedback", recentFeedback);
 
         // Handle feedback parameter

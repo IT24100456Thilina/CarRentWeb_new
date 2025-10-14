@@ -106,8 +106,8 @@ public class AuthController extends HttpServlet {
 
                 ResultSet rs;
                 if ("admin".equals(role)) {
-                    // For admin, check Staff table
-                    String sql = "SELECT * FROM Staff WHERE username=? AND password=? AND isActive=?";
+                    // For admin, check Staff table, excluding Marketing, Executive, Account positions
+                    String sql = "SELECT * FROM Staff WHERE username=? AND password=? AND isActive=? AND position NOT IN ('Marketing', 'Executive', 'Account')";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ps.setString(1, username);
                     ps.setString(2, password);

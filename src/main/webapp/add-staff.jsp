@@ -201,5 +201,77 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Email Domain Validation
+        function validateEmailDomain(email) {
+            if (!email) return false;
+            const allowedDomains = ['@gmail.com', '@my.sliit.lk'];
+            return allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
+        }
+
+        function showEmailValidation(emailInput, isValid) {
+            // Remove existing validation message
+            const existingMsg = emailInput.parentNode.querySelector('.email-validation-msg');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+
+            // Add validation message
+            const msg = document.createElement('div');
+            msg.className = 'email-validation-msg mt-1';
+            msg.style.fontSize = '0.875rem';
+
+            if (!emailInput.value.trim()) {
+                msg.innerHTML = '<span style="color: #6c757d;">Please enter an email address</span>';
+            } else if (!isValid) {
+                msg.innerHTML = '<span style="color: #dc3545;">Email must end with @gmail.com or @my.sliit.lk</span>';
+                emailInput.style.borderColor = '#dc3545';
+            } else {
+                msg.innerHTML = '<span style="color: #198754;">✓ Valid email domain</span>';
+                emailInput.style.borderColor = '#198754';
+            }
+
+            emailInput.parentNode.appendChild(msg);
+        }
+
+        function validateStaffForm(form) {
+            const emailInput = form.querySelector('input[name="email"]');
+            if (emailInput) {
+                const isValid = validateEmailDomain(emailInput.value);
+                if (!isValid) {
+                    showEmailValidation(emailInput, false);
+                    emailInput.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Initialize email validation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email');
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+                emailInput.addEventListener('blur', function() {
+                    const isValid = validateEmailDomain(this.value);
+                    showEmailValidation(this, isValid);
+                });
+            }
+
+            // Add form validation
+            const staffForm = document.querySelector('form[action="AddStaffServlet"]');
+            if (staffForm) {
+                staffForm.addEventListener('submit', function(e) {
+                    if (!validateStaffForm(this)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

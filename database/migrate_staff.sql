@@ -29,7 +29,8 @@ BEGIN
     ('Sarah Johnson', 'sarah.johnson@carrent.com', '+1234567892', 'sjohnson', 'password123', 'Supervisor', 'Customer Service', 1),
     ('Mike Davis', 'mike.davis@carrent.com', '+1234567893', 'mdavis', 'password123', 'Staff', 'Maintenance', 1),
     ('Lisa Brown', 'lisa.brown@carrent.com', '+1234567894', 'lbrown', 'password123', 'Driver', 'Operations', 1),
-    ('Emily Chen', 'emily.chen@carrent.com', '+1234567895', 'echen', 'password123', 'Accountant', 'Finance', 1);
+    ('Emily Chen', 'emily.chen@carrent.com', '+1234567895', 'echen', 'password123', 'Accountant', 'Finance', 1),
+    ('David Wilson', 'david.wilson@carrent.com', '+1234567896', 'dwilson', 'password123', 'Fleet Supervisor', 'Fleet Management', 1);
 END
 GO
 

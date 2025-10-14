@@ -206,6 +206,8 @@ public class VehicleController extends HttpServlet {
                      ps.setBoolean(5, Boolean.parseBoolean(request.getParameter("available")));
                      ps.setString(6, imageUrl);
                      ps.executeUpdate();
+
+                     response.sendRedirect("admin-crud.jsp?vehicleAdded=1");
                      break;
                  }
                 case "update": {
@@ -254,6 +256,8 @@ public class VehicleController extends HttpServlet {
                         ps.setInt(5, Integer.parseInt(request.getParameter("vehicleId")));
                         ps.executeUpdate();
                     }
+
+                    response.sendRedirect("admin-crud.jsp?vehicleUpdated=1");
                     break;
                 }
                 case "delete": {
@@ -290,10 +294,11 @@ public class VehicleController extends HttpServlet {
                             ps.executeUpdate();
                         }
                     }
+
+                    response.sendRedirect("admin-crud.jsp?vehicleDeleted=1");
                     break;
                 }
             }
-            response.sendRedirect("admin-crud.jsp?vehiclesUpdated=1");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
