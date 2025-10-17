@@ -96,19 +96,10 @@
             <a class="nav-link" href="AdminServlet">
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
-            <a class="nav-link" href="AdminServlet?section=users">
-                <i class="fas fa-users"></i> Users
-            </a>
-            <a class="nav-link" href="AdminServlet?section=vehicles">
-                <i class="fas fa-car"></i> Vehicles
-            </a>
-            <a class="nav-link" href="AdminServlet?section=bookings">
-                <i class="fas fa-calendar-check"></i> Bookings
-            </a>
             <a class="nav-link active" href="CampaignController">
                 <i class="fas fa-envelope"></i> Campaigns
             </a>
-            <a class="nav-link" href="AdminServlet?section=promotions">
+            <a class="nav-link" href="admin-promotion-create.jsp">
                 <i class="fas fa-tags"></i> Promotions
             </a>
             <hr class="my-3">

@@ -21,13 +21,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="${pageContext.request.contextPath}/">
     <meta property="og:image" content="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=630&fit=crop">
-    
+
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Smart Vehicle Booking & Fleet Management">
     <meta name="twitter:description" content="Comprehensive platform for vehicle booking and fleet management with advanced analytics and customer insights.">
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=630&fit=crop">
-    
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -54,7 +54,7 @@
         "areaServed": "Sri Lanka"
     }
     </script>
-    
+
     <title>Smart Vehicle Booking & Fleet Management Platform</title>
 
     <!-- Preload critical resources -->
@@ -1835,18 +1835,18 @@
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             const typeFilter = document.getElementById('filterType')?.value || '';
             const availabilityFilter = document.getElementById('filterAvailability')?.value || '';
-            
+
             document.querySelectorAll('.vehicle-item').forEach(item => {
                 const name = item.querySelector('.card-title')?.textContent.toLowerCase() || '';
                 const type = item.dataset.type || '';
                 const availability = item.dataset.availability || '';
-                
+
                 let show = true;
-                
+
                 if (searchTerm && !name.includes(searchTerm)) show = false;
                 if (typeFilter && type !== typeFilter) show = false;
                 if (availabilityFilter && availability !== availabilityFilter) show = false;
-                
+
                 item.style.display = show ? 'block' : 'none';
             });
         }

@@ -96,6 +96,21 @@ public class CustomerServiceServlet extends HttpServlet {
         String newStatus = "approve".equals(action) ? "Confirmed" : "Cancelled";
 
         try (Connection conn = DBConnection.getConnection()) {
+            // First, get the current status before updating
+            String previousStatus = null;
+            String selectSql = "SELECT status FROM Bookings WHERE bookingId = ?";
+            try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+                ps.setInt(1, bookingId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        previousStatus = rs.getString("status");
+                    } else {
+                        response.sendRedirect("CustomerServiceServlet?error=booking_not_found");
+                        return;
+                    }
+                }
+            }
+
             // Update booking status
             String updateSql = "UPDATE Bookings SET status = ? WHERE bookingId = ?";
             try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
@@ -104,6 +119,9 @@ public class CustomerServiceServlet extends HttpServlet {
                 int rowsAffected = ps.executeUpdate();
 
                 if (rowsAffected > 0) {
+                    // Log the action to BookingActionLogs
+                    logBookingAction(conn, bookingId, action, previousStatus, newStatus);
+
                     // Send notification (we'll implement this)
                     sendNotification(conn, bookingId, newStatus);
 
@@ -248,6 +266,30 @@ public class CustomerServiceServlet extends HttpServlet {
         body.append("Please do not reply to this email.");
 
         return body.toString();
+    }
+
+    private void logBookingAction(Connection conn, int bookingId, String action, String previousStatus, String newStatus) {
+        String insertSql = "INSERT INTO BookingActionLogs (bookingId, action, previousStatus, newStatus, actionBy, actionDate, notes) " +
+                          "VALUES (?, ?, ?, ?, ?, GETDATE(), ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+            ps.setInt(1, bookingId);
+            ps.setString(2, action);
+            ps.setString(3, previousStatus);
+            ps.setString(4, newStatus);
+            ps.setNull(5, java.sql.Types.INTEGER); // actionBy can be NULL for now
+            ps.setString(6, "Booking " + action + " action performed");
+
+            int rowsInserted = ps.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Booking action logged: Booking " + bookingId + " " + action + " from " + previousStatus + " to " + newStatus);
+            } else {
+                System.err.println("Failed to log booking action for booking " + bookingId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error logging booking action: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private Properties loadEmailProperties() {
