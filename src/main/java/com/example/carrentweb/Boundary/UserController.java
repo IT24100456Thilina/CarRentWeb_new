@@ -65,6 +65,11 @@ public class UserController extends HttpServlet {
                     String password = request.getParameter("password");
                     String role = request.getParameter("role");
 
+                    if (phone == null || !phone.matches("\\d{10}")) {
+                        response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Phone number must be exactly 10 digits", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
+
                     String sql = "INSERT INTO Users(fullName, email, phone, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ps.setString(1, fullName);
@@ -86,6 +91,11 @@ public class UserController extends HttpServlet {
                     String username = request.getParameter("username");
                     String password = request.getParameter("password");
                     String role = request.getParameter("role");
+
+                    if (phone == null || !phone.matches("\\d{10}")) {
+                        response.sendRedirect("AdminServlet?errorMsg=" + java.net.URLEncoder.encode("Phone number must be exactly 10 digits", java.nio.charset.StandardCharsets.UTF_8));
+                        return;
+                    }
 
                     String sql = "UPDATE Users SET fullName=?, email=?, phone=?, username=?, password=?, role=? WHERE userId=?";
                     PreparedStatement ps = conn.prepareStatement(sql);

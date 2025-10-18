@@ -152,6 +152,12 @@ public class UserManagementServlet extends HttpServlet {
             return;
         }
 
+        // Phone validation
+        if (phone == null || !phone.matches("\\d{10}")) {
+            response.sendRedirect("admin-crud.jsp?error=Phone number must be exactly 10 digits");
+            return;
+        }
+
         try {
             // Check if username already exists
             if (userDAO.isUsernameExists(username)) {
@@ -194,6 +200,12 @@ public class UserManagementServlet extends HttpServlet {
             email == null || email.trim().isEmpty() ||
             username == null || username.trim().isEmpty()) {
             response.sendRedirect("admin-crud.jsp?error=All required fields must be filled");
+            return;
+        }
+
+        // Phone validation
+        if (phone == null || !phone.matches("\\d{10}")) {
+            response.sendRedirect("admin-crud.jsp?error=Phone number must be exactly 10 digits");
             return;
         }
 

@@ -45,6 +45,12 @@ public class AuthController extends HttpServlet {
                 String password = request.getParameter("password");
                 String role = normalizeRole(request.getParameter("role"));
 
+                // Phone validation
+                if (phone == null || !phone.matches("\\d{10}")) {
+                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Phone number must be exactly 10 digits", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+
                 if ("admin".equals(role)) {
                     // For admin, register in Staff table
                     String position = request.getParameter("position");
