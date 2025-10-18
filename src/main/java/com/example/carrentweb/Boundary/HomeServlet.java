@@ -91,10 +91,15 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("login", "1");
         }
 
-        // Load recent feedback
+        // Load recent feedback with customer names
         List<java.util.Map<String, Object>> recentFeedback = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("SELECT TOP 5 f.feedbackId, f.bookingId, f.comments, f.rating FROM Feedbacks f ORDER BY f.feedbackId DESC");
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT TOP 10 f.feedbackId, f.bookingId, f.comments, f.rating, f.dateSubmitted, u.fullName " +
+                "FROM Feedbacks f " +
+                "LEFT JOIN Users u ON f.userId = u.userId " +
+                "ORDER BY f.feedbackId DESC"
+            );
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 java.util.Map<String, Object> f = new java.util.HashMap<>();
@@ -102,11 +107,13 @@ public class HomeServlet extends HttpServlet {
                 f.put("bookingId", rs.getObject("bookingId"));
                 f.put("comments", rs.getString("comments"));
                 f.put("rating", rs.getInt("rating"));
-                f.put("dateSubmitted", "Recent"); // Since no date column exists
-                f.put("fullName", "Valued Customer"); // Since no user info available
+                f.put("dateSubmitted", rs.getString("dateSubmitted") != null ? rs.getString("dateSubmitted") : "Recent");
+                f.put("fullName", rs.getString("fullName") != null ? rs.getString("fullName") : "Valued Customer");
                 recentFeedback.add(f);
             }
-        } catch (Exception ignore) {}
+        } catch (Exception e) {
+            System.err.println("Error loading feedback: " + e.getMessage());
+        }
         if (recentFeedback.isEmpty()) {
             // Add sample feedback if none in DB
             java.util.Map<String, Object> f1 = new java.util.HashMap<>();

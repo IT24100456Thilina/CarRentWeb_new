@@ -23,6 +23,7 @@
         .countdown-text { font-size: 0.9rem; margin-bottom: 5px; }
         .countdown-timer { font-size: 1.2rem; font-weight: 700; }
     </style>
+    <script src="${pageContext.request.contextPath}/notifications.js"></script>
 </head>
 <body>
 

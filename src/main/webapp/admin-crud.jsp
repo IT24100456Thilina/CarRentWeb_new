@@ -185,6 +185,7 @@
     <title>CRUD Management - Fleet Management Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="${pageContext.request.contextPath}/notifications.js"></script>
     <style>
         :root {
             --primary-color: #0f172a;
@@ -274,6 +275,69 @@
             margin-top: 0;   /* prevent table pushing down */
         }
 
+        /* Staff Table Column Widths */
+        #staff-tab-pane table th:nth-child(1),
+        #staff-tab-pane table td:nth-child(1) {
+            width: 40px;
+        }
+
+        #staff-tab-pane table th:nth-child(2),
+        #staff-tab-pane table td:nth-child(2) {
+            width: 80px;
+        }
+
+        #staff-tab-pane table th:nth-child(3),
+        #staff-tab-pane table td:nth-child(3) {
+            width: 150px;
+            min-width: 120px;
+        }
+
+        #staff-tab-pane table th:nth-child(4),
+        #staff-tab-pane table td:nth-child(4) {
+            width: 200px;
+            min-width: 180px;
+        }
+
+        #staff-tab-pane table th:nth-child(5),
+        #staff-tab-pane table td:nth-child(5) {
+            width: 100px;
+        }
+
+        #staff-tab-pane table th:nth-child(6),
+        #staff-tab-pane table td:nth-child(6) {
+            width: 120px;
+            min-width: 100px;
+        }
+
+        #staff-tab-pane table th:nth-child(7),
+        #staff-tab-pane table td:nth-child(7) {
+            width: 100px;
+        }
+
+        #staff-tab-pane table th:nth-child(8),
+        #staff-tab-pane table td:nth-child(8) {
+            width: 80px;
+        }
+
+        #staff-tab-pane table th:nth-child(9),
+        #staff-tab-pane table td:nth-child(9) {
+            width: 100px;
+        }
+
+        /* Staff table text handling */
+        #staff-tab-pane table td {
+            max-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #staff-tab-pane table td:nth-child(3),
+        #staff-tab-pane table td:nth-child(4) {
+            white-space: normal;
+            word-break: break-word;
+        }
+
         .form-control,
         .form-select {
             border-radius: 8px;
@@ -331,6 +395,44 @@
             .main-content { margin-left: 0; }
             .navbar { display: none; }
             .section-header { padding: 1rem; }
+
+            /* Staff table responsive fixes */
+            #staff-tab-pane .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            #staff-tab-pane table th,
+            #staff-tab-pane table td {
+                padding: 0.5rem 0.25rem;
+            }
+
+            #staff-tab-pane table th:nth-child(3),
+            #staff-tab-pane table td:nth-child(3) {
+                width: 100px;
+                min-width: 80px;
+            }
+
+            #staff-tab-pane table th:nth-child(4),
+            #staff-tab-pane table td:nth-child(4) {
+                width: 150px;
+                min-width: 120px;
+            }
+
+            #staff-tab-pane table th:nth-child(6),
+            #staff-tab-pane table td:nth-child(6) {
+                width: 80px;
+                min-width: 70px;
+            }
+
+            /* Hide less critical columns on very small screens */
+            @media (max-width: 576px) {
+                #staff-tab-pane table th:nth-child(5),
+                #staff-tab-pane table td:nth-child(5),
+                #staff-tab-pane table th:nth-child(7),
+                #staff-tab-pane table td:nth-child(7) {
+                    display: none;
+                }
+            }
         }
     </style>
 </head>
@@ -985,14 +1087,14 @@
                                                 <td>${staff.fullName}</td>
                                                 <td>${staff.email}</td>
                                                 <td>${staff.phone}</td>
-                                                <td><span class="badge bg-info">${staff.position}</span></td>
-                                                <td><span class="badge bg-secondary">${staff.department}</span></td>
-                                                <td><span class="badge ${staff.isActive ? 'bg-success' : 'bg-danger'}">${staff.isActive ? 'Active' : 'Inactive'}</span></td>
+                                                <td><span class="badge bg-info" style="font-size: 0.75rem; padding: 0.375rem 0.5rem;">${staff.position}</span></td>
+                                                <td><span class="badge bg-secondary" style="font-size: 0.75rem; padding: 0.375rem 0.5rem;">${staff.department}</span></td>
+                                                <td><span class="badge ${staff.isActive ? 'bg-success' : 'bg-danger'}" style="font-size: 0.75rem; padding: 0.375rem 0.5rem;">${staff.isActive ? 'Active' : 'Inactive'}</span></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editStaff('${staff.staffId}')">
+                                                    <button class="btn btn-sm btn-outline-primary action-btn me-1" onclick="editStaff('${staff.staffId}')" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteStaff('${staff.staffId}')">
+                                                    <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteStaff('${staff.staffId}')" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>

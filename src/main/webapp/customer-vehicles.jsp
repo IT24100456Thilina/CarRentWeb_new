@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="${pageContext.request.contextPath}/notifications.js"></script>
     <style>
         :root {
             --primary-color: #161d3d;
@@ -396,93 +397,11 @@
                 <label class="form-label">Return Date</label>
                 <input type="date" class="form-control" name="returnDate" value="${param.returnDate}" required>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Vehicle Type</label>
-                <select class="form-select" name="vehicleType">
-                    <option value="">All Types</option>
-                    <option value="Sedan" ${param.vehicleType == 'Sedan' ? 'selected' : ''}>Sedan</option>
-                    <option value="SUV" ${param.vehicleType == 'SUV' ? 'selected' : ''}>SUV</option>
-                    <option value="Luxury SUV" ${param.vehicleType == 'Luxury SUV' ? 'selected' : ''}>Luxury SUV</option>
-                    <option value="Van" ${param.vehicleType == 'Van' ? 'selected' : ''}>Van</option>
-                </select>
-            </div>
             <div class="col-md-3 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">Search Vehicles</button>
             </div>
         </form>
     </div>
-    
-    <!-- Filters -->
-<div class="filters-section">
-    <h4 style="margin-bottom: 1.5rem;">Filters</h4>
-    <div class="row g-3">
-        <div class="col-12 col-md-3">
-            <label class="form-label">Brand & Model</label>
-            <select id="filterBrandModel" class="form-select">
-                <option value="">All Brands & Models</option>
-                <option value="Toyota Camry">Toyota Camry</option>
-                <option value="Honda Civic">Honda Civic</option>
-                <option value="Ford Mustang">Ford Mustang</option>
-                <option value="BMW X5">BMW X5</option>
-                <!-- Add more options as needed -->
-            </select>
-        </div>
-        <div class="col-12 col-md-3">
-            <label class="form-label">Price Range (per day)</label>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span>$</span>
-                <input id="filterMinPrice" type="number" min="0" step="1" class="form-control" placeholder="Min">
-                <span>-</span>
-                <input id="filterMaxPrice" type="number" min="0" step="1" class="form-control" placeholder="Max">
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <label class="form-label">Car Type</label>
-            <div class="checkbox-group">
-                <div class="checkbox-item">
-                    <input type="checkbox" id="typeSedan" value="Sedan">
-                    <label for="typeSedan">Sedan</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="typeSUV" value="SUV">
-                    <label for="typeSUV">SUV</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="typeVan" value="Van">
-                    <label for="typeVan">Van</label>
-                </div>
-                <!-- Add more as needed -->
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <label class="form-label">Color</label>
-            <div class="checkbox-group">
-                <div class="checkbox-item">
-                    <input type="checkbox" id="colorBlack" value="Black">
-                    <label for="colorBlack">Black</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="colorWhite" value="White">
-                    <label for="colorWhite">White</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="colorBlue" value="Blue">
-                    <label for="colorBlue">Blue</label>
-                </div>
-                <!-- Add more as needed -->
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="checkbox-item">
-                <input type="checkbox" id="availableOnly">
-                <label for="availableOnly">Available now only</label>
-            </div>
-        </div>
-        <div class="col-12 d-flex justify-content-end">
-            <button class="btn btn-primary" type="button" onclick="applyFilters()">Apply Filters</button>
-        </div>
-    </div>
-</div>
 
 <!-- Vehicles Grid -->
 <div class="row" id="vehicleGrid">

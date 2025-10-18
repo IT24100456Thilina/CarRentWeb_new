@@ -301,9 +301,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-crud.jsp?campaignCreated=1");
+            response.sendRedirect("admin-campaign-create.jsp?campaignCreated=1");
         } else {
-            response.sendRedirect("admin-crud.jsp?error=Failed to create campaign");
+            response.sendRedirect("admin-campaign-create.jsp?error=Failed to create campaign");
         }
     }
 
@@ -325,9 +325,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-crud.jsp?campaignUpdated=1");
+            response.sendRedirect("admin-campaign-create.jsp?campaignUpdated=1");
         } else {
-            response.sendRedirect("admin-crud.jsp?error=Failed to update campaign");
+            response.sendRedirect("admin-campaign-create.jsp?error=Failed to update campaign");
         }
     }
 
@@ -354,9 +354,9 @@ public class CampaignController extends HttpServlet {
 
         int rows = ps.executeUpdate();
         if (rows > 0) {
-            response.sendRedirect("admin-crud.jsp?campaignDeleted=1");
+            response.sendRedirect("admin-campaign-create.jsp?campaignDeleted=1");
         } else {
-            response.sendRedirect("admin-crud.jsp?error=Failed to delete campaign");
+            response.sendRedirect("admin-campaign-create.jsp?error=Failed to delete campaign");
         }
     }
 
@@ -418,7 +418,7 @@ public class CampaignController extends HttpServlet {
             // Update SendCampaign as completed
             updateSendCampaignCompletion(sendId, sentCount, recipients.size() - sentCount, null, conn);
 
-            response.sendRedirect("admin-crud.jsp?campaignSent=1");
+            response.sendRedirect("admin-campaign-create.jsp?campaignSent=1");
         } catch (MessagingException e) {
             // Log error and alert admin
             logEmailServerError(campaignId, "Email server error: " + e.getMessage(), conn);

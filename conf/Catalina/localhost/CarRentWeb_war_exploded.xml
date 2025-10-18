@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context docBase="C:/Users/praba/Desktop/CarRentWeb (4)add vvv/CarRentWeb (7)/CarRentWeb (5)/CarRentWeb/src/main/webapp">
+  <Resources cacheMaxSize="10240">
+    <PreResources base="C:/Users/praba/Desktop/CarRentWeb (4)add vvv/CarRentWeb (7)/CarRentWeb (5)/CarRentWeb/target/classes" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/microsoft/sqlserver/mssql-jdbc/11.2.0.jre17/mssql-jdbc-11.2.0.jre17.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/mssql-jdbc-11.2.0.jre17.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/microsoft/azure/msal4j/1.13.0/msal4j-1.13.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/msal4j-1.13.0.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/nimbusds/oauth2-oidc-sdk/9.35/oauth2-oidc-sdk-9.35.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/oauth2-oidc-sdk-9.35.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/github/stephenc/jcip/jcip-annotations/1.0-1/jcip-annotations-1.0-1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jcip-annotations-1.0-1.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/nimbusds/content-type/2.2/content-type-2.2.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/content-type-2.2.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/nimbusds/lang-tag/1.6/lang-tag-1.6.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/lang-tag-1.6.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/nimbusds/nimbus-jose-jwt/9.22/nimbus-jose-jwt-9.22.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/nimbus-jose-jwt-9.22.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/net/minidev/json-smart/2.4.8/json-smart-2.4.8.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/json-smart-2.4.8.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/net/minidev/accessors-smart/2.4.8/accessors-smart-2.4.8.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/accessors-smart-2.4.8.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/org/ow2/asm/asm/9.1/asm-9.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/asm-9.1.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/slf4j-api-1.7.36.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.2.1/jackson-databind-2.13.2.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jackson-databind-2.13.2.1.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.2/jackson-annotations-2.13.2.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jackson-annotations-2.13.2.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.2/jackson-core-2.13.2.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jackson-core-2.13.2.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/jakarta/servlet/jsp/jstl/jakarta.servlet.jsp.jstl-api/2.0.0/jakarta.servlet.jsp.jstl-api-2.0.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-2.0.0.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/jakarta/el/jakarta.el-api/4.0.0/jakarta.el-api-4.0.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jakarta.el-api-4.0.0.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/3.0.0/jakarta.xml.bind-api-3.0.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jakarta.xml.bind-api-3.0.0.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/com/sun/activation/jakarta.activation/2.0.0/jakarta.activation-2.0.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jakarta.activation-2.0.0.jar"/>
+    <PostResources base="C:/Users/praba/.m2/repository/org/glassfish/web/jakarta.servlet.jsp.jstl/2.0.0/jakarta.servlet.jsp.jstl-2.0.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/jakarta.servlet.jsp.jstl-2.0.0.jar"/>
+  </Resources>
+</Context>
+

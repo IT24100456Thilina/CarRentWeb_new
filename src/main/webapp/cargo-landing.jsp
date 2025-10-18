@@ -73,6 +73,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Sinhala:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="${pageContext.request.contextPath}/notifications.js"></script>
 
     <style>
         :root {
@@ -257,10 +258,13 @@
 
         .hero-video {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
             object-fit: cover;
             z-index: 0;
         }
@@ -891,6 +895,56 @@
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="contact-pattern" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,45,45,0.05)"/><circle cx="90" cy="90" r="2" fill="rgba(255,45,45,0.05)"/><circle cx="50" cy="20" r="1" fill="rgba(255,45,45,0.03)"/><circle cx="20" cy="80" r="1" fill="rgba(255,45,45,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23contact-pattern)"/></svg>');
         }
 
+        /* Location Map Section */
+        .location-info h4 {
+            color: var(--text-black);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .location-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            background: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .location-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .location-item i {
+            font-size: 1.25rem;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .location-item div {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .location-item strong {
+            color: var(--text-black);
+            font-weight: 600;
+        }
+
+        .map-container {
+            position: relative;
+            background: var(--bg-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .map-container iframe {
+            border-radius: 16px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .hero {
@@ -1272,6 +1326,444 @@
                 opacity: 1;
             }
         }
+
+        /* Modern Testimonials Section */
+        .testimonials-section {
+            position: relative;
+            padding: 100px 0;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .testimonials-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&h=800&fit=crop') center/cover;
+            z-index: 0;
+        }
+
+        .testimonials-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 1;
+        }
+
+        .testimonials-section .container {
+            z-index: 2;
+        }
+
+        .testimonials-header {
+            color: white;
+            padding-right: 2rem;
+        }
+
+        .testimonials-label {
+            color: #3b82f6;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .testimonials-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .testimonials-description {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+        }
+
+        .testimonial-card-modern {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .testimonial-stars {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-stars i {
+            color: #fbbf24;
+            font-size: 1.25rem;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .author-info h6 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-black);
+        }
+
+        .author-info p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .testimonial-navigation {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .testimonial-nav-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-nav-btn:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            transform: scale(1.1);
+        }
+
+        .testimonial-quote {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 5rem;
+            color: #3b82f6;
+            opacity: 0.1;
+        }
+
+        @media (max-width: 992px) {
+            .testimonials-title {
+                font-size: 2rem;
+            }
+            
+            .testimonials-header {
+                padding-right: 0;
+                margin-bottom: 3rem;
+                text-align: center;
+            }
+
+            .testimonial-card-modern {
+                padding: 2rem;
+            }
+
+            .testimonial-quote {
+                font-size: 3rem;
+            }
+        }
+
+        /* Modern Car Cards */
+        .car-card-modern {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-card-modern:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .car-image-wrapper {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+        }
+
+        .car-image-modern {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .car-card-modern:hover .car-image-modern {
+            transform: scale(1.1);
+        }
+
+        .car-price-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 50px;
+            padding: 12px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .price-amount {
+            color: #ef4444;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .price-period {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .car-content-modern {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .car-rating i {
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        .car-title-modern {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-black);
+            margin-bottom: 0.75rem;
+        }
+
+        .car-description-modern {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .car-specs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .spec-item i {
+            color: #ef4444;
+            font-size: 1rem;
+            width: 20px;
+        }
+
+        .btn-rent-modern {
+            background: white;
+            color: var(--text-black);
+            border: 2px solid #e5e7eb;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        .btn-rent-modern:hover {
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .car-image-wrapper {
+                height: 220px;
+            }
+
+            .car-content-modern {
+                padding: 1.25rem;
+            }
+
+            .car-title-modern {
+                font-size: 1.25rem;
+            }
+
+            .price-amount {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Call to Action Section */
+        .cta-section {
+            position: relative;
+            padding: 120px 0;
+            overflow: hidden;
+        }
+
+        .cta-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&h=600&fit=crop') center/cover;
+            z-index: 0;
+        }
+
+        .cta-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        .cta-section .container {
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        .cta-description {
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-cta-phone {
+            background: #3b82f6;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-cta-phone:hover {
+            background: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+
+        .btn-cta-phone i {
+            font-size: 1.25rem;
+        }
+
+        /* Validation message styling */
+        .validation-message {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Phone input styling for better UX */
+        input[name="phone"] {
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Focus styles for validation */
+        input[name="phone"]:focus {
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        input[name="phone"]:invalid {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .cta-section {
+                padding: 80px 0;
+            }
+
+            .cta-title {
+                font-size: 1.75rem;
+            }
+
+            .cta-description {
+                font-size: 1rem;
+            }
+
+            .btn-cta-phone {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1298,7 +1790,7 @@
                     <li class="nav-item"><a class="nav-link" href="#vehicles">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#vehicles">Cars</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Pricing</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#location">Location</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
@@ -1330,10 +1822,11 @@
 
 <!-- Hero Section -->
 <section class="hero" id="home">
-    <div class="hero-background">
-        <div class="hero-bg-image" style="background-image: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&h=1080&fit=crop&crop=center');"></div>
-        <div class="hero-bg-overlay"></div>
-    </div>
+    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="auto">
+        <source src="video/hero-background.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="hero-overlay"></div>
     <div class="container">
         <div class="hero-content">
             <c:choose>
@@ -1392,50 +1885,6 @@
         </div>
     </div>
 </section>
-<!-- Promotions Section -->
-<c:if test="${not empty promotions}">
-    <section class="section" id="promotions" style="background: var(--bg-white);">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Special Offers & Promotions</h2>
-                <p class="section-subtitle">Don't miss out on our latest deals and exclusive offers</p>
-            </div>
-            <div class="row g-4">
-                <c:forEach var="promo" items="${promotions}">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card hover-lift">
-                            <div class="card-body text-center">
-                                <div class="card-icon text-warning mb-3">
-                                    <i class="fas fa-tags fa-3x"></i>
-                                </div>
-                                <h5 class="card-title">${promo.title}</h5>
-                                <c:if test="${not empty promo.badge}">
-                                    <span class="badge bg-warning text-dark mb-2">${promo.badge}</span>
-                                </c:if>
-                                <p class="card-text">${promo.description}</p>
-                                <c:if test="${not empty promo.validTill}">
-                                    <small class="text-muted">Valid until: ${promo.validTill}</small>
-                                </c:if>
-                                <c:choose>
-                                    <c:when test="${not empty sessionScope.username}">
-                                        <a href="#booking" class="btn btn-primary mt-3">
-                                            <i class="fas fa-calendar-check me-2"></i>Book Now
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-primary mt-3">
-                                            <i class="fas fa-sign-in-alt me-2"></i>Login to Book
-                                        </a>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                        </div>
-                    </div>
-                </c:forEach>
-            </div>
-        </div>
-    </section>
-</c:if>
 
 <!-- Fleet Section -->
 <section class="section fleet-section" id="vehicles">
@@ -1471,33 +1920,50 @@
             <c:forEach var="car" items="${carList}" varStatus="status">
                 <c:if test="${status.index < 6}"> <!-- Show first 6 cars -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="car-card vehicle-item" data-type="${car.vehicleType}" data-availability="${car.available == true or car.available == 1 ? 'available' : 'unavailable'}">
-                            <div class="car-image">
-                                <img src="${car.imageUrl != null && car.imageUrl != '' ? car.imageUrl : 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400&h=250&fit=crop&crop=center'}"
-                                     alt="${car.vehicleName}" class="img-fluid">
-                                <c:if test="${car.available == true or car.available == 1}">
-                                    <div class="availability-badge available">Available</div>
-                                </c:if>
-                                <c:if test="${car.available != true and car.available != 1}">
-                                    <div class="availability-badge unavailable">Unavailable</div>
-                                </c:if>
-                            </div>
-                            <div class="car-content">
-                                <h4 class="car-name">${car.vehicleName}</h4>
-                                <p class="car-type">${car.vehicleType}</p>
-                                <p class="car-description">Comfortable and reliable vehicle perfect for your travels.</p>
-                                <div class="car-price">
-                                    <span class="price">Starting at $${car.dailyPrice}/day</span>
+                        <div class="car-card-modern vehicle-item" data-type="${car.vehicleType}" data-availability="${car.available == true or car.available == 1 ? 'available' : 'unavailable'}">
+                            <div class="car-image-wrapper">
+                                <div class="car-price-badge">
+                                    <span class="price-amount">Rs.${car.dailyPrice}</span>
+                                    <span class="price-period">/Day</span>
                                 </div>
+                                <img src="${car.imageUrl != null && car.imageUrl != '' ? car.imageUrl : 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&h=350&fit=crop&crop=center'}"
+                                     alt="${car.vehicleName}" class="car-image-modern">
+                            </div>
+                            <div class="car-content-modern">
+                                <div class="car-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <h4 class="car-title-modern">${car.vehicleName}</h4>
+                                <p class="car-description-modern">${car.description != null && car.description != '' ? car.description : 'Komodo Island is one of the only places in the world where you can spot...'}</p>
+                                
+                                <div class="car-specs">
+                                    <div class="spec-item">
+                                        <i class="fas fa-users"></i>
+                                        <span>Seat Capacity: 4 People</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <i class="fas fa-door-closed"></i>
+                                        <span>Total Doors: 4 Doors</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <i class="fas fa-gas-pump"></i>
+                                        <span>Fuel Tank: 450 Liters</span>
+                                    </div>
+                                </div>
+
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.username}">
-                                        <a href="#booking" class="btn-rent" onclick="prefillBooking('${car.vehicleId}','${car.vehicleName}')">
-                                            <i class="fas fa-key me-2"></i>Rent Now
+                                        <a href="HomeServlet?page=customer-booking&vehicleId=${car.vehicleId}" class="btn-rent-modern">
+                                            Rent Now
                                         </a>
                                     </c:when>
                                     <c:otherwise>
-                                        <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn-rent">
-                                            <i class="fas fa-sign-in-alt me-2"></i>Login to Rent
+                                        <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn-rent-modern">
+                                            Rent Now
                                         </a>
                                     </c:otherwise>
                                 </c:choose>
@@ -1514,174 +1980,157 @@
     </div>
 </section>
 
-<!-- Booking Section -->
-<c:if test="${not empty sessionScope.username}">
-    <section class="section" id="booking" style="background: var(--bg-white);">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Book Your Vehicle</h2>
-                <p class="section-subtitle">Complete your booking details below</p>
+<!-- Testimonials Section -->
+<section class="testimonials-section" id="testimonials">
+    <div class="testimonials-background"></div>
+    <div class="testimonials-overlay"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-5">
+                <div class="testimonials-header">
+                    <p class="testimonials-label">TESTIMONIALS</p>
+                    <h2 class="testimonials-title">What Clients Say About Us</h2>
+                    <p class="testimonials-description">Experience premium car rentals with our extensive fleet of luxury and economy vehicles. Seamless booking, exceptional service, and unforgettable journeys await</p>
+                </div>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-body p-4">
-                            <form action="BookingController" method="post" onsubmit="showBooked()">
-                                <input type="hidden" name="action" value="create">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="fas fa-calendar-alt me-2"></i>Pick-up Date
-                                        </label>
-                                        <input type="date" class="form-control" name="pickupDate" required>
+            <div class="col-lg-7">
+                <div class="testimonials-slider">
+                    <div class="testimonial-card-modern">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <c:choose>
+                            <c:when test="${not empty recentFeedback && recentFeedback.size() > 0}">
+                                <c:set var="feedback" value="${recentFeedback[0]}" />
+                                <p class="testimonial-text">${feedback.comments}</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <i class="fas fa-user"></i>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="fas fa-calendar-alt me-2"></i>Return Date
-                                        </label>
-                                        <input type="date" class="form-control" name="returnDate" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">
-                                            <i class="fas fa-car me-2"></i>Select Vehicle
-                                        </label>
-                                        <select id="bookingCar" class="form-select" name="vehicleId" required>
-                                            <option value="">Choose a vehicle...</option>
-                                            <c:forEach var="car" items="${carList}">
-                                                <option value="${car.vehicleId}">${car.vehicleName} - $${car.dailyPrice}/day</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 d-grid">
-                                        <button type="submit" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-check me-2"></i>Confirm Booking
-                                        </button>
+                                    <div class="author-info">
+                                        <h6 class="author-name">Customer</h6>
+                                        <p class="author-role">Client</p>
                                     </div>
                                 </div>
-                            </form>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="testimonial-text">Experience premium car rentals with our extensive fleet of luxury and economy vehicles. Seamless booking, exceptional service, and unforgettable journeys await</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="author-info">
+                                        <h6 class="author-name">Mike Brown</h6>
+                                        <p class="author-role">Client</p>
+                                    </div>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="testimonial-navigation">
+                            <button class="testimonial-nav-btn prev"><i class="fas fa-chevron-left"></i></button>
+                            <button class="testimonial-nav-btn next"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-right"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-</c:if>
-
-
-<!-- Testimonials Section -->
-<section class="section" id="testimonials" style="background: var(--bg-gray);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">What Our Customers Say</h2>
-            <p class="section-subtitle">Real feedback from our valued customers</p>
-            <div class="text-center mb-4">
-                <c:if test="${not empty sessionScope.username && sessionScope.role == 'customer'}">
-                    <a data-bs-toggle="modal" data-bs-target="#customerFeedbackModal" class="btn btn-primary">
-                        <i class="fas fa-comments me-2"></i>Share Your Feedback
-                    </a>
-                </c:if>
-                <c:if test="${empty sessionScope.username}">
-                    <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-outline-primary">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login to Share Feedback
-                    </a>
-                </c:if>
-            </div>
+        <div class="text-center mt-5">
+            <c:if test="${not empty sessionScope.username && sessionScope.role == 'customer'}">
+                <a data-bs-toggle="modal" data-bs-target="#customerFeedbackModal" class="btn btn-primary">
+                    <i class="fas fa-comments me-2"></i>Share Your Feedback
+                </a>
+            </c:if>
+            <c:if test="${empty sessionScope.username}">
+                <a data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-outline-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Share Feedback
+                </a>
+            </c:if>
         </div>
-        <!-- Recent Customer Feedback -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Recent Customer Feedback</h5>
-                        <span class="badge bg-primary">${recentFeedback != null ? recentFeedback.size() : 0} Reviews</span>
-                    </div>
-                    <div class="card-body">
-                        <c:if test="${empty recentFeedback}">
-                            <div class="text-center py-5">
-                                <h6 class="text-muted mb-3">No Reviews Yet</h6>
-                                <p class="text-muted">Be the first to share your experience with CarGO!</p>
-                            </div>
-                        </c:if>
-                        <c:if test="${not empty recentFeedback}">
-                            <div class="row g-3">
-                                <c:forEach var="feedback" items="${recentFeedback}">
-                                    <div class="col-md-6">
-                                        <div class="card feedback-card h-100">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div class="rating-stars">
-                                                        <c:forEach begin="1" end="5" var="i">
-                                                            <c:choose>
-                                                                <c:when test="${i <= feedback.rating}">
-                                                                    ⭐
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    ☆
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </c:forEach>
-                                                    </div>
-                                                    <small class="text-muted">${feedback.dateSubmitted}</small>
-                                                </div>
-                                                <c:if test="${not empty feedback.bookingId}">
-                                                    <p class="text-muted small mb-2">Booking #${feedback.bookingId}</p>
-                                                </c:if>
-                                                <p class="card-text">${feedback.comments}</p>
-                                                <c:if test="${not empty feedback.adminResponse}">
-                                                    <div class="mt-3 p-3 bg-light rounded">
-                                                        <small class="text-muted fw-semibold">Admin Response:</small>
-                                                        <p class="mb-0 mt-1">${feedback.adminResponse}</p>
-                                                    </div>
-                                                </c:if>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </c:if>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
-
 </section>
 
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="cta-background"></div>
+    <div class="cta-overlay"></div>
+    <div class="container position-relative">
+        <div class="text-center">
+            <h2 class="cta-title">Call us, and let's chat over a cup of coffee</h2>
+            <p class="cta-description">Experience premium car rentals with our extensive fleet of luxury and economy vehicles. Seamless booking, exceptional service, and unforgettable journeys await</p>
+            <a href="tel:+94783872180" class="btn-cta-phone">
+                <i class="fas fa-phone me-2"></i>+94 783872180
+            </a>
+        </div>
+    </div>
+</section>
 
-<!-- Contact Section -->
-<section class="section contact-section" id="contact">
+<!-- Location Map Section -->
+<section class="section" id="location" style="background: var(--bg-light); padding: 80px 0;">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="section-title">Get In Touch</h2>
-            <p class="section-subtitle">Ready to start your journey? Contact us today.</p>
+            <h2 class="section-title">Find Our Location</h2>
+            <p class="section-subtitle">Visit us at our convenient location in Kandy</p>
         </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-lg-3 col-md-6">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="location-info">
+                    <h4 class="mb-4">CarGO Office</h4>
+                    <div class="location-details">
+                        <div class="location-item mb-3">
+                            <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                            <div>
+                                <strong>Address:</strong><br>
+                                KU-07 SE2030, SLIIT Kandy<br>
+                                Central Province, Sri Lanka 20000
+                            </div>
+                        </div>
+                        <div class="location-item mb-3">
+                            <i class="fas fa-phone text-primary me-3"></i>
+                            <div>
+                                <strong>Phone:</strong><br>
+                                081 123 4567
+                            </div>
+                        </div>
+                        <div class="location-item mb-3">
+                            <i class="fas fa-envelope text-primary me-3"></i>
+                            <div>
+                                <strong>Email:</strong><br>
+                                KU07SE@cargo.com
+                            </div>
+                        </div>
+                        <div class="location-item mb-4">
+                            <i class="fas fa-clock text-primary me-3"></i>
+                            <div>
+                                <strong>Business Hours:</strong><br>
+                                Monday - Friday: 8:00 AM - 8:00 PM<br>
+                                Saturday: 9:00 AM - 6:00 PM<br>
+                                Sunday: 10:00 AM - 4:00 PM
+                            </div>
+                        </div>
+                        <a href="https://maps.google.com/?q=SLIIT+Kandy" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-directions me-2"></i>Get Directions
+                        </a>
                     </div>
-                    <h5>Visit Us</h5>
-                    <p>KU-07 SE2030, SLIIT Kandy<br>Kandy, Sri Lanka</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <h5>Call Us</h5>
-                    <p>081 123 4567<br>Mon-Fri: 8AM-8PM</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h5>Email Us</h5>
-                    <p>KU07SE2030@cargo.com<br>KU07SE@cargo.com</p>
+            <div class="col-lg-6">
+                <div class="map-container" style="border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-lg);">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.1234567890123!2d80.6333!3d7.2906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae368c8c0b8c8c8%3A0x1234567890abcdef!2sSLIIT%20Kandy!5e0!3m2!1sen!2slk!4v1234567890123!5m2!1sen!2slk"
+                        width="100%" 
+                        height="400" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
                 </div>
             </div>
         </div>
@@ -1711,6 +2160,7 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#vehicles">Vehicles</a></li>
                     <li><a href="#features">Features</a></li>
+                    <li><a href="#location">Location</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
@@ -1770,6 +2220,98 @@
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
         }, 500);
+    });
+
+    // Video Background Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const video = document.getElementById('heroVideo');
+        if (video) {
+            video.addEventListener('loadeddata', function() {
+                console.log('Hero video loaded successfully');
+            });
+            
+            video.addEventListener('error', function(e) {
+                console.error('Video failed to load:', e);
+            });
+            
+            // Ensure video plays
+            video.play().catch(function(error) {
+                console.log('Video autoplay prevented by browser:', error);
+            });
+        }
+    });
+
+    // Testimonial Slider
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackData = [];
+        <c:if test="${not empty recentFeedback}">
+            <c:forEach var="feedback" items="${recentFeedback}">
+                feedbackData.push({
+                    text: "${feedback.comments}",
+                    name: "${feedback.fullName != null ? feedback.fullName : 'Valued Customer'}",
+                    role: "Client",
+                    rating: ${feedback.rating},
+                    date: "${feedback.dateSubmitted != null ? feedback.dateSubmitted : 'Recent'}"
+                });
+            </c:forEach>
+        </c:if>
+
+        // Add default feedback if no real feedback exists
+        if (feedbackData.length === 0) {
+            feedbackData.push({
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec diam quis purus tincidunt lacinia id ac magna.",
+                name: "Mike Brown",
+                role: "Client",
+                rating: 5,
+                date: "Recent"
+            });
+        }
+
+        console.log("Loaded " + feedbackData.length + " testimonials");
+
+        let currentIndex = 0;
+
+        function updateTestimonial() {
+            const testimonial = feedbackData[currentIndex];
+            const card = document.querySelector('.testimonial-card-modern');
+            if (card) {
+                card.querySelector('.testimonial-text').textContent = testimonial.text;
+                card.querySelector('.author-name').textContent = testimonial.name;
+                card.querySelector('.author-role').textContent = testimonial.role;
+                
+                // Update stars
+                const starsContainer = card.querySelector('.testimonial-stars');
+                starsContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const star = document.createElement('i');
+                    star.className = i < testimonial.rating ? 'fas fa-star' : 'far fa-star';
+                    starsContainer.appendChild(star);
+                }
+            }
+        }
+
+        const prevBtn = document.querySelector('.testimonial-nav-btn.prev');
+        const nextBtn = document.querySelector('.testimonial-nav-btn.next');
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                currentIndex = (currentIndex - 1 + feedbackData.length) % feedbackData.length;
+                updateTestimonial();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                currentIndex = (currentIndex + 1) % feedbackData.length;
+                updateTestimonial();
+            });
+        }
+
+        // Auto-rotate testimonials every 5 seconds
+        setInterval(function() {
+            currentIndex = (currentIndex + 1) % feedbackData.length;
+            updateTestimonial();
+        }, 5000);
     });
 
     // Header Scroll Effect
@@ -1933,6 +2475,38 @@
         emailInput.parentNode.appendChild(msg);
     }
 
+    // Phone number validation (10 digits)
+    function validatePhoneNumber(phone) {
+        // Remove all non-digit characters
+        const cleanPhone = phone.replace(/\D/g, '');
+        // Check if it's exactly 10 digits
+        return cleanPhone.length === 10 && /^\d{10}$/.test(cleanPhone);
+    }
+
+    function showPhoneValidation(phoneInput, isValid) {
+        // Remove existing validation message
+        const existingMsg = phoneInput.parentNode.querySelector('.validation-message');
+        if (existingMsg) {
+            existingMsg.remove();
+        }
+
+        const msg = document.createElement('div');
+        msg.className = 'validation-message mt-1';
+
+        if (!phoneInput.value.trim()) {
+            // Don't show message for empty field
+            return;
+        } else if (isValid) {
+            msg.innerHTML = '<span style="color: #198754;">✓ Valid phone number</span>';
+            phoneInput.style.borderColor = '#198754';
+        } else {
+            msg.innerHTML = '<span style="color: #dc3545;">✗ Phone number must be exactly 10 digits</span>';
+            phoneInput.style.borderColor = '#dc3545';
+        }
+
+        phoneInput.parentNode.appendChild(msg);
+    }
+
     function setupEmailValidation() {
         // Admin registration email validation
         const adminEmailInput = document.querySelector('#adminRegisterModal input[name="email"]');
@@ -1961,17 +2535,59 @@
         }
     }
 
+    function setupPhoneValidation() {
+        // Admin registration phone validation
+        const adminPhoneInput = document.querySelector('#adminRegisterModal input[name="phone"]');
+        if (adminPhoneInput) {
+            adminPhoneInput.addEventListener('input', function() {
+                const isValid = validatePhoneNumber(this.value);
+                showPhoneValidation(this, isValid);
+            });
+            adminPhoneInput.addEventListener('blur', function() {
+                const isValid = validatePhoneNumber(this.value);
+                showPhoneValidation(this, isValid);
+            });
+        }
+
+        // Customer registration phone validation
+        const customerPhoneInput = document.querySelector('#registerModal input[name="phone"]');
+        if (customerPhoneInput) {
+            customerPhoneInput.addEventListener('input', function() {
+                const isValid = validatePhoneNumber(this.value);
+                showPhoneValidation(this, isValid);
+            });
+            customerPhoneInput.addEventListener('blur', function() {
+                const isValid = validatePhoneNumber(this.value);
+                showPhoneValidation(this, isValid);
+            });
+        }
+    }
+
     // Form validation on submit
     function validateRegistrationForm(form) {
         const emailInput = form.querySelector('input[name="email"]');
+        const phoneInput = form.querySelector('input[name="phone"]');
+
+        // Validate email
         if (emailInput) {
-            const isValid = validateEmailDomain(emailInput.value);
-            if (!isValid) {
+            const isEmailValid = validateEmailDomain(emailInput.value);
+            if (!isEmailValid) {
                 showEmailValidation(emailInput, false);
                 emailInput.focus();
                 return false;
             }
         }
+
+        // Validate phone number
+        if (phoneInput) {
+            const isPhoneValid = validatePhoneNumber(phoneInput.value);
+            if (!isPhoneValid) {
+                showPhoneValidation(phoneInput, false);
+                phoneInput.focus();
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -1979,6 +2595,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Setup email validation
         setupEmailValidation();
+
+        // Setup phone validation
+        setupPhoneValidation();
 
         // Add form validation to registration forms
         const adminForm = document.querySelector('#adminRegisterModal form');
@@ -2150,6 +2769,8 @@
 
             if (lowerMessage.includes('bye') || lowerMessage.includes('goodbye')) {
                 return "Goodbye! Thank you for choosing CarGO. Have a great day!";
+
+
             }
 
             // Default responses
