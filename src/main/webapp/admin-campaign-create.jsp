@@ -113,6 +113,9 @@
                 <p class="text-muted mb-0">Design and launch your next email marketing campaign</p>
             </div>
             <div>
+                <a href="CampaignController?action=create" class="btn btn-success me-2">
+                    <i class="fas fa-plus me-2"></i>Add New Campaign
+                </a>
                 <a href="admin-promotion-create.jsp" class="btn btn-outline-success me-2">
                     <i class="fas fa-tags me-2"></i>Create Promotion
                 </a>

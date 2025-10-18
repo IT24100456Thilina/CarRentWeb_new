@@ -129,7 +129,14 @@ public class BookingController extends HttpServlet {
                 Date endDate = Date.valueOf(drop);
 
                 if (!startDate.before(endDate)) {
-                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
+                    String returnPage = request.getParameter("returnPage");
+                    String redirectUrl = "cargo-landing.jsp";
+                    if ("customer-booking".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-booking";
+                    } else if ("customer-vehicles".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-vehicles";
+                    }
+                    response.sendRedirect(redirectUrl + "?errorMsg=" + java.net.URLEncoder.encode("Start date must be before end date", java.nio.charset.StandardCharsets.UTF_8));
                     return;
                 }
 
@@ -143,7 +150,14 @@ public class BookingController extends HttpServlet {
                 ResultSet checkRs = checkPs.executeQuery();
                 checkRs.next();
                 if (checkRs.getInt(1) > 0) {
-                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Vehicle is not available for the selected dates", java.nio.charset.StandardCharsets.UTF_8));
+                    String returnPage = request.getParameter("returnPage");
+                    String redirectUrl = "cargo-landing.jsp";
+                    if ("customer-booking".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-booking";
+                    } else if ("customer-vehicles".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-vehicles";
+                    }
+                    response.sendRedirect(redirectUrl + "?errorMsg=" + java.net.URLEncoder.encode("Vehicle is not available for the selected dates", java.nio.charset.StandardCharsets.UTF_8));
                     return;
                 }
 
@@ -178,7 +192,14 @@ public class BookingController extends HttpServlet {
                     // Redirect to payment page
                     response.sendRedirect("customer-payment.jsp?bookingId=" + booking.getBookingId() + "&amount=" + String.format("%.2f", totalCost));
                 } else {
-                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Booking failed", java.nio.charset.StandardCharsets.UTF_8));
+                    String returnPage = request.getParameter("returnPage");
+                    String redirectUrl = "cargo-landing.jsp";
+                    if ("customer-booking".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-booking";
+                    } else if ("customer-vehicles".equals(returnPage)) {
+                        redirectUrl = "HomeServlet?page=customer-vehicles";
+                    }
+                    response.sendRedirect(redirectUrl + "?errorMsg=" + java.net.URLEncoder.encode("Booking failed", java.nio.charset.StandardCharsets.UTF_8));
                 }
             } else if ("updateStatus".equalsIgnoreCase(action)) {
                 int bookingId = Integer.parseInt(request.getParameter("bookingId"));
@@ -316,7 +337,14 @@ public class BookingController extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+            String returnPage = request.getParameter("returnPage");
+            String redirectUrl = "cargo-landing.jsp";
+            if ("customer-booking".equals(returnPage)) {
+                redirectUrl = "HomeServlet?page=customer-booking";
+            } else if ("customer-vehicles".equals(returnPage)) {
+                redirectUrl = "HomeServlet?page=customer-vehicles";
+            }
+            response.sendRedirect(redirectUrl + "?errorMsg=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 }

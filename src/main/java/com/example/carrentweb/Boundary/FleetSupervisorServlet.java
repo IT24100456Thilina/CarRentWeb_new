@@ -83,10 +83,11 @@ public class FleetSupervisorServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check if user is logged in as Fleet Supervisor
+        // Check if user is logged in as Fleet Supervisor or System Administrator
         HttpSession session = request.getSession(false);
         if (session == null || !"admin".equals(session.getAttribute("role")) ||
-            !"Fleet Supervisor".equals(session.getAttribute("position"))) {
+            (!"Fleet Supervisor".equals(session.getAttribute("position")) &&
+             !"System Administrator".equals(session.getAttribute("position")))) {
             response.sendRedirect(request.getContextPath() + "/cargo-landing.jsp?error=access_denied");
             return;
         }
@@ -136,10 +137,11 @@ public class FleetSupervisorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check if user is logged in as Fleet Supervisor
+        // Check if user is logged in as Fleet Supervisor or System Administrator
         HttpSession session = request.getSession(false);
         if (session == null || !"admin".equals(session.getAttribute("role")) ||
-            !"Fleet Supervisor".equals(session.getAttribute("position"))) {
+            (!"Fleet Supervisor".equals(session.getAttribute("position")) &&
+             !"System Administrator".equals(session.getAttribute("position")))) {
             response.sendRedirect(request.getContextPath() + "/cargo-landing.jsp?error=access_denied");
             return;
         }

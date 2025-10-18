@@ -256,6 +256,98 @@
                     </div>
                 </div>
 
+                <!-- Department Dashboards Section -->
+                <div class="section-header">
+                    <h3><i class="fas fa-tachometer-alt me-2"></i>Department Dashboards</h3>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <!-- Operational Reports - Operations Department or System Administrators -->
+                    <c:if test="${(sessionScope.position == 'Operations Manager' || sessionScope.position == 'Manager' && sessionScope.department == 'Operations' || sessionScope.department == 'Operations') ||
+                                 (sessionScope.position == 'System Administrator' || sessionScope.position == 'Administrator')}">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card text-center p-4">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h5 class="mb-3">Operational Reports</h5>
+                                <p class="text-muted mb-3">View operational performance and analytics</p>
+                                <a href="OperationalReportServlet" class="btn btn-outline-warning">
+                                    <i class="fas fa-arrow-right me-2"></i>View Reports
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+
+                    <!-- Customer Service - Customer Service Department or System Administrators -->
+                    <c:if test="${(sessionScope.position == 'Customer Service Executive' || sessionScope.department == 'Customer Service') ||
+                                 (sessionScope.position == 'System Administrator' || sessionScope.position == 'Administrator')}">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card text-center p-4">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h5 class="mb-3">Customer Service</h5>
+                                <p class="text-muted mb-3">Manage customer inquiries and support</p>
+                                <a href="CustomerServiceServlet" class="btn btn-outline-info">
+                                    <i class="fas fa-arrow-right me-2"></i>Open Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+
+                    <!-- Income Reports - Accountants or System Administrators -->
+                    <c:if test="${(sessionScope.position == 'Accountant' || sessionScope.department == 'Finance' || sessionScope.department == 'Accounting') ||
+                                 (sessionScope.position == 'System Administrator' || sessionScope.position == 'Administrator')}">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card text-center p-4">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <h5 class="mb-3">Income Reports</h5>
+                                <p class="text-muted mb-3">Financial analysis and revenue tracking</p>
+                                <a href="IncomeReportServlet" class="btn btn-outline-success">
+                                    <i class="fas fa-arrow-right me-2"></i>View Reports
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+
+                    <!-- Fleet Status - Fleet Management or System Administrators -->
+                    <c:if test="${(sessionScope.position == 'Fleet Supervisor' || sessionScope.department == 'Fleet Management' || sessionScope.department == 'Fleet') ||
+                                 (sessionScope.position == 'System Administrator' || sessionScope.position == 'Administrator')}">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card text-center p-4">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                                <h5 class="mb-3">Fleet Status</h5>
+                                <p class="text-muted mb-3">Monitor vehicle fleet and availability</p>
+                                <a href="FleetSupervisorServlet?action=viewFleet" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-right me-2"></i>View Status
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+
+                    <!-- Email Campaigns - Marketing or System Administrators -->
+                    <c:if test="${(sessionScope.position == 'Marketing Executive' || sessionScope.department == 'Marketing' || sessionScope.position == 'Marketing Manager') ||
+                                 (sessionScope.position == 'System Administrator' || sessionScope.position == 'Administrator')}">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card text-center p-4">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h5 class="mb-3">Email Campaigns</h5>
+                                <p class="text-muted mb-3">Create and manage marketing campaigns</p>
+                                <a href="CampaignController" class="btn btn-outline-danger">
+                                    <i class="fas fa-arrow-right me-2"></i>Manage Campaigns
+                                </a>
+                            </div>
+                        </div>
+                    </c:if>
+                </div>
+
                 <!-- Vehicles Management -->
                 <div id="vehicles" class="section-header">
                     <div class="d-flex justify-content-between align-items-center">
@@ -455,6 +547,22 @@
                                         </c:forEach>
                                     </tbody>
                                 </table>
+                            </div>
+                        </c:if>
+    
+                        <!-- Show message if no department dashboards are accessible (excluding System Administrators) -->
+                        <c:if test="${(sessionScope.position != 'System Administrator' && sessionScope.position != 'Administrator') &&
+                                     ((sessionScope.position != 'Operations Manager' && sessionScope.position != 'Manager' || sessionScope.department != 'Operations') &&
+                                      (sessionScope.position != 'Customer Service Executive' && sessionScope.department != 'Customer Service') &&
+                                      (sessionScope.position != 'Accountant' && sessionScope.department != 'Finance' && sessionScope.department != 'Accounting') &&
+                                      (sessionScope.position != 'Fleet Supervisor' && sessionScope.department != 'Fleet Management' && sessionScope.department != 'Fleet') &&
+                                      (sessionScope.position != 'Marketing Executive' && sessionScope.department != 'Marketing' && sessionScope.position != 'Marketing Manager'))}">
+                            <div class="col-12">
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No department-specific dashboards available for your current role.
+                                    <br><small>Contact your system administrator if you need access to specific department functions.</small>
+                                </div>
                             </div>
                         </c:if>
                     </div>

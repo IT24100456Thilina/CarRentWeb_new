@@ -62,6 +62,22 @@
 
 <!-- Header -->
 <div class="container mt-4">
+    <!-- Error Message Display -->
+    <c:if test="${not empty param.errorMsg}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${param.errorMsg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+    <c:if test="${not empty param.successMsg}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            ${param.successMsg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </c:if>
+
     <div class="row align-items-center mb-4">
         <div class="col">
             <h1 class="display-6 mb-0">My Bookings</h1>
@@ -148,6 +164,7 @@
             <div class="modal-body">
                 <form id="bookingForm" action="BookingController" method="post">
                     <input type="hidden" name="action" value="create">
+                    <input type="hidden" name="returnPage" value="customer-booking">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Pickup Date</label>

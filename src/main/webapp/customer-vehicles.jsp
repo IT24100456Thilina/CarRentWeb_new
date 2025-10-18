@@ -553,6 +553,7 @@
             <div class="modal-body">
                 <form id="bookingForm" action="BookingController" method="post">
                     <input type="hidden" name="action" value="create">
+                    <input type="hidden" name="returnPage" value="customer-vehicles">
                     <input type="hidden" id="selectedVehicleId" name="vehicleId">
                     <div class="row g-3">
                         <div class="col-md-6">

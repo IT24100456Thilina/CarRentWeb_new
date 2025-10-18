@@ -151,7 +151,7 @@
 
         /* Header & Navigation */
         .header {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow);
             position: fixed;
@@ -165,11 +165,11 @@
 
         .header.scrolled {
             padding: 0.5rem 0;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.98);
         }
 
         .navbar-brand {
-            font-size: 1.25rem;
+            font-size: 1.75rem;
             font-weight: 800;
             color: var(--text-black) !important;
             display: flex;
@@ -179,24 +179,23 @@
         }
 
         .navbar-brand .logo {
-            width: 35px;
-            height: 35px;
+            width: 45px;
+            height: 45px;
             background: var(--gradient-red);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             box-shadow: var(--shadow);
         }
 
         .navbar-nav .nav-link {
-            font-size: 0.875rem;
             font-weight: 500;
             color: var(--text-black) !important;
-            padding: 0.5rem 0.75rem;
+            padding: 0.75rem 1rem;
             transition: all 0.3s ease;
             border-radius: 8px;
             margin: 0 0.25rem;
@@ -264,46 +263,6 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
-            opacity: 0.8;
-        }
-
-        .hero-fallback-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-fallback-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.7;
-        }
-
-        .hero-video:not([src]),
-        .hero-video[src=""] {
-            display: none;
-        }
-
-        .hero-video:not([src]) ~ .hero-fallback-bg,
-        .hero-video[src=""] ~ .hero-fallback-bg {
-            opacity: 1;
-        }
-
-        .hero-fallback-bg {
-            pointer-events: none;
         }
 
         .hero-overlay {
@@ -946,14 +905,6 @@
                 font-size: 1rem;
             }
 
-            .hero-video {
-                opacity: 0.6;
-            }
-
-            .hero-fallback-bg {
-                opacity: 0.8;
-            }
-
             .btn-get-started {
                 padding: 0.875rem 2rem;
                 font-size: 1rem;
@@ -1380,18 +1331,7 @@
 <!-- Hero Section -->
 <section class="hero" id="home">
     <div class="hero-background">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
-            <source src="https://videos.pexels.com/video-files/1722764/1722764-hd_1920_1080_30fps.mp4" type="video/mp4">
-            <source src="https://player.vimeo.com/external/371433597.sd.mp4?s=236dabf0c69c5c0cb0c3c7a9a5a8b2c0" type="video/mp4">
-            <source src="https://videos.pexels.com/video-files/855565/855565-hd_1920_1080_30fps.mp4" type="video/mp4">
-        </video>
-        <!-- Fallback background video -->
-        <div class="hero-fallback-bg">
-            <video class="hero-fallback-video" autoplay muted loop playsinline preload="metadata">
-                <source src="https://player.vimeo.com/external/371433597.sd.mp4?s=236dabf0c69c5c0cb0c3c7a9a5a8b2c0" type="video/mp4">
-                <source src="https://videos.pexels.com/video-files/855565/855565-hd_1920_1080_30fps.mp4" type="video/mp4">
-            </video>
-        </div>
+        <div class="hero-bg-image" style="background-image: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&h=1080&fit=crop&crop=center');"></div>
         <div class="hero-bg-overlay"></div>
     </div>
     <div class="container">
@@ -1830,35 +1770,6 @@
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
         }, 500);
-
-        // Video loading check
-        const heroVideo = document.querySelector('.hero-video');
-        const fallbackVideo = document.querySelector('.hero-fallback-video');
-
-        if (heroVideo) {
-            heroVideo.addEventListener('error', function() {
-                console.log('Primary video failed to load, trying fallback...');
-                this.style.display = 'none';
-                if (fallbackVideo) {
-                    fallbackVideo.style.opacity = '1';
-                }
-            });
-
-            heroVideo.addEventListener('loadstart', function() {
-                console.log('Primary video started loading...');
-            });
-        }
-
-        if (fallbackVideo) {
-            fallbackVideo.addEventListener('error', function() {
-                console.log('Fallback video also failed to load');
-                // Show a gradient background as ultimate fallback
-                const heroBackground = document.querySelector('.hero-background');
-                if (heroBackground) {
-                    heroBackground.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                }
-            });
-        }
     });
 
     // Header Scroll Effect
@@ -1954,13 +1865,6 @@
         showNotification('Your booking request has been submitted successfully!');
     }
 
-    // Modal form submission
-    document.querySelector('.modal-content form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Booking confirmed for ' + modalCar.textContent + '!');
-        closeModal();
-    });
-
     function showNotification(message) {
         const notifyElement = document.getElementById('notify');
         const notifyText = document.getElementById('notifyText');
@@ -2004,37 +1908,6 @@
         return allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
     }
 
-    // Phone Validation
-    function validatePhone(phone) {
-        if (!phone) return false;
-        return phone.match(/^\d{10}$/);
-    }
-
-    function showPhoneValidation(phoneInput, isValid) {
-        // Remove existing validation message
-        const existingMsg = phoneInput.parentNode.querySelector('.phone-validation-msg');
-        if (existingMsg) {
-            existingMsg.remove();
-        }
-
-        // Add validation message
-        const msg = document.createElement('div');
-        msg.className = 'phone-validation-msg mt-1';
-        msg.style.fontSize = '0.875rem';
-
-        if (!phoneInput.value.trim()) {
-            msg.innerHTML = '<span style="color: #6c757d;">Please enter a phone number</span>';
-        } else if (!isValid) {
-            msg.innerHTML = '<span style="color: #dc3545;">Phone number must be exactly 10 digits</span>';
-            phoneInput.style.borderColor = '#dc3545';
-        } else {
-            msg.innerHTML = '<span style="color: #198754;">✓ Valid phone number</span>';
-            phoneInput.style.borderColor = '#198754';
-        }
-
-        phoneInput.parentNode.appendChild(msg);
-    }
-
     function showEmailValidation(emailInput, isValid) {
         // Remove existing validation message
         const existingMsg = emailInput.parentNode.querySelector('.email-validation-msg');
@@ -2074,19 +1947,6 @@
             });
         }
 
-        // Admin registration phone validation
-        const adminPhoneInput = document.querySelector('#adminRegisterModal input[name="phone"]');
-        if (adminPhoneInput) {
-            adminPhoneInput.addEventListener('input', function() {
-                const isValid = validatePhone(this.value);
-                showPhoneValidation(this, isValid);
-            });
-            adminPhoneInput.addEventListener('blur', function() {
-                const isValid = validatePhone(this.value);
-                showPhoneValidation(this, isValid);
-            });
-        }
-
         // Customer registration email validation
         const customerEmailInput = document.querySelector('#registerModal input[name="email"]');
         if (customerEmailInput) {
@@ -2099,26 +1959,11 @@
                 showEmailValidation(this, isValid);
             });
         }
-
-        // Customer registration phone validation
-        const customerPhoneInput = document.querySelector('#registerModal input[name="phone"]');
-        if (customerPhoneInput) {
-            customerPhoneInput.addEventListener('input', function() {
-                const isValid = validatePhone(this.value);
-                showPhoneValidation(this, isValid);
-            });
-            customerPhoneInput.addEventListener('blur', function() {
-                const isValid = validatePhone(this.value);
-                showPhoneValidation(this, isValid);
-            });
-        }
     }
 
     // Form validation on submit
     function validateRegistrationForm(form) {
         const emailInput = form.querySelector('input[name="email"]');
-        const phoneInput = form.querySelector('input[name="phone"]');
-
         if (emailInput) {
             const isValid = validateEmailDomain(emailInput.value);
             if (!isValid) {
@@ -2127,16 +1972,6 @@
                 return false;
             }
         }
-
-        if (phoneInput) {
-            const isValid = validatePhone(phoneInput.value);
-            if (!isValid) {
-                showPhoneValidation(phoneInput, false);
-                phoneInput.focus();
-                return false;
-            }
-        }
-
         return true;
     }
 

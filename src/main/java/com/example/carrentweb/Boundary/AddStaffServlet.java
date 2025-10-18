@@ -89,6 +89,12 @@ public class AddStaffServlet extends HttpServlet {
             return;
         }
 
+        // Email validation
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            response.sendRedirect("add-staff.jsp?errorMsg=" + java.net.URLEncoder.encode("Please enter a valid email address", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
         // Check if username already exists
         if (staffDAO.isUsernameExists(username)) {
             response.sendRedirect("add-staff.jsp?errorMsg=" + java.net.URLEncoder.encode("Username already exists", java.nio.charset.StandardCharsets.UTF_8));
@@ -140,6 +146,12 @@ public class AddStaffServlet extends HttpServlet {
         // Phone validation
         if (!phone.matches("\\d{10}")) {
             response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Phone number must be exactly 10 digits", java.nio.charset.StandardCharsets.UTF_8));
+            return;
+        }
+
+        // Email validation
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            response.sendRedirect("admin-crud.jsp?errorMsg=" + java.net.URLEncoder.encode("Please enter a valid email address", java.nio.charset.StandardCharsets.UTF_8));
             return;
         }
 

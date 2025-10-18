@@ -51,6 +51,12 @@ public class AuthController extends HttpServlet {
                     return;
                 }
 
+                // Email validation
+                if (email == null || !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                    response.sendRedirect("cargo-landing.jsp?errorMsg=" + java.net.URLEncoder.encode("Please enter a valid email address", java.nio.charset.StandardCharsets.UTF_8));
+                    return;
+                }
+
                 if ("admin".equals(role)) {
                     // For admin, register in Staff table
                     String position = request.getParameter("position");

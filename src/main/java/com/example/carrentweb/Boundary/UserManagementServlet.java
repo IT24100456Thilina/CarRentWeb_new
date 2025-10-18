@@ -158,6 +158,18 @@ public class UserManagementServlet extends HttpServlet {
             return;
         }
 
+        // Email validation
+        if (email == null || !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            response.sendRedirect("admin-crud.jsp?error=Please enter a valid email address");
+            return;
+        }
+
+        // Email validation
+        if (email == null || !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            response.sendRedirect("admin-crud.jsp?error=Please enter a valid email address");
+            return;
+        }
+
         try {
             // Check if username already exists
             if (userDAO.isUsernameExists(username)) {
